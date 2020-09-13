@@ -4,11 +4,29 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Vendor;
+use App\Package;
 use Response;
+use DB;
 
 class VendorController extends Controller
 {
-    //
+     /**
+     * Display packages page
+     *
+     * @return \Illuminate\View\View
+     */
+    public function vendors_view(Vendor $model)
+    {
+        //$vendor=Vendor::all();
+       // DB::enableQueryLog();
+        $vendor=Vendor::select('vendor.*','package.*')
+        ->join('package', 'package.id', '=', 'vendor.current_package')
+        ->paginate(5);
+        //dd(DB::getQueryLog());
+        return view('pages.vendors',compact('vendor'));
+        //return view('pages.vendors', ['vendor' => $model->paginate(5)]);
+
+    }
     public function create_vendor(Request $request)
     {
         //`vendor`(`id`, `name`, `address`, `location_lat`, `location_long`, `location_maplink`,

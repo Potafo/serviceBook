@@ -23,8 +23,8 @@
                     <p>{{ __('Users') }}</p>
                 </a>
             </li>
-            <li @if ($pageSlug ?? '' == 'vendors')class="active "  @endif>
-                <a href="{{ route('pages.rtl') }}">
+            <li @if ($pageSlug ?? '' == 'vendors') class="active "  @endif>
+                <a href="{{ route('pages.vendors') }}">
                     <i class="tim-icons icon-world"></i>
                     <p>{{ __('Vendors') }}</p>
                 </a>

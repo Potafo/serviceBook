@@ -34,6 +34,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('upgrade', ['as' => 'pages.upgrade', 'uses' => 'PageController@upgrade']);
         Route::get('packages', ['as' => 'pages.packages', 'uses' => 'PackageController@packages_view']);
         Route::get('load_package', 'PackageController@load_package')->name('load_package');
+        Route::get('vendors', ['as' => 'pages.vendors', 'uses' => 'VendorController@vendors_view']);
 });
 
 Route::group(['middleware' => 'auth'], function () {
