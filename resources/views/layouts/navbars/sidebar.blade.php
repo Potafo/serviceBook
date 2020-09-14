@@ -17,19 +17,19 @@
                     <p>{{ __('User Profile') }}</p>
                 </a>
             </li>
-            <li @if ($pageSlug ?? '' == 'users') class="active " @endif>
+            <!--<li @if ($pageSlug ?? '' == 'users') class="active " @endif>
                 <a href="{{ route('user.index') }}">
                     <i class="tim-icons icon-world"></i>
                     <p>{{ __('Users') }}</p>
                 </a>
-            </li>
+            </li>-->
             <li @if ($pageSlug ?? '' == 'vendors') class="active "  @endif>
                 <a href="{{ route('pages.vendors') }}">
                     <i class="tim-icons icon-world"></i>
                     <p>{{ __('Vendors') }}</p>
                 </a>
             </li>
-            <li @if ($pageSlug ?? '' == 'products')class="active " @endif>
+           <!-- <li @if ($pageSlug ?? '' == 'products')class="active " @endif>
                 <a href="{{ route('pages.rtl') }}">
                     <i class="tim-icons icon-world"></i>
                     <p>{{ __('Products') }}</p>
@@ -40,7 +40,7 @@
                     <i class="tim-icons icon-world"></i>
                     <p>{{ __('Categories') }}</p>
                 </a>
-            </li>
+            </li>-->
             <li @if ($pageSlug ?? '' == 'packages') class="active " @endif>
                 <a href="{{ route('pages.packages') }}">
                     <i class="tim-icons icon-world"></i>
