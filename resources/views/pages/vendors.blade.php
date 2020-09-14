@@ -67,8 +67,7 @@
             </thead>
             <tbody>
                 @if(count($vendor)>0)
-                <?php $i=1; ?>
-                    @foreach($vendor as $value)
+                    @foreach($vendor as $key=>$value)
                         <?php
                         $package_days_count=$value->days;
                          $joined_date=date("Y-m-d",strtotime($value->joined_on));
@@ -78,7 +77,7 @@
                         ?>
                         <tr>
                             <td>
-                                {{ $i++ }}
+                                {{ $vendor->firstItem() + $key }}
                             </td>
                             <td>
                                 {{ $value->address }}
