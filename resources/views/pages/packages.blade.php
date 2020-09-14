@@ -64,10 +64,10 @@
             </thead>
             <tbody>
                 @if(count($package)>0)
-                    @foreach($package as $value)
+                    @foreach($package as $key=>$value)
                         <tr>
                             <td>
-                                {{ $value->type }}
+                                {{ $package->firstItem() + $key }}
                             </td>
                             <td>
                                 {{ $value->type }}
