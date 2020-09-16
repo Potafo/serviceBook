@@ -24,3 +24,4 @@ Route::post('insert_products','ProductController@insert_products');
 Route::post('add_service','ServiceController@add_service');
 Route::post('add_customer','CustomerController@add_customer');
 Route::post('add_status','StatusController@add_status');
+Route::post('register','UserController@register_user');
