@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => __('Tables'), 'pageSlug' => 'tables'])
+@extends('layouts.app', ['page' => __('Vendors'), 'pageSlug' => 'vendors'])
 
 @section('content')
 <div class="row">
@@ -11,16 +11,16 @@
 
 
             <div class="col-8">
-                <h4 class="card-title">Package List</h4>
+                <h4 class="card-title">Vendor List</h4>
             </div>
-            <div class="col-4 text-right">
-                <a class="btn btn-sm btn-primary addpackage">Add Package</a>
-            </div>
+           <!-- <div class="col-4 text-right">
+                <a class="btn btn-sm btn-primary addpackage">Add Vendors</a>
+            </div>-->
             <div class="col-8">
                 <nav aria-label="breadcrumb" role="navigation">
                     <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="home">Home</a></li>
-                    <li class="breadcrumb-item "><a href="packages">Packages</a></li>
+                    <li class="breadcrumb-item "><a href="packages">Vendors</a></li>
                     <li class="breadcrumb-item active" aria-current="page" id="bc_current">View</li>
                     </ol>
                 </nav>
@@ -52,31 +52,44 @@
                   Slno
                 </th>
                 <th>
-                  Type
+                  Name
                 </th>
                 <th>
-                  Days
+                  Phone
                 </th>
-                <th class="text-center">
-                  Status
-                </th>
+                <th>
+                    Current package
+                  </th>
+                  <th>
+                    Pending Days
+                  </th>
               </tr>
             </thead>
             <tbody>
-                @if(count($package)>0)
-                    @foreach($package as $key=>$value)
+                @if(count($vendor)>0)
+                    @foreach($vendor as $key=>$value)
+                        <?php
+                        $package_days_count=$value->days;
+                         $joined_date=date("Y-m-d",strtotime($value->joined_on));
+                         $current_date=date("Y-m-d");
+                         $diff=(new DateTime($joined_date))->diff(new DateTime($current_date))->days;
+                         $pending=intval($package_days_count) - intval($diff);
+                        ?>
                         <tr>
                             <td>
-                                {{ $package->firstItem() + $key }}
+                                {{ $vendor->firstItem() + $key }}
                             </td>
                             <td>
+                                {{ $value->address }}
+                            </td>
+                            <td>
+                                {{ $value->contact_number }}
+                            </td>
+                            <td >
                                 {{ $value->type }}
                             </td>
-                            <td>
-                                {{ $value->days }}
-                            </td>
-                            <td class="text-center">
-                                {{ $value->status }}
+                            <td >
+                                {{ $pending }} Days more
                             </td>
                         </tr>
                 @endforeach
@@ -87,7 +100,7 @@
 
         </div>
         <div class="card-footer py-4">
-            {{ $package->links() }}
+            {{ $vendor->links() }}
         </div>
       </div>
 
