@@ -55,6 +55,9 @@
                   Name
                 </th>
                 <th>
+                    Address
+                  </th>
+                <th>
                   Phone
                 </th>
                 <th>
@@ -62,6 +65,9 @@
                   </th>
                   <th>
                     Pending Days
+                  </th>
+                  <th>
+                    Action
                   </th>
               </tr>
             </thead>
@@ -80,6 +86,9 @@
                                 {{ $vendor->firstItem() + $key }}
                             </td>
                             <td>
+                                {{ $value->name }}
+                            </td>
+                            <td>
                                 {{ $value->address }}
                             </td>
                             <td>
@@ -90,6 +99,9 @@
                             </td>
                             <td >
                                 {{ $pending }} Days more
+                            </td>
+                            <td >
+                             <a href="vendor_view/{{ $value->vid }}" >  View </a>
                             </td>
                         </tr>
                 @endforeach
