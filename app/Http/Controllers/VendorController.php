@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Vendor;
 use App\Package;
+use App\RenewalList;
 use Response;
 use DB;
 
@@ -19,7 +20,7 @@ class VendorController extends Controller
     {
         //$vendor=Vendor::all();
        // DB::enableQueryLog();
-        $vendor=Vendor::select('vendor.*','package.*')
+        $vendor=Vendor::select('vendor.*','package.*','vendor.id as vid')
         ->join('package', 'package.id', '=', 'vendor.current_package')
         ->paginate(5);
         //dd(DB::getQueryLog());
@@ -72,5 +73,19 @@ class VendorController extends Controller
             'image' => 'image|mimes:jpeg,png,jpg|max:2048',
             'contact_number' => 'integer',
         ]);
+    }
+    public function vendors_view_fulllist($id)
+    {
+        $vendor=Vendor::select('vendor.*','package.*')
+        ->join('package', 'package.id', '=', 'vendor.current_package')
+        ->where('vendor.id','=',$id)
+        ->paginate(1);
+        //DB::enableQueryLog();
+        $renewal=RenewalList::select("renewal_list.*","package.*")
+        ->join('package', 'package.id', '=', 'renewal_list.package')
+        ->where("renewal_list.vendor_id","=",$id)
+        ->get();
+        //dd(DB::getQueryLog());
+        return view('pages.vendor_view',compact('vendor','renewal'));
     }
 }
