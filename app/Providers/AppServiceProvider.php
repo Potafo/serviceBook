@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\UserType;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->loadUsertype();
     }
 
     /**
@@ -24,5 +26,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+    }
+    private function loadUsertype() {
+        view()->composer(['*'], function($view) {
+            $usertype = UserType::select('type', 'id')
+                ->where('status','Y')
+                ->Where('type','!=' ,'Admin')
+                ->get();
+            $view->with('usertype', $usertype);
+        });
     }
 }

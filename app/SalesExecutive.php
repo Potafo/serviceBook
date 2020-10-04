@@ -4,14 +4,13 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Vendor extends Model
+class SalesExecutive extends Model
 {
-    //
     protected $fillable = [
-        'name', 'mail_id',
+        'name', 'email',
     ];
 
-    protected $table = 'vendor';
+    protected $table = 'sales_executive';
     protected $primaryKey = 'id';
     public $timestamps =false;
 }
