@@ -36,6 +36,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('load_package', 'PackageController@load_package')->name('load_package');
         Route::get('vendors', ['as' => 'vendors.vendors', 'uses' => 'VendorController@vendors_view']);
         Route::get('vendor_view/{id}', ['as' => 'vendors.vendor_view', 'uses' => 'VendorController@vendors_view_fulllist']);
+
 });
 
 Route::group(['middleware' => 'auth'], function () {

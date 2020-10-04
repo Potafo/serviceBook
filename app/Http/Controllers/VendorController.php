@@ -90,6 +90,7 @@ class VendorController extends Controller
         ->join('package', 'package.id', '=', 'renewal_list.package')
         ->where("renewal_list.vendor_id","=",$id)
         ->get();
+
         //dd(DB::getQueryLog());
         return view('vendors.vendor_view',compact('vendor','renewal'));
     }
