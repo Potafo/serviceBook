@@ -18,7 +18,7 @@ class CreateCustomersTable extends Migration {
 			$table->increments('id');
 			$table->string('name', 200);
 			$table->string('contact_number', 100);
-			$table->integer('vendor_id')->index('vendor_customer_id');
+			$table->integer('vendor_id')->unsigned()->index('vendor_customer_id');
 			$table->dateTime('created_at')->nullable();
 			$table->dateTime('modified_at')->nullable();
 		});
