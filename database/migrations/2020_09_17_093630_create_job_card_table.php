@@ -17,9 +17,9 @@ class CreateJobCardTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('user_id')->nullable();
-			$table->integer('vendor_id')->nullable()->index('vendor_job_id');
+			$table->integer('vendor_id')->unsigned()->nullable()->index('vendor_job_id');
 			$table->string('jobcard_number', 100)->nullable();
-			$table->integer('product_id')->nullable()->index('product_job_id');
+			$table->integer('product_id')->unsigned()->nullable()->index('product_job_id');
 			$table->date('date')->nullable();
 			$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
 			$table->timestamp('modified_at')->default(DB::raw('CURRENT_TIMESTAMP'));
