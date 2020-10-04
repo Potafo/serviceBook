@@ -16,9 +16,9 @@ class CreateRenewalListTable extends Migration {
 		Schema::create('renewal_list', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('vendor_id')->nullable()->index('vendor_renewal_id');
+			$table->integer('vendor_id')->unsigned()->nullable()->index('vendor_renewal_id');
 			$table->dateTime('renewal_date')->nullable();
-			$table->integer('package')->nullable()->index('package_renewal_id');
+			$table->integer('package')->unsigned()->nullable()->index('package_renewal_id');
 			$table->bigInteger('amount_paid')->nullable();
 		});
 	}

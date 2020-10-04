@@ -18,7 +18,7 @@ class CreateServiceTable extends Migration {
 			$table->increments('id');
 			$table->string('name', 200);
 			$table->string('type', 100);
-			$table->integer('product_id')->index('product_service_id');
+			$table->integer('product_id')->unsigned()->index('product_service_id');
 			$table->timestamp('created_at')->nullable()->default(DB::raw('CURRENT_TIMESTAMP'));
 			$table->dateTime('modified_at')->nullable();
 		});
