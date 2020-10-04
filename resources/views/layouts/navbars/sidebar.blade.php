@@ -24,7 +24,7 @@
                 </a>
             </li>-->
             <li @if ($pageSlug ?? '' == 'vendors') class="active "  @endif>
-                <a href="{{ route('pages.vendors') }}">
+                <a href="{{ route('vendors.vendors') }}">
                     <i class="tim-icons icon-world"></i>
                     <p>{{ __('Vendors') }}</p>
                 </a>

@@ -13,9 +13,9 @@
             <div class="col-8">
                 <h4 class="card-title">Vendor List</h4>
             </div>
-           <!-- <div class="col-4 text-right">
+           <div class="col-4 text-right">
                 <a class="btn btn-sm btn-primary addpackage">Add Vendors</a>
-            </div>-->
+            </div>
             <div class="col-8">
                 <nav aria-label="breadcrumb" role="navigation">
                     <ol class="breadcrumb">
@@ -67,7 +67,10 @@
                     Pending Days
                   </th>
                   <th>
-                    Action
+                    View
+                  </th>
+                  <th>
+                    Edit
                   </th>
               </tr>
             </thead>
@@ -102,7 +105,12 @@
                             </td>
                             <td >
                              <a href="vendor_view/{{ $value->vid }}" >  View </a>
+
                             </td>
+                            <td >
+
+                                <a href="vendor_view/{{ $value->vid }}" >  Edit </a>
+                               </td>
                         </tr>
                 @endforeach
 

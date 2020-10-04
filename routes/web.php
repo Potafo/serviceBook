@@ -34,8 +34,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('upgrade', ['as' => 'pages.upgrade', 'uses' => 'PageController@upgrade']);
         Route::get('packages', ['as' => 'pages.packages', 'uses' => 'PackageController@packages_view']);
         Route::get('load_package', 'PackageController@load_package')->name('load_package');
-        Route::get('vendors', ['as' => 'pages.vendors', 'uses' => 'VendorController@vendors_view']);
-        Route::get('vendor_view/{id}', ['as' => 'pages.vendor_view', 'uses' => 'VendorController@vendors_view_fulllist']);
+        Route::get('vendors', ['as' => 'vendors.vendors', 'uses' => 'VendorController@vendors_view']);
+        Route::get('vendor_view/{id}', ['as' => 'vendors.vendor_view', 'uses' => 'VendorController@vendors_view_fulllist']);
+
 });
 
 Route::group(['middleware' => 'auth'], function () {

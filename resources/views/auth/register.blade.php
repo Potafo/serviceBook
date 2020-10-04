@@ -65,6 +65,20 @@
                             <input type="email" name="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" placeholder="{{ __('Email') }}">
                             @include('alerts.feedback', ['field' => 'email'])
                         </div>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <i class="tim-icons icon-single-02"></i>
+                                </div>
+                            </div>
+
+                            <select class="form-control" placeholder="{{ __('User Type') }}" name="usertype" id="usertype">
+                                <option value="">Select User Type</option>
+                                    @foreach($usertype as $list)
+			                            <option value="{{$list->id}}">{{$list->type}}</option>
+                                    @endforeach
+                            </select>
+                        </div>
                         <div class="input-group{{ $errors->has('password') ? ' has-danger' : '' }}">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">
