@@ -14,13 +14,13 @@
                 <h4 class="card-title">Vendor List</h4>
             </div>
            <div class="col-4 text-right">
-                <a class="btn btn-sm btn-primary addpackage">Add Vendors</a>
+                <a class="btn btn-sm btn-primary " href="vendor_add">Add Vendors</a>
             </div>
             <div class="col-8">
                 <nav aria-label="breadcrumb" role="navigation">
                     <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="home">Home</a></li>
-                    <li class="breadcrumb-item "><a href="packages">Vendors</a></li>
+                    <li class="breadcrumb-item "><a href="vendors">Vendors</a></li>
                     <li class="breadcrumb-item active" aria-current="page" id="bc_current">View</li>
                     </ol>
                 </nav>
@@ -55,11 +55,14 @@
                   Name
                 </th>
                 <th>
-                    Address
-                  </th>
-                <th>
                   Phone
                 </th>
+                <th>
+                    Category
+                  </th>
+                  <th>
+                    Type
+                  </th>
                 <th>
                     Current package
                   </th>
@@ -83,19 +86,25 @@
                          $current_date=date("Y-m-d");
                          $diff=(new DateTime($joined_date))->diff(new DateTime($current_date))->days;
                          $pending=intval($package_days_count) - intval($diff);
+
+
                         ?>
                         <tr>
                             <td>
                                 {{ $vendor->firstItem() + $key }}
                             </td>
                             <td>
-                                {{ $value->name }}
+                                {{ $value->vname }}
                             </td>
-                            <td>
-                                {{ $value->address }}
-                            </td>
+
                             <td>
                                 {{ $value->contact_number }}
+                            </td>
+                            <td >
+                                {{ $value->vcategory }}
+                            </td>
+                            <td >
+                                {{ $value->vcategory }}
                             </td>
                             <td >
                                 {{ $value->type }}
@@ -109,7 +118,7 @@
                             </td>
                             <td >
 
-                                <a href="vendor_view/{{ $value->vid }}" >  Edit </a>
+                                <a href="vendor_edit/{{ $value->vid }}" >  Edit </a>
                                </td>
                         </tr>
                 @endforeach
