@@ -1,5 +1,9 @@
 @extends('layouts.app', ['page' => __('User Profile'), 'pageSlug' => 'profile'])
-
+<style>
+select > option {
+    color: black;
+}
+    </style>
 @section('content')
     <div class="row">
         <div class="col-md-8">
@@ -7,124 +11,110 @@
                 <div class="card-header">
                     <h5 class="title">{{ __('Details') }}</h5>
                 </div>
-                <form method="post" action="{{ route('profile.update') }}" autocomplete="off">
+                <form method="post" action="{{ route('vendors.update') }}" autocomplete="off">
                     <div class="card-body">
+                            @csrf
+                            @method('put')
 
+                            @include('alerts.success')
+
+                            <div class="form-group{{ $errors->has('name') ? ' has-danger' : '' }}">
+                                <label>{{ __('Name') }}</label>
+                                <input type="text" name="name" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" placeholder="{{ __('Name') }}" value="">
+                                @include('alerts.feedback', ['field' => 'name'])
+                            </div>
+                            <div class="form-group{{ $errors->has('address') ? ' has-danger' : '' }}">
+                                <label>{{ __('Address') }}</label>
+                                <input type="text" name="address" class="form-control{{ $errors->has('address') ? ' is-invalid' : '' }}" placeholder="{{ __('Address') }}" value="">
+                                @include('alerts.feedback', ['field' => 'address'])
+                            </div>
+                            <div class="form-group{{ $errors->has('latitude') ? ' has-danger' : '' }}">
+                                <label>{{ __('Latitude') }}</label>
+                                <input type="text" name="latitude" class="form-control{{ $errors->has('latitude') ? ' is-invalid' : '' }}" placeholder="{{ __('Latitude') }}" value="">
+                                @include('alerts.feedback', ['field' => 'latitude'])
+                            </div>
+                            <div class="form-group{{ $errors->has('longitude') ? ' has-danger' : '' }}">
+                                <label>{{ __('Longitude') }}</label>
+                                <input type="text" name="longitude" class="form-control{{ $errors->has('longitude') ? ' is-invalid' : '' }}" placeholder="{{ __('Longitude') }}" value="">
+                                @include('alerts.feedback', ['field' => 'longitude'])
+                            </div>
+                            <div class="form-group{{ $errors->has('maplink') ? ' has-danger' : '' }}">
+                                <label>{{ __('Map Link') }}</label>
+                                <input type="text" name="maplink" class="form-control{{ $errors->has('maplink') ? ' is-invalid' : '' }}" placeholder="{{ __('Map Link') }}" value="">
+                                @include('alerts.feedback', ['field' => 'maplink'])
+                            </div>
+                            <div class="form-group{{ $errors->has('embed') ? ' has-danger' : '' }}">
+                                <label>{{ __('Embed') }}</label>
+                                <input type="text" name="embed" class="form-control{{ $errors->has('embed') ? ' is-invalid' : '' }}" placeholder="{{ __('Longitude') }}" value="">
+                                @include('alerts.feedback', ['field' => 'embed'])
+                            </div>
+                            <div class="form-group{{ $errors->has('description') ? ' has-danger' : '' }}">
+                                <label>{{ __('Description') }}</label>
+                                <input type="text" name="description" class="form-control{{ $errors->has('description') ? ' is-invalid' : '' }}" placeholder="{{ __('Description') }}" value="">
+                                @include('alerts.feedback', ['field' => 'description'])
+                            </div>
+                            <div class="form-group{{ $errors->has('website') ? ' has-danger' : '' }}">
+                                <label>{{ __('Website') }}</label>
+                                <input type="text" name="website" class="form-control{{ $errors->has('website') ? ' is-invalid' : '' }}" placeholder="{{ __('Website') }}" value="">
+                                @include('alerts.feedback', ['field' => 'website'])
+                            </div>
+                            <div class="form-group{{ $errors->has('email') ? ' has-danger' : '' }}">
+                                <label>{{ __('Email address') }}</label>
+                                <input type="email" name="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" placeholder="{{ __('Email address') }}" value="">
+                                @include('alerts.feedback', ['field' => 'email'])
+                            </div>
+                            <div class="form-group{{ $errors->has('mobile') ? ' has-danger' : '' }}">
+                                <label>{{ __('Mobile') }}</label>
+                                <input type="text" name="mobile" class="form-control{{ $errors->has('mobile') ? ' is-invalid' : '' }}" placeholder="{{ __('Mobile') }}" value="">
+                                @include('alerts.feedback', ['field' => 'mobile'])
+                            </div>
                             <div class="form-group">
-                                <label>{{ __('Refferal By') }} : </label>
-                                <label>{{ $vendor[0]->refferal_by }}</label>
+                                <label>{{ __('Refferal') }}</label>
+                                <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Refferal') }}" name="refferal" id="refferal">
+                                        @foreach($salesexec as $list)
+                                            <option value="{{$list->id}}">{{$list->name}}</option>
+                                        @endforeach
+                                </select>
+                                @include('alerts.feedback', ['field' => 'mobile'])
+                            </div>
+                            <input type="hidden" name="packid" id="packid" value="1">
+                            <div class="form-group">
+                                <label>{{ __('Vendor Category') }}</label>
+                                <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Category') }}" name="category" id="category">
+                                        @foreach($vendorcategory as $list)
+                                            <option value="{{$list->id}}">{{$list->name}}</option>
+                                        @endforeach
+                                </select>
+                                @include('alerts.feedback', ['field' => 'mobile'])
+                            </div>
+                            <div class="form-group">
+                                <label>{{ __('Vendor Type') }}</label>
+                                <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Type') }}" name="type" id="type">
+                                        @foreach($vendortype as $list)
+                                            <option value="{{$list->id}}">{{$list->name}}</option>
+                                        @endforeach
+                                </select>
+                                @include('alerts.feedback', ['field' => 'mobile'])
+                            </div>
+                            <div class="form-group">
+                                <label>{{ __('Digital Profile Status') }}</label>
+                                <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Digital Profile Status') }}" name="dps" id="dps">
+                                            <option value="Active">Active</option>
+                                            <option value="Non Active">Non Active</option>
+                                </select>
+                                @include('alerts.feedback', ['field' => 'mobile'])
                             </div>
 
-                            <div class="form-group">
-                                <label>{{ __('Email') }} : </label>
-                                <label>{{ $vendor[0]->email }}</label>
-                            </div>
-                            <div class="form-group">
-                                <label>{{ __('Website') }} : </label>
-                                <label>{{ $vendor[0]->website }}</label>
-                            </div>
+
                     </div>
-                    <div class="card-footer" style="display: none">
+                    <div class="card-footer">
                         <button type="submit" class="btn btn-fill btn-primary">{{ __('Save') }}</button>
                     </div>
                 </form>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="title">{{ __('Package Details') }}</h5>
-                </div>
 
-                    <div class="card-body">
-
-                        <div class="form-group">
-                            <table class="table tablesorter " id="">
-                                <thead class=" text-primary">
-                                    <th>Slno</th>
-                                    <th>Package Name</th>
-                                    <th>Renewed Date</th>
-                                    <th>Amount</th>
-                                </thead>
-                                @if(count($renewal)>0)
-                                <?php $i=1; ?>
-                                @foreach($renewal as $key=>$value)
-                                <tr>
-                                    <td>{{ $i++  }}</td>
-                                    <td>{{ $value->type }}</td>
-                                    <td>{{ $value->renewal_date }}</td>
-                                    <td>{{ $value->amount_paid }}</td>
-                                </tr>
-                                @endforeach
-                                @endif
-                            </table>
-                        </div>
-
-
-                    </div>
-                    <div class="card-body" style="display: none">
-                        @csrf
-                        @method('put')
-
-                        @include('alerts.success', ['key' => 'password_status'])
-
-                        <div class="form-group{{ $errors->has('old_password') ? ' has-danger' : '' }}">
-                            <label>{{ __('Current Password') }}</label>
-                            <input type="password" name="old_password" class="form-control{{ $errors->has('old_password') ? ' is-invalid' : '' }}" placeholder="{{ __('Current Password') }}" value="" required>
-                            @include('alerts.feedback', ['field' => 'old_password'])
-                        </div>
-
-                        <div class="form-group{{ $errors->has('password') ? ' has-danger' : '' }}">
-                            <label>{{ __('New Password') }}</label>
-                            <input type="password" name="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" placeholder="{{ __('New Password') }}" value="" required>
-                            @include('alerts.feedback', ['field' => 'password'])
-                        </div>
-                        <div class="form-group">
-                            <label>{{ __('Confirm New Password') }}</label>
-                            <input type="password" name="password_confirmation" class="form-control" placeholder="{{ __('Confirm New Password') }}" value="" required>
-                        </div>
-                    </div>
-                    <div class="card-footer" style="display: none">
-                        <button type="submit" class="btn btn-fill btn-primary">{{ __('Change password') }}</button>
-                    </div>
-
-            </div>
         </div>
-        <div class="col-md-4">
-            <div class="card card-user">
-                <div class="card-body">
-                    <p class="card-text">
-                        <div class="author">
-                            <div class="block block-one"></div>
-                            <div class="block block-two"></div>
-                            <div class="block block-three"></div>
-                            <div class="block block-four"></div>
-                            <a href="#">
-                                <img class="avatar" src="{{ asset('black') }}/img/bg5.jpg" alt="">
-                                <h5 class="title">{{ $vendor[0]->name }}</h5>
-                            </a>
-                            <p class="description">
-                                {{ $vendor[0]->contact_number }}
-                            </p>
-                        </div>
-                    </p>
-                    <div class="card-description">
-                        {{ $vendor[0]->description }}
-                    </div>
-                </div>
-               <!-- <div class="card-footer">
-                    <div class="button-container">
-                        <button class="btn btn-icon btn-round btn-facebook">
-                            <i class="fab fa-facebook"></i>
-                        </button>
-                        <button class="btn btn-icon btn-round btn-twitter">
-                            <i class="fab fa-twitter"></i>
-                        </button>
-                        <button class="btn btn-icon btn-round btn-google">
-                            <i class="fab fa-google-plus"></i>
-                        </button>
-                    </div>
-                </div>-->
-            </div>
-        </div>
+
     </div>
 @endsection

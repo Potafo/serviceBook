@@ -7,6 +7,16 @@
                 <div class="card-header">
                     <h5 class="title">{{ __('Details') }}</h5>
                 </div>
+                <div class="col-8">
+                    <nav aria-label="breadcrumb" role="navigation">
+                        <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="home">Home</a></li>
+                        <li class="breadcrumb-item "><a href="../vendors">Vendors</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" id="bc_current">View</li>
+                        </ol>
+                    </nav>
+                </div>
+
                 <form method="post" action="{{ route('profile.update') }}" autocomplete="off">
                     <div class="card-body">
 
