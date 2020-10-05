@@ -20,7 +20,21 @@ class CreateUserTypeTable extends Migration {
 			$table->char('status', 1)->nullable()->default('Y');
 			$table->dateTime('created_at')->nullable();
 			$table->dateTime('modified_at')->nullable();
-		});
+        });
+        $data = [
+            ['type'=>'Admin', 'status'=> 'Y'],
+            ['type'=>'Staff', 'status'=> 'Y'],
+            ['type'=>'Vendor', 'status'=> 'Y'],
+            ['type'=>'Sales_executive', 'status'=> 'Y'],
+        ];
+        DB::table('user_type')->insert($data
+        );
+        /*DB::table('user_type')->insert(
+            array(
+                'type' => 'Admin',
+                'Status' => 'Y'
+            )
+        );*/
 	}
 
 
