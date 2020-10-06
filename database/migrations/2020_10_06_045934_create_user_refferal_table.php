@@ -19,7 +19,8 @@ class CreateUserRefferalTable extends Migration {
 			$table->integer('user_id')->index('user_refferal_user_id_foreign');
 			$table->string('refferal_code');
 			$table->date('used_date');
-			$table->timestamps();
+			$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 		});
 	}
 

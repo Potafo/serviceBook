@@ -18,8 +18,8 @@ class CreateStatusTable extends Migration {
 			$table->increments('id');
 			$table->string('name', 100);
 			$table->char('active', 1)->default('Y');
-			$table->timestamp('created_at')->nullable()->default(DB::raw('CURRENT_TIMESTAMP'));
-			$table->dateTime('modified_at')->nullable();
+			$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 		});
 	}
 

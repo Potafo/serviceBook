@@ -18,8 +18,8 @@ class CreateUserTypeTable extends Migration {
 			$table->increments('id');
 			$table->string('type', 50)->nullable();
 			$table->char('status', 1)->nullable()->default('Y');
-			$table->dateTime('created_at')->nullable();
-			$table->dateTime('modified_at')->nullable();
+			$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
         });
         $data = [
             ['type'=>'Admin', 'status'=> 'Y'],

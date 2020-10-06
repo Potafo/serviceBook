@@ -19,8 +19,8 @@ class CreateCustomersTable extends Migration {
 			$table->string('name', 200);
 			$table->string('contact_number', 100);
 			$table->integer('vendor_id')->unsigned()->index('vendor_customer_id');
-			$table->dateTime('created_at')->nullable();
-			$table->dateTime('modified_at')->nullable();
+			$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 		});
 	}
 

@@ -19,7 +19,9 @@ class CreateRenewalListTable extends Migration {
 			$table->integer('vendor_id')->unsigned()->nullable()->index('vendor_renewal_id');
 			$table->dateTime('renewal_date')->nullable();
 			$table->integer('package')->unsigned()->nullable()->index('package_renewal_id');
-			$table->bigInteger('amount_paid')->nullable();
+            $table->string('amount_paid', 100)->nullable();
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 		});
 	}
 

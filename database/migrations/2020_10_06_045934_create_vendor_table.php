@@ -20,8 +20,8 @@ class CreateVendorTable extends Migration {
 			$table->string('address', 200)->nullable();
 			$table->string('location_lat', 50)->nullable();
 			$table->string('location_long', 50)->nullable();
-			$table->string('location_maplink', 200)->nullable();
-			$table->string('location_embed', 200)->nullable();
+			$table->string('location_maplink', 500)->nullable();
+			$table->string('location_embed', 500)->nullable();
 			$table->string('description', 200)->nullable();
 			$table->string('website', 200)->nullable();
 			$table->string('mail_id', 100)->nullable();
@@ -32,8 +32,11 @@ class CreateVendorTable extends Migration {
 			$table->integer('first_package')->nullable();
 			$table->dateTime('last_renewal_date')->nullable();
 			$table->integer('current_package')->nullable();
-			$table->timestamp('created_at')->nullable()->default(DB::raw('CURRENT_TIMESTAMP'));
-			$table->dateTime('modified_at')->nullable();
+			$table->string('digital_profile_status', 50)->nullable()->default('Active');
+			$table->integer('category')->nullable();
+			$table->integer('type')->nullable();
+			$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 		});
 	}
 

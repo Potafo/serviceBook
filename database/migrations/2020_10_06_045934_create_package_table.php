@@ -19,7 +19,9 @@ class CreatePackageTable extends Migration {
 			$table->string('type', 100)->nullable();
 			$table->string('days', 50)->nullable();
 			$table->char('status', 1)->nullable()->default('Y');
-			$table->bigInteger('amount')->nullable();
+            $table->string('amount', 100)->nullable();
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 		});
 	}
 

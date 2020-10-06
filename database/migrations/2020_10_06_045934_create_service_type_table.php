@@ -17,7 +17,9 @@ class CreateServiceTypeTable extends Migration {
 		{
 			$table->increments('id');
 			$table->string('type', 50);
-			$table->char('status', 1)->default('Y');
+            $table->char('status', 1)->default('Y');
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 		});
 	}
 
