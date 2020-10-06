@@ -29,6 +29,7 @@ class PackageController extends Controller
         $package= new Package();
         $package->type               =$request['package_type'];
         $package->days               =$request['package_days'];
+        $package->amount             =$request['package_amount'];
         $saved=$package->save();
         if ($saved) {
             $savestatus++;

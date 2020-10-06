@@ -57,6 +57,9 @@
                 <th>
                   Days
                 </th>
+                <th>
+                    Amount
+                  </th>
                 <th class="text-center">
                   Status
                 </th>
@@ -74,6 +77,9 @@
                             </td>
                             <td>
                                 {{ $value->days }}
+                            </td>
+                            <td>
+                                {{ $value->amount }}
                             </td>
                             <td class="text-center">
                                 {{ $value->status }}
@@ -95,11 +101,15 @@
         <form>
           <div class="form-group">
             <label for="exampleFormControlInput1">Package Type</label>
-            <input type="email" class="form-control" id="package_type" name="package_type" placeholder="Package Type/Name">
+            <input type="text" class="form-control" id="package_type" name="package_type" placeholder="Package Type/Name">
           </div>
           <div class="form-group">
             <label for="exampleFormControlInput1">Days</label>
-            <input type="email" class="form-control" id="package_days" name="package_days" placeholder="Days">
+            <input type="text" class="form-control" id="package_days" name="package_days" placeholder="Days">
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlInput1">Amount</label>
+            <input type="text" class="form-control" id="package_amount" name="package_amount" placeholder="Amount">
           </div>
           <div class="form-group">
              <div class="col-4 text-right">
@@ -126,6 +136,7 @@
 
                 var package_type=''
                 var package_days='';
+                var package_amount='';
                 if($("#package_type").val() != '')
                     package_type=$("#package_type").val();
                 else{
@@ -141,8 +152,15 @@
                     return false;
                 }
 
+                if($("#package_amount").val() != '')
+                package_amount=$("#package_amount").val();
+                else{
+                    showNotification('warning','top','right','Please add package amount');
+                    return false;
+                }
 
-                var data={"package_type":package_type,"package_days":package_days};
+
+                var data={"package_type":package_type,"package_days":package_days,"package_amount":package_amount};
                 $.ajax({
                     method: "post",
                     url : "api/insert_packages",
