@@ -104,7 +104,7 @@
                                 {{ $value->vcategory }}
                             </td>
                             <td >
-                                {{ $value->vcategory }}
+                                {{ $value->vtype }}
                             </td>
                             <td >
                                 {{ $value->type }}
