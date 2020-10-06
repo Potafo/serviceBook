@@ -22,7 +22,7 @@ class CreateJobCardTable extends Migration {
 			$table->integer('product_id')->unsigned()->nullable()->index('product_job_id');
 			$table->date('date')->nullable();
 			$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-			$table->timestamp('modified_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 		});
 	}
 
