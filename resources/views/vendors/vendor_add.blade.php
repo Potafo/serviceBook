@@ -71,7 +71,8 @@ select > option {
                             <div class="form-group">
                                 <label>{{ __('Refferal') }}</label>
                                 <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Refferal') }}" name="refferal" id="refferal">
-                                        @foreach($salesexec as $list)
+                                    <option value="0">No Refferal</option>
+                                    @foreach($salesexec as $list)
                                             <option value="{{$list->id}}">{{$list->name}}</option>
                                         @endforeach
                                 </select>
