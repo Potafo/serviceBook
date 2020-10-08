@@ -21,7 +21,7 @@ class CreateTrigger extends Migration
         FOR EACH ROW
             begin
                 IF new.user_type ='3' THEN
-                    insert into vendor(name,mail_id) values (new.name, new.email);
+                    insert into vendor(name,mail_id,current_package,category,type) values (new.name, new.email,'1','1','1');
                 ELSEIF new.user_type='4' THEN
                     insert into sales_executive(name,email) values (new.name, new.email);
                 end IF;

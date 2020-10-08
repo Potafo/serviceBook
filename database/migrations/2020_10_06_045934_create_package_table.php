@@ -22,7 +22,14 @@ class CreatePackageTable extends Migration {
             $table->string('amount', 100)->nullable();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
-		});
+        });
+
+        $data = [
+            ['type'=>'Free Trial','days'=>'30', 'status'=> 'Y','amount'=>'0'],
+
+        ];
+        DB::table('package')->insert($data
+        );
 	}
 
 
