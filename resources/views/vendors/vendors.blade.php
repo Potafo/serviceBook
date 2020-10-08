@@ -26,6 +26,7 @@
                 </nav>
             </div>
         </div>
+        @include('alerts.success')
 
         <div class="alert alert-danger" style="display: none">
           <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
@@ -118,7 +119,7 @@
                             </td>
                             <td >
 
-                                <a href="/vendor_edit/{{ $value->vid }}" >  Edit </a>
+                                <a href="vendor_edit/{{ $value->vid }}" >  Edit </a>
                                </td>
                         </tr>
                 @endforeach

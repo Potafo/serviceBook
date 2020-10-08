@@ -11,6 +11,7 @@ use Response;
 use DB;
 use DateTime;
 use DateTimeZone;
+use Illuminate\Support\Facades\Redirect;
 
 class VendorController extends Controller
 {
@@ -19,20 +20,23 @@ class VendorController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function vendors_view(Vendor $model)
+    public function vendor_list_query()
     {
-        //$vendor=Vendor::all();
-       // DB::enableQueryLog();
-
         $vendor=DB::table('vendor')
         ->join('package', 'package.id', '=', 'vendor.current_package')
         ->join('vendor_category', 'vendor_category.id', '=', 'vendor.category')
         ->join('vendor_type', 'vendor_type.id', '=', 'vendor.type')
         ->select('vendor.id as vid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
         ->orderBy('vendor.name', 'ASC')
-        ->paginate(2);
+        ->paginate(5);
+        return $vendor;
+    }
+    public function vendors_view()
+    {
+        //$vendor=Vendor::all();
+       // DB::enableQueryLog();
        // dd(DB::getQueryLog());
-
+        $vendor=$this->vendor_list_query();
       // $vendor=Vendor::table("SELECT *,vendor.id as vid, package.type as pname,vendor_category.name as vcategory,vendor_type.name as vtype FROM `vendor`  join package   ON vendor.current_package=package.id join vendor_type on vendor.type=vendor_type.id JOIN vendor_category on vendor_category.id=vendor.category")->get()->paginate(2);
         return view('vendors.vendors',compact('vendor'));
        // return view('vendors.vendors', ['vendor' => $model->paginate(2)]);
@@ -112,25 +116,33 @@ class VendorController extends Controller
     }
     public function vendors_edit($id)
     {
-        $vendor=Vendor::select('vendor.*','package.*')
+        // $vendor=Vendor::select('vendor.*','package.*')
+        // ->join('package', 'package.id', '=', 'vendor.current_package')
+        // ->where('vendor.id','=',$id)
+        // ->paginate(1);
+        // //DB::enableQueryLog();
+        // $renewal=RenewalList::select("renewal_list.*","package.*")
+        // ->join('package', 'package.id', '=', 'renewal_list.package')
+        // ->where("renewal_list.vendor_id","=",$id)
+        // ->get();
+        $vendor=DB::table('vendor')
         ->join('package', 'package.id', '=', 'vendor.current_package')
+        ->join('vendor_category', 'vendor_category.id', '=', 'vendor.category')
+        ->join('vendor_type', 'vendor_type.id', '=', 'vendor.type')
+        ->select('vendor.*','vendor.id as vid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
+        ->orderBy('vendor.name', 'ASC')
         ->where('vendor.id','=',$id)
-        ->paginate(1);
-        //DB::enableQueryLog();
-        $renewal=RenewalList::select("renewal_list.*","package.*")
-        ->join('package', 'package.id', '=', 'renewal_list.package')
-        ->where("renewal_list.vendor_id","=",$id)
         ->get();
 
         //dd(DB::getQueryLog());
-        return view('vendors.vendor_edit',compact('vendor','renewal'));
+        return view('vendors.vendor_edit',compact('vendor'));
     }
     public function vendors_add()
     {
 
         return view('vendors.vendor_add');
     }
-    public function update(Request $request)
+    public function insert(Request $request)
     {
         //auth()->user()->update($request->all());
         $this->create_vendor($request);
@@ -138,9 +150,53 @@ class VendorController extends Controller
         {
             return back()->withStatus(__('Add Name'));
         }else{
-            return back()->withStatus(__('Vendor successfully updated.'));
+            return Redirect('vendors')->with('status', 'Vendor successfully Added!');
+            //return back()->withStatus(__('Vendor successfully Added.'));
         }
 
+
+    }
+    public function update_sql(Request $request)
+    {
+        //$vendor= new Vendor();
+        $savestatus=1;
+        if($request['name']!="")
+        {
+            $data['name']              =$request['name'];
+            $data['address']           =$request['address'];
+            $data['location_lat']       =$request['latitude'];
+            $data['location_long']      =$request['longitude'];
+            $data['location_maplink']   =$request['maplink'];
+            $data['location_embed']     =$request['embed'];
+            $data['description']        =$request['description'];
+            $data['website']            =$request['website'];
+            $data['mail_id']            =$request['email'];
+            $data['image']              =$request['image'];
+            $data['contact_number']     =$request['mobile'];
+            $data['refferal_by']        =$request['refferal'];
+
+            //$data['first_package']       =$request['packid'];
+            //$data['current_package']     =$request['packid'];
+            $data['category']            =$request['category'];
+            $data['type']                =$request['type'];
+            $data['digital_profile_status']     =$request['dps'];
+
+            $vendor = Vendor::findOrFail($request['vendorid']);
+            $saved=$vendor->update($data);
+            if ($saved) {
+                $savestatus++;
+            }
+        }
+        return $savestatus;
+    }
+    public function update(Request $request)
+    {
+      $updated = $this->update_sql($request);
+        if($updated == '2'){
+            return Redirect('vendors')->with('status', 'Vendor successfully Updated!');
+        }else{
+            return Redirect('vendors')->with('status', 'Sorry!');
+        }
 
     }
 }
