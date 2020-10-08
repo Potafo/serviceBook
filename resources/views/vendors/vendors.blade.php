@@ -107,7 +107,7 @@
                                 {{ $value->vtype }}
                             </td>
                             <td >
-                                {{ $value->type }}
+                                {{ $value->pname }}
                             </td>
                             <td >
                                 {{ $pending }} Days more
@@ -118,7 +118,7 @@
                             </td>
                             <td >
 
-                                <a href="vendor_edit/{{ $value->vid }}" >  Edit </a>
+                                <a href="/vendor_edit/{{ $value->vid }}" >  Edit </a>
                                </td>
                         </tr>
                 @endforeach
