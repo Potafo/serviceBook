@@ -24,9 +24,9 @@ class VendorController extends Controller
         //$vendor=Vendor::all();
        // DB::enableQueryLog();
         $vendor=Vendor::select('vendor.*','package.*','vendor_category.*','vendor_type.*','vendor.id as vid','vendor.name as vname','vendor_category.name as vcategory','vendor_type.name as vtype')
-        ->rightjoin('package', 'package.id', '=', 'vendor.current_package')
-        ->rightjoin('vendor_category', 'vendor_category.id', '=', 'vendor.category')
-        ->rightjoin('vendor_type', 'vendor_category.id', '=', 'vendor.type')
+        ->join('package', 'package.id', '=', 'vendor.current_package')
+        ->join('vendor_category', 'vendor_category.id', '=', 'vendor.category')
+        ->join('vendor_type', 'vendor_category.id', '=', 'vendor.type')
         ->orderBy('vendor.name', 'ASC')
         ->paginate(5);
         //dd(DB::getQueryLog());
