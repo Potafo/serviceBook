@@ -23,15 +23,19 @@ class VendorController extends Controller
     {
         //$vendor=Vendor::all();
        // DB::enableQueryLog();
-        $vendor=Vendor::select('vendor.*','package.*','vendor_category.*','vendor_type.*','vendor.id as vid','vendor.name as vname','vendor_category.name as vcategory','vendor_type.name as vtype')
+
+        $vendor=DB::table('vendor')
         ->join('package', 'package.id', '=', 'vendor.current_package')
         ->join('vendor_category', 'vendor_category.id', '=', 'vendor.category')
-        ->join('vendor_type', 'vendor_category.id', '=', 'vendor.type')
+        ->join('vendor_type', 'vendor_type.id', '=', 'vendor.type')
+        ->select('vendor.id as vid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
         ->orderBy('vendor.name', 'ASC')
-        ->paginate(5);
-        //dd(DB::getQueryLog());
+        ->paginate(2);
+       // dd(DB::getQueryLog());
+
+      // $vendor=Vendor::table("SELECT *,vendor.id as vid, package.type as pname,vendor_category.name as vcategory,vendor_type.name as vtype FROM `vendor`  join package   ON vendor.current_package=package.id join vendor_type on vendor.type=vendor_type.id JOIN vendor_category on vendor_category.id=vendor.category")->get()->paginate(2);
         return view('vendors.vendors',compact('vendor'));
-        //return view('pages.vendors', ['vendor' => $model->paginate(5)]);
+       // return view('vendors.vendors', ['vendor' => $model->paginate(2)]);
 
     }
     public function create_vendor(Request $request)
