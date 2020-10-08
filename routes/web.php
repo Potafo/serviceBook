@@ -38,6 +38,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('vendor_view/{id}', ['as' => 'vendors.vendor_view', 'uses' => 'VendorController@vendors_view_fulllist']);
         Route::get('vendor_edit/{id}', ['as' => 'vendors.vendor_edit', 'uses' => 'VendorController@vendors_edit']);
         Route::get('vendor_add', ['as' => 'vendors.vendor_add', 'uses' => 'VendorController@vendors_add']);
+
 });
 
 Route::group(['middleware' => 'auth'], function () {
@@ -45,6 +46,7 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::get('profile', ['as' => 'profile.edit', 'uses' => 'ProfileController@edit']);
 	Route::put('profile', ['as' => 'profile.update', 'uses' => 'ProfileController@update']);
     Route::put('profile/password', ['as' => 'profile.password', 'uses' => 'ProfileController@password']);
+    Route::put('vendors', ['as' => 'vendors.insert', 'uses' => 'VendorController@insert']);
     Route::put('vendors', ['as' => 'vendors.update', 'uses' => 'VendorController@update']);
 });
 

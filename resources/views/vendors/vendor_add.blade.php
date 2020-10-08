@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => __('User Profile'), 'pageSlug' => 'profile'])
+@extends('layouts.app', ['page' => __('User Profile'), 'pageSlug' => 'vendors'])
 <style>
 select > option {
     color: black;
@@ -11,7 +11,7 @@ select > option {
                 <div class="card-header">
                     <h5 class="title">{{ __('Details') }}</h5>
                 </div>
-                <form method="post" action="{{ route('vendors.update') }}" autocomplete="off">
+                <form method="post" action="{{ route('vendors.insert') }}" autocomplete="off">
                     <div class="card-body">
                             @csrf
                             @method('put')
