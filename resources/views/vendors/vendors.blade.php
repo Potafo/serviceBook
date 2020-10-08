@@ -82,6 +82,10 @@
                 @if(count($vendor)>0)
                     @foreach($vendor as $key=>$value)
                         <?php
+                        $timezone = 'ASIA/KOLKATA';
+                        $date = new DateTime('now', new DateTimeZone($timezone));
+                         //$datetime = $date->format('Y-m-d H:i:s');
+
                         $package_days_count=$value->days;
                          $joined_date=date("Y-m-d",strtotime($value->joined_on));
                          $current_date=date("Y-m-d");
