@@ -5,6 +5,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use DateTime;
+use DateTimeZone;
+use App\User;
+use App\UserLogin;
+use App\Http\Requests\UserRequest;
 
 class LoginController extends Controller
 {
@@ -36,5 +42,13 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+    public function authenticated(Request $request,$user) {
+        $timezone = 'ASIA/KOLKATA';
+        $date = new DateTime('now', new DateTimeZone($timezone));
+        $userlogin=new UserLogin;
+        $userlogin->userid =$user->id;
+        $userlogin->login_time =$date;
+        $userlogin->save();
     }
 }
