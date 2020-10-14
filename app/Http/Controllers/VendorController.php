@@ -212,14 +212,15 @@ class VendorController extends Controller
         if ($saved) {
             $savestatus++;
         }
-    //     if($savestatus>0){
-    //     $status = 'success';
-    //    }else {
-    //     $status = 'fail';
-    //    }
 
-        // $response_code = '200';
-        // return response::json(['status' =>$status,'response_code' =>$response_code]);
+        $timezone = 'ASIA/KOLKATA';
+        $date = new DateTime('now', new DateTimeZone($timezone));
+        $datetime = $date->format('Y-m-d H:i:s');
+        $data['current_package']     =$request['package_to_renew'];
+        $data['last_renewal_date']          =$datetime;
+        $vendor = Vendor::findOrFail($request['vendor_id']);
+        $saved=$vendor->update($data);
+
         return $savestatus;
 
     }
