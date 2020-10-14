@@ -82,12 +82,21 @@
                 @if(count($vendor)>0)
                     @foreach($vendor as $key=>$value)
                         <?php
+                        $timezone = 'ASIA/KOLKATA';
+                        $date = new DateTime('now', new DateTimeZone($timezone));
+                         //$datetime = $date->format('Y-m-d H:i:s');
+
                         $package_days_count=$value->days;
                          $joined_date=date("Y-m-d",strtotime($value->joined_on));
                          $current_date=date("Y-m-d");
                          $diff=(new DateTime($joined_date))->diff(new DateTime($current_date))->days;
                          $pending=intval($package_days_count) - intval($diff);
-
+                        if($pending<0)
+                        {
+                            $pending= "Expired";
+                        }else {
+                            $pending=$pending ." Days more";
+                        }
 
                         ?>
                         <tr>
@@ -111,8 +120,8 @@
                                 {{ $value->pname }}
                             </td>
                             <td >
-                                {{ $pending }} Days more
-                            </td>
+                                {{ $pending }}
+                                                        </td>
                             <td >
                              <a href="vendor_view/{{ $value->vid }}" >  View </a>
 
