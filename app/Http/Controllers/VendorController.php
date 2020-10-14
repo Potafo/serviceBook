@@ -104,15 +104,15 @@ class VendorController extends Controller
         $vendor=Vendor::select('vendor.*','package.*')
         ->join('package', 'package.id', '=', 'vendor.current_package')
         ->where('vendor.id','=',$id)
-        ->paginate(1);
+        ->get();
         //DB::enableQueryLog();
         $renewal=RenewalList::select("renewal_list.*","package.*")
         ->join('package', 'package.id', '=', 'renewal_list.package')
         ->where("renewal_list.vendor_id","=",$id)
-        ->get();
+        ->paginate(5);
 
         //dd(DB::getQueryLog());
-        return view('vendors.vendor_view',compact('vendor','renewal'));
+        return view('vendors.vendor_view',compact('vendor','renewal','id'));
     }
     public function vendors_edit($id)
     {
@@ -196,6 +196,40 @@ class VendorController extends Controller
             return Redirect('vendors')->with('status', 'Vendor successfully Updated!');
         }else{
             return Redirect('vendors')->with('status', 'Sorry!');
+        }
+
+    }
+    public function renewallist(Request $request)
+    {
+    // /`renewal_list`(`id`, `vendor_id`, `renewal_date`, `package`, `amount_paid`
+        $savestatus=1;
+        $renew= new RenewalList();
+        $renew->vendor_id               =$request['vendor_id'];
+        $renew->renewal_date               =date("Y-m-d",strtotime($request['next_renewal']));
+        $renew->package               =$request['package_to_renew'];
+        $renew->amount_paid               =$request['pack_amount_renew'];
+        $saved=$renew->save();
+        if ($saved) {
+            $savestatus++;
+        }
+    //     if($savestatus>0){
+    //     $status = 'success';
+    //    }else {
+    //     $status = 'fail';
+    //    }
+
+        // $response_code = '200';
+        // return response::json(['status' =>$status,'response_code' =>$response_code]);
+        return $savestatus;
+
+    }
+    public function renew(Request $request)
+    {
+      $updated = $this->renewallist($request);
+        if($updated == '2'){
+            return back()->with('status', 'Renewed successfully');
+        }else{
+            return back()->with('status', 'Sorry!');
         }
 
     }

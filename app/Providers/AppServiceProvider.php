@@ -7,6 +7,7 @@ use App\UserType;
 use App\SalesExecutive;
 use App\VendorCategory;
 use App\VendorType;
+use App\Package;
 
 use Illuminate\Support\Facades\Schema;
 
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
          $this->loadSalesExecutive();
          $this->loadVendorCategory();
          $this->loadVendorType();
+         $this->loadPackages();
     }
 
     /**
@@ -65,6 +67,15 @@ class AppServiceProvider extends ServiceProvider
                 ->where('status','Y')
                 ->get();
             $view->with('vendortype', $vendortype);
+        });
+    }
+    private function loadPackages() {
+        view()->composer(['*'], function($view) {
+            $packagetype = Package::select('type', 'id','days','amount')
+                ->where('status','Y')
+                ->where('id','!=',1)
+                ->get();
+            $view->with('packagetype', $packagetype);
         });
     }
 }
