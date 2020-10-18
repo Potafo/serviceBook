@@ -32,8 +32,7 @@ Route::group(['middleware' => 'auth'], function () {
 		Route::get('tables', ['as' => 'pages.tables', 'uses' => 'PageController@tables']);
 		Route::get('typography', ['as' => 'pages.typography', 'uses' => 'PageController@typography']);
         Route::get('upgrade', ['as' => 'pages.upgrade', 'uses' => 'PageController@upgrade']);
-        Route::get('packages', ['as' => 'pages.packages', 'uses' => 'PackageController@packages_view']);
-        Route::get('load_package', 'PackageController@load_package')->name('load_package');
+
         Route::get('vendors', ['as' => 'vendors.vendors', 'uses' => 'VendorController@vendors_view']);
         Route::get('vendor_view/{id}', ['as' => 'vendors.vendor_view', 'uses' => 'VendorController@vendors_view_fulllist']);
         Route::get('vendor_edit/{id}', ['as' => 'vendors.vendor_edit', 'uses' => 'VendorController@vendors_edit']);
@@ -49,5 +48,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('vendors_i', ['as' => 'vendors.insert', 'uses' => 'VendorController@insert']);
     Route::put('vendors_u', ['as' => 'vendors.update', 'uses' => 'VendorController@update']);
     Route::put('vendors_r', ['as' => 'vendors.renew', 'uses' => 'VendorController@renew']);
+    //package
+    Route::put('package_insert', ['as' => 'package.insert', 'uses' => 'PackageController@insert']);
+    Route::get('packages', ['as' => 'package.packages', 'uses' => 'PackageController@packages_view']);
+    Route::get('load_package', 'PackageController@load_package')->name('load_package');
+    Route::get('package_add', function() {
+        return view('package.packages_add');
+    });
+    Route::get('package_edit/{id}', ['as' => 'package.package_edit', 'uses' => 'PackageController@package_edit']);
+    Route::put('package_update', ['as' => 'package.update', 'uses' => 'PackageController@update']);
 });
 

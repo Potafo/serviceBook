@@ -58,7 +58,7 @@
             </li>
 
             <li @if ($pageSlug  == 'packages') class="active " @endif>
-                <a href="{{ route('pages.packages') }}">
+                <a href="{{ route('package.packages') }}">
                     <i class="tim-icons icon-world"></i>
                     <p>{{ __('Packages') }}</p>
                 </a>
