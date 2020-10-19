@@ -15,7 +15,8 @@ class CreateSalesExecutiveTable extends Migration {
 	{
 		Schema::create('sales_executive', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->increments('id');
+            $table->integer('user_id')->nullable();
 			$table->string('name', 100);
 			$table->string('mobile', 50)->nullable();
 			$table->string('email', 100)->nullable();
