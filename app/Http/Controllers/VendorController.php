@@ -7,6 +7,7 @@ use App\Vendor;
 use App\Package;
 use App\RenewalList;
 use App\VendorType;
+use App\UserLogin;
 use Response;
 use DB;
 use DateTime;
@@ -110,9 +111,12 @@ class VendorController extends Controller
         ->join('package', 'package.id', '=', 'renewal_list.package')
         ->where("renewal_list.vendor_id","=",$id)
         ->paginate(5);
-
+        //SELECT MAX(`login_time`) FROM `user_logindetails` WHERE userid='2'
+        $userlogin=UserLogin::select(DB::raw('MAX(user_logindetails.login_time) AS logintime'))
+        ->where("user_logindetails.userid","=",$id)
+        ->get();
         //dd(DB::getQueryLog());
-        return view('vendors.vendor_view',compact('vendor','renewal','id'));
+        return view('vendors.vendor_view',compact('vendor','renewal','id','userlogin'));
     }
     public function vendors_edit($id)
     {

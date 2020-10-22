@@ -39,6 +39,10 @@
                                 <label>{{ __('Website') }} : </label>
                                 <label>{{ $vendor[0]->website }}</label>
                             </div>
+                            <div class="form-group">
+                                <label>{{ __('Last Login') }} : </label>
+                                <label>{{ date("d-m-Y H:i:s",strtotime($userlogin[0]->logintime))  }}</label>
+                            </div>
                     </div>
                     <div class="card-footer" style="display: none">
                         <button type="submit" class="btn btn-fill btn-primary">{{ __('Save') }}</button>
