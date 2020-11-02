@@ -123,12 +123,19 @@
                                 {{ $pending }}
                                                         </td>
                             <td >
-                             <a href="vendor_view/{{ $value->vid }}" >  View </a>
+                                <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
+                                    <a href="vendor_view/{{ $value->vid }}" ><i class="tim-icons icon-single-02"></i></a>
+                                </button>
+
 
                             </td>
                             <td >
-
-                                <a href="vendor_edit/{{ $value->vid }}" >  Edit </a>
+                                <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-icon">
+                                    <a href="vendor_edit/{{ $value->vid }}" ><i class="tim-icons icon-settings"></i> </a>
+                                </button>
+                                {{-- <button type="button" rel="tooltip" class="btn btn-danger btn-sm btn-icon">
+                                    <i class="tim-icons icon-simple-remove"></i>
+                                </button> --}}
                                </td>
                         </tr>
                 @endforeach
