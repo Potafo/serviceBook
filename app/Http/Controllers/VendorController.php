@@ -13,7 +13,11 @@ use DB;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Facades\Redirect;
-
+use Illuminate\Support\Facades\Validator;
+use App\Rules\PhoneNumber;
+use App\Http\Controllers\Auth;
+use App\Http\Controllers\Storage;
+use Illuminate\Support\Str;
 class VendorController extends Controller
 {
      /**
@@ -43,6 +47,26 @@ class VendorController extends Controller
        // return view('vendors.vendors', ['vendor' => $model->paginate(2)]);
 
     }
+    public function valid_data(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:50',
+            'latitude' => 'required|string|max:50',
+            'longitude' => 'required|string|max:50',
+            'email' => 'required|email|max:100',
+            'mobile' => ['required', new PhoneNumber],
+            'shortkey' => 'required|string|max:6',
+            'file' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'name.required' => 'A Vendor name is required',
+            'latitude.required' => 'Latitude is required',
+            'longitude.required' => 'Longitude is required',
+            'email.required' => 'Email is required',
+            'mobile.required' => 'Mobile is required',
+            'shortkey.required' => 'Shortkey is required'
+          ]);
+          return $validator;
+    }
     public function create_vendor(Request $request)
     {
         //`vendor`(`id`, `name`, `address`, `location_lat`, `location_long`, `location_maplink`, `location_embed`,
@@ -65,7 +89,7 @@ class VendorController extends Controller
             $vendor->description        =$request['description'];
             $vendor->website            =$request['website'];
             $vendor->mail_id            =$request['email'];
-            $vendor->image              =$request['image'];
+            //$vendor->image              =$request['image'];
             $vendor->contact_number     =$request['mobile'];
             $vendor->refferal_by        =$request['refferal'];
             $vendor->joined_on           =$datetime;
@@ -74,6 +98,30 @@ class VendorController extends Controller
             $vendor->category            =$request['category'];
             $vendor->type                =$request['type'];
             $vendor->digital_profile_status     =$request['dps'];
+            $vendor->shortkey       =$request['shortkey'];
+
+
+
+            // Check if a profile image has been uploaded
+            if ($request->has('file')) {
+                // Get image file
+                $image = $request->file('file');
+                // Make a image name based on user name and current timestamp
+                $name = Str::slug($request->input('name')).'_'.time();
+                // Define folder path
+                $folder = 'uploads/vendor_logo/';
+                // Make a file path where image will be stored [ folder path + file name + file extension]
+                $filePath = $folder . $name. '.' . $image->getClientOriginalExtension();
+                // Upload image
+                //$this->uploadOne($image, $folder, 'public', $name);
+                $filename=$name;
+                $name = !is_null($filename) ? $filename : Str::random(25);
+
+                $file = $image->storeAs($folder, $name.'.'.$image->getClientOriginalExtension(), 'public');
+
+                // Set user profile image path in database to filePath
+                $vendor->image=$filePath;
+            }
 
 
             $saved=$vendor->save();
@@ -92,14 +140,7 @@ class VendorController extends Controller
 
     }
 
-    private function validate_data($request, $id = null)
-    {
-        return $request->validate([
-            'name' => 'required|unique:name,' . $id,
-            'image' => 'image|mimes:jpeg,png,jpg|max:2048',
-            'contact_number' => 'integer',
-        ]);
-    }
+
     public function vendors_view_fulllist($id)
     {
         $vendor=Vendor::select('vendor.*','package.*')
@@ -146,17 +187,31 @@ class VendorController extends Controller
 
         return view('vendors.vendor_add');
     }
+
     public function insert(Request $request)
     {
-        //auth()->user()->update($request->all());
-        $this->create_vendor($request);
-        if($request['name']=="")
-        {
-            return back()->withStatus(__('Add Name'));
-        }else{
+// /regex:/(0)[0-9]/|not_regex:/[a-z]/
+        $validator=$this->valid_data($request);
+          //ALTER TABLE `vendor` ADD `shortkey` VARCHAR(6) NULL AFTER `name`;
+        if($validator->fails()) {
+             $errors = $validator->errors();
+             return Redirect()->back()->with('errors',$errors)->withInput($request->all());
+
+        }else {
+            $this->create_vendor($request);
             return Redirect('vendors')->with('status', 'Vendor successfully Added!');
-            //return back()->withStatus(__('Vendor successfully Added.'));
         }
+
+
+
+
+        // $this->create_vendor($request);
+        // if($request['name']=="")
+        // {
+        //     return back()->withStatus(__('Add Name'));
+        // }else{
+        //     return Redirect('vendors')->with('status', 'Vendor successfully Added!');
+        // }
 
 
     }
@@ -164,8 +219,7 @@ class VendorController extends Controller
     {
         //$vendor= new Vendor();
         $savestatus=1;
-        if($request['name']!="")
-        {
+
             $data['name']              =$request['name'];
             $data['address']           =$request['address'];
             $data['location_lat']       =$request['latitude'];
@@ -178,6 +232,7 @@ class VendorController extends Controller
             $data['image']              =$request['image'];
             $data['contact_number']     =$request['mobile'];
             $data['refferal_by']        =$request['refferal'];
+            $data['shortkey']           =$request['shortkey'];
 
             //$data['first_package']       =$request['packid'];
             //$data['current_package']     =$request['packid'];
@@ -185,22 +240,53 @@ class VendorController extends Controller
             $data['type']                =$request['type'];
             $data['digital_profile_status']     =$request['dps'];
 
+
+
+            // Check if a profile image has been uploaded
+            if ($request->has('file')) {
+                // Get image file
+                $image = $request->file('file');
+                // Make a image name based on user name and current timestamp
+                $name = Str::slug($request->input('name')).'_'.time();
+                // Define folder path
+                $folder = 'uploads/vendor_logo/';
+                // Make a file path where image will be stored [ folder path + file name + file extension]
+                $filePath = $folder . $name. '.' . $image->getClientOriginalExtension();
+                // Upload image
+                //$this->uploadOne($image, $folder, 'public', $name);
+                $filename=$name;
+                $name = !is_null($filename) ? $filename : Str::random(25);
+
+                $file = $image->storeAs($folder, $name.'.'.$image->getClientOriginalExtension(), 'public');
+
+                // Set user profile image path in database to filePath
+                $data['image']=$filePath;
+            }
+
+
+
             $vendor = Vendor::findOrFail($request['vendorid']);
             $saved=$vendor->update($data);
             if ($saved) {
                 $savestatus++;
             }
-        }
+
         return $savestatus;
     }
     public function update(Request $request)
     {
-      $updated = $this->update_sql($request);
-        if($updated == '2'){
-            return Redirect('vendors')->with('status', 'Vendor successfully Updated!');
-        }else{
-            return Redirect('vendors')->with('status', 'Sorry!');
-        }
+        $validator=$this->valid_data($request);
+        if($validator->fails()) {
+            $errors = $validator->errors();
+            return Redirect()->back()->with('errors',$errors)->withInput($request->all());
+
+       }else {
+        $updated = $this->update_sql($request);
+           return Redirect('vendors')->with('status', 'Vendor Updated successfully!');
+       }
+
+
+
 
     }
     public function renewallist(Request $request)
