@@ -56,6 +56,12 @@
                     </ul>
                 </div>
             </li>
+            <li @if ($pageSlug  == 'jobcard') class="active " @endif>
+                <a href="{{ route('jobcard.jobcard')  }}">
+                    <i class="tim-icons icon-single-02"></i>
+                    <p>{{ __('Job Card') }}</p>
+                </a>
+            </li>
 
             <li @if ($pageSlug  == 'packages') class="active " @endif>
                 <a href="{{ route('package.packages') }}">

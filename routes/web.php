@@ -66,5 +66,14 @@ Route::group(['middleware' => 'auth'], function () {
     });
     Route::get('package_edit/{id}', ['as' => 'package.package_edit', 'uses' => 'PackageController@package_edit']);
     Route::put('package_update', ['as' => 'package.update', 'uses' => 'PackageController@update']);
+
+    //jobcard
+    Route::get('jobcard', ['as' => 'jobcard.jobcard', 'uses' => 'JobcardController@jobcard_view']);
+    Route::get('jobcard_add', function() {
+        return view('jobcard.jobcard_add');
+    });
+    Route::put('jobcard_insert', ['as' => 'jobcard.insert', 'uses' => 'JobcardController@insert']);
+    Route::get('jobcard_edit/{id}', ['as' => 'jobcard.jobcard_edit', 'uses' => 'JobcardController@jobcard_edit']);
+    Route::put('jobcard_update', ['as' => 'jobcard.update', 'uses' => 'JobcardController@update']);
 });
 

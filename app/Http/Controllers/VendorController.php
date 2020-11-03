@@ -15,9 +15,10 @@ use DateTimeZone;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use App\Rules\PhoneNumber;
-use App\Http\Controllers\Auth;
+//use App\Http\Controllers\Auth;
 use App\Http\Controllers\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 class VendorController extends Controller
 {
      /**
@@ -27,13 +28,20 @@ class VendorController extends Controller
      */
     public function vendor_list_query()
     {
-        $vendor=DB::table('vendor')
+        $logged_user_id = Auth::id();
+        $rows1=DB::table('vendor')
         ->join('package', 'package.id', '=', 'vendor.current_package')
         ->join('vendor_category', 'vendor_category.id', '=', 'vendor.category')
         ->join('vendor_type', 'vendor_type.id', '=', 'vendor.type')
         ->select('vendor.id as vid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
-        ->orderBy('vendor.name', 'ASC')
-        ->paginate(5);
+        ->orderBy('vendor.name', 'ASC');
+        if($logged_user_id=="1")
+        {
+            $vendor=$rows1->paginate(5);
+        }else{
+           $vendor= $rows1->where('vendor.user_id','=',$logged_user_id)
+            ->paginate(5);
+        }
         return $vendor;
     }
     public function vendors_view()
@@ -80,7 +88,9 @@ class VendorController extends Controller
         $vendor= new Vendor();
         if($request['name']!="")
         {
+            $logged_user_id = Auth::id();
             $vendor->name               =$request['name'];
+            $vendor->user_id            =$logged_user_id;
             $vendor->address            =$request['address'];
             $vendor->location_lat       =$request['latitude'];
             $vendor->location_long      =$request['longitude'];
