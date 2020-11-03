@@ -27,3 +27,5 @@ Route::post('add_status','StatusController@add_status');
 Route::post('insert_packages','PackageController@insert_packages');
 Route::post('insert_jobcard','JobcardController@insert_jobcard');
 Route::post('register','UserController@register_user');
+
+Route::post('product_list', 'JobcardController@getProductList');
