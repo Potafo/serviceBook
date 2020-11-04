@@ -47,11 +47,6 @@ class JobcardController extends Controller
         ->select('vendor.name as vname','products.name as pdtname' ,'job_card.id as jobid','job_card.*')
         ->orderBy('job_card.date', 'ASC')
         ->paginate(5);
-
-
-
-
-
         return view('jobcard.jobcard', compact('jobcard'));
         //return view('snippets/salary_report_tile')->with(['staff_data' => $staff_data, 'pagination' => '']);
     }
@@ -120,7 +115,7 @@ class JobcardController extends Controller
             return Redirect()->back()->with('errors',$errors)->withInput($request->all());
 
        }else {
-       // $updated = $this->update_sql($request);
+       $updated = $this->update_sql($request);
            return Redirect('jobcard')->with('status', 'Job card Updated successfully!');
        }
 
@@ -133,8 +128,8 @@ class JobcardController extends Controller
            //$data['name']              =$request['jobcard_id'];
             $data['product_id']           =$request['product_list'];
             $data['vendor_id']       =$request['vendor_name'];
-            $vendor = Jobcard::findOrFail($request['jobcard_id']);
-            $saved=$vendor->update($data);
+            $jobcard = Jobcard::findOrFail($request['jobcard_id']);
+            $saved=$jobcard->update($data);
             if ($saved) {
                 $savestatus++;
             }
