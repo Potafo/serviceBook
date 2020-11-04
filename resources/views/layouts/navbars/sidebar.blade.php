@@ -5,26 +5,21 @@
             <a href="#" class="simple-text logo-normal">{{ __('Service Book') }}</a>
         </div>
         <ul class="nav">
+            @if(Session::get('logged_user_type') == "1")
             <li @if ($pageSlug  == 'dashboard') class="active " @endif>
                 <a href="{{ route('home') }}">
                     <i class="tim-icons icon-chart-pie-36"></i>
                     <p>{{ __('Dashboard') }}</p>
                 </a>
             </li>
+            @endif
+
             <li @if ($pageSlug  == 'profile') class="active " @endif>
                 <a href="{{ route('profile.edit')  }}">
                     <i class="tim-icons icon-single-02"></i>
                     <p>{{ __('User Profile') }}</p>
                 </a>
             </li>
-
-
-            {{-- <li @if ($pageSlug ?? '' == 'vendors') class="active "  @endif>
-                <a href="{{ route('vendors.vendors') }}">
-                    <i class="tim-icons icon-world"></i>
-                    <p>{{ __('Vendors') }}</p>
-                </a>
-            </li> --}}
 
             <li>
                 <a data-toggle="collapse" href="#vendor_tab" aria-expanded="true">
@@ -62,14 +57,21 @@
                     <p>{{ __('Job Card') }}</p>
                 </a>
             </li>
+            <li @if ($pageSlug  == 'products') class="active " @endif>
+                <a href="{{ route('products.products')  }}">
+                    <i class="tim-icons icon-single-02"></i>
+                    <p>{{ __('Products') }}</p>
+                </a>
+            </li>
 
+            @if(Session::get('logged_user_type') == "1")
             <li @if ($pageSlug  == 'packages') class="active " @endif>
                 <a href="{{ route('package.packages') }}">
                     <i class="tim-icons icon-world"></i>
                     <p>{{ __('Packages') }}</p>
                 </a>
             </li>
-
+            @endif
 
 
 

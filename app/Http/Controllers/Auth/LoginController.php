@@ -12,6 +12,7 @@ use App\User;
 use App\UserLogin;
 use App\Http\Requests\UserRequest;
 use Session;
+use App\Vendor;
 
 class LoginController extends Controller
 {
@@ -52,5 +53,13 @@ class LoginController extends Controller
         $userlogin->login_time =$date;
         $userlogin->save();
         Session::put('logged_user_id', $user->id);
+        Session::put('logged_user_type', $user->user_type);
+        if($user->user_type == '3')
+        {
+            $vendor_id=Vendor::select('vendor.id')
+            ->where('vendor.user_id','=',$user->id)
+            ->get();
+            Session::put('logged_vendor_id', $vendor_id[0]->id);
+        }
     }
 }

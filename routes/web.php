@@ -75,5 +75,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('jobcard_insert', ['as' => 'jobcard.insert', 'uses' => 'JobcardController@insert']);
     Route::get('jobcard_edit/{id}', ['as' => 'jobcard.jobcard_edit', 'uses' => 'JobcardController@jobcard_edit']);
     Route::put('jobcard_update', ['as' => 'jobcard.update', 'uses' => 'JobcardController@update']);
+
+    //products
+    Route::get('products', ['as' => 'products.products', 'uses' => 'ProductController@products_view']);
+    Route::get('products_add', function() {
+        return view('products.products_add');
+    });
+    Route::put('products_insert', ['as' => 'products.insert', 'uses' => 'ProductController@insert']);
+    Route::get('products_edit/{id}', ['as' => 'products.products_edit', 'uses' => 'ProductController@products_edit']);
+    Route::put('products_update', ['as' => 'products.update', 'uses' => 'ProductController@update']);
 });
 

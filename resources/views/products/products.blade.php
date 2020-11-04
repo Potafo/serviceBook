@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => __('Job Card'), 'pageSlug' => 'jobcard'])
+@extends('layouts.app', ['page' => __('Products'), 'pageSlug' => 'products'])
 
 @section('content')
 <div class="row">
@@ -11,16 +11,16 @@
 
 
             <div class="col-8">
-                <h4 class="card-title">Job Card List</h4>
+                <h4 class="card-title">Products List</h4>
             </div>
             <div class="col-4 text-right">
-                <a class="btn btn-sm btn-primary addpackage" href="jobcard_add">Add Job Card</a>
+                <a class="btn btn-sm btn-primary addpackage" href="products_add">Add Products</a>
             </div>
             <div class="col-8">
                 <nav aria-label="breadcrumb" role="navigation">
                     <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="home">Home</a></li>
-                    <li class="breadcrumb-item "><a href="jobcard">JobCard</a></li>
+                    <li class="breadcrumb-item "><a href="products">Products</a></li>
                     <li class="breadcrumb-item active" aria-current="page" id="bc_current">View</li>
                     </ol>
                 </nav>
@@ -39,40 +39,38 @@
                   Slno
                 </th>
                 <th>
-                  JobCard Number
+                  Name
                 </th>
                 <th>
-                  Vendor
-                </th>
-                <th>
-                    Product
+                    Image
                   </th>
-
                 <th >
                     Action
                   </th>
               </tr>
             </thead>
             <tbody>
-                @if(count($jobcard)>0)
-                    @foreach($jobcard as $key=>$value)
+                @if(count($products)>0)
+                    @foreach($products as $key=>$value)
                         <tr>
                             <td>
-                                {{ $jobcard->firstItem() + $key }}
-                            </td>
-                            <td>
-                                {{ $value->jobcard_number }}
-                            </td>
-                            <td>
-                                {{ $value->pdtname }}
-                            </td>
-                            <td>
-                                {{ $value->vname }}
+                                {{ $products->firstItem() + $key }}
                             </td>
 
+                            <td>
+                                {{ $value->name }}
+                            </td>
+                            <td>
+                                <?php
+                                $url =Storage::url('app/public/'.$value->image);
+                                ?>
+                                <div  style="width:30%; height:30%" >
+                                    <a href='{{ url($url) }}' target="_blank" >Image</a>
+                                </div>
+                            </td>
                             <td >
                                 <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
-                                    <a href="jobcard_edit/{{ $value->jobid }}" ><i class="tim-icons icon-settings"></i></a>
+                                    <a href="products_edit/{{ $value->id }}" ><i class="tim-icons icon-settings"></i></a>
                                 </button>
 
 
@@ -86,7 +84,7 @@
 
         </div>
         <div class="card-footer py-4">
-            {{ $jobcard->links() }}
+            {{ $products->links() }}
         </div>
       </div>
 

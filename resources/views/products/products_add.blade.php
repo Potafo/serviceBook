@@ -9,18 +9,18 @@ select > option {
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="title">{{ __('Add Jobcard') }}</h5>
+                    <h5 class="title">{{ __('Add Products') }}</h5>
                 </div>
                 <div class="col-8">
                     <nav aria-label="breadcrumb" role="navigation">
                         <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="home">Home</a></li>
-                        <li class="breadcrumb-item "><a href="jobcard">Job Card</a></li>
+                        <li class="breadcrumb-item "><a href="Products">Products</a></li>
                         <li class="breadcrumb-item active" aria-current="page" id="bc_current">Add</li>
                         </ol>
                     </nav>
                 </div>
-                <form method="post" action="{{ route('jobcard.insert') }}" autocomplete="off">
+                <form method="post" action="{{ route('products.insert') }}" autocomplete="off" enctype="multipart/form-data">
                     <div class="card-body">
                     @csrf
                     @method('put')
@@ -28,27 +28,14 @@ select > option {
                     @include('alerts.success')
                     <input type="hidden" name="user_id" id="user_id" value="{{  Session::get('logged_user_id') }}" >
                   <div class="form-group">
-                    <label for="exampleFormControlInput1">JobCard Number{{ Session::get('logged_user_type') }}</label>
-                    <input type="text" class="form-control{{ $errors->has('jobcardnumber') ? ' is-invalid' : '' }}"  id="jobcardnumber" name="jobcardnumber" placeholder="Job Card Number" value="{{ old('jobcardnumber','JCN'.mt_rand(1000000,99999999)) }}">
-                    @include('alerts.feedback', ['field' => 'jobcardnumber'])
+                    <label for="exampleFormControlInput1">Product Name</label>
+                    <input type="text" class="form-control{{ $errors->has('productname') ? ' is-invalid' : '' }}"  id="productname" name="productname" placeholder="Product Name" value="{{ old('productname') }}">
+                    @include('alerts.feedback', ['field' => 'productname'])
                   </div>
-                  <div class="form-group">
-                    <label>{{ __('Vendors') }}</label>
-                    <select class="form-control{{ $errors->has('vendor_name') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Vendors') }}" name="vendor_name" id="vendor_name" value="{{ old('vendor_name') }}">
-                        <option value="">Select Vendor</option>
-                        @foreach($vendor_list as $list)
-                                <option value="{{$list->id}}">{{$list->name}}</option>
-                            @endforeach
-                    </select>
-                    @include('alerts.feedback', ['field' => 'vendor_name'])
-                </div>
-                <div class="form-group">
-                    <label>{{ __('Products') }}</label>
-                    <select class="form-control{{ $errors->has('product_list') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Products') }}" name="product_list" id="product_list" value="{{ old('product_list') }}">
-                        <option value="">Select Products</option>
-                    </select>
-                    @include('alerts.feedback', ['field' => 'product_list'])
-                </div>
+                  <label>{{ __('Product Image') }}</label>
+                  <input type="file" name="file" class="form-control{{ $errors->has('file') ? ' is-invalid' : '' }}" />
+                  @include('alerts.feedback', ['field' => 'file'])
+
                   <div class="form-group">
                      <div class="col-4 text-right">
                         <button type="submit" class="btn btn-fill btn-primary">{{ __('Save') }}</button>
