@@ -94,7 +94,9 @@
 
         </div>
         <div class="card-footer py-4">
+            @if(count($products)>0)
             {{ $products->links() }}
+            @endif
         </div>
       </div>
 
