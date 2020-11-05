@@ -18,8 +18,12 @@ class ProductController extends Controller
         $savestatus=0;
         $product= new Product();
         $product->name               =$request['productname'];
-        //$product->image              =$request['image'];
-        $product->vendor_id          =Session::get('logged_vendor_id');
+
+        if(Session::get('logged_user_type') =='3')
+            $product->vendor_id          =Session::get('logged_vendor_id');
+        else if(Session::get('logged_user_type') =='1')
+            $product->vendor_id          =$request['vendor_name'];
+
         // Check if a profile image has been uploaded
         if ($request->has('file')) {
             // Get image file
@@ -59,13 +63,28 @@ class ProductController extends Controller
     }
     public function products_view(Product $model)
     {
-        $vendor_id=Session::get('logged_vendor_id');
+
         //$products=Product::all();
-        $products=Product::select('products.*')
-            ->where('products.vendor_id','=',$vendor_id)
+        // $products=Product::select('products.*')
+        //     ->where('products.vendor_id','=',$vendor_id)
+        //     ->paginate(5);
+
+        $rows1=DB::table('products');
+        if(Session::get('logged_user_type') =='3')
+        {
+            $vendor_id=Session::get('logged_vendor_id');
+            $products= $rows1->where('products.vendor_id','=',$vendor_id)
+                ->paginate(5);
+        }
+        else if(Session::get('logged_user_type') =='1')
+        {
+            $products=$rows1->join('vendor', 'vendor.id', '=', 'products.vendor_id')
+            ->select('products.*','vendor.name as vname')
             ->paginate(5);
-        return view('products.products',compact('products'));
-        //return view('snippets/salary_report_tile')->with(['staff_data' => $staff_data, 'pagination' => '']);
+        }
+
+       return view('products.products',compact('products'));
+
     }
     public function validate_data(Request $request)
     {
@@ -120,6 +139,11 @@ class ProductController extends Controller
 
            //$data['name']              =$request['jobcard_id'];
            $data['name']           =$request['productname'];
+
+           if(Session::get('logged_user_type') =='1')
+            $data['vendor_id']          =$request['vendor_name'];
+
+
         //    / $data['product_id']           =$request['productname'];
             // Check if a profile image has been uploaded
             if ($request->has('file')) {
