@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => __('Job Card'), 'pageSlug' => 'jobcard'])
+@extends('layouts.app', ['page' => __('Products'), 'pageSlug' => 'products'])
 <style>
 select > option {
     color: black;

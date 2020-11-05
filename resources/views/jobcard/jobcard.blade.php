@@ -41,9 +41,11 @@
                 <th>
                   JobCard Number
                 </th>
+                @if(Session::get('logged_user_type') =='1')
                 <th>
                   Vendor
                 </th>
+                @endif
                 <th>
                     Product
                   </th>
@@ -63,12 +65,15 @@
                             <td>
                                 {{ $value->jobcard_number }}
                             </td>
-                            <td>
-                                {{ $value->pdtname }}
-                            </td>
+                            @if(Session::get('logged_user_type') =='1')
                             <td>
                                 {{ $value->vname }}
                             </td>
+                            @endif
+                            <td>
+                                {{ $value->pdtname }}
+                            </td>
+
 
                             <td >
                                 <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">

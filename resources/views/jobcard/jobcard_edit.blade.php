@@ -33,20 +33,25 @@ select > option {
                     <input type="text" class="form-control{{ $errors->has('jobcardnumber') ? ' is-invalid' : '' }}"  id="jobcardnumber" name="jobcardnumber" placeholder="Job Card Number" value="{{ old('jobcardnumber',$jobcard[0]->jobcard_number) }}" readonly="true">
                     @include('alerts.feedback', ['field' => 'jobcardnumber'])
                   </div>
+                  @if(Session::get('logged_user_type') =='1')
                   <div class="form-group">
                     <label>{{ __('Vendors') }}</label>
                     <select class="form-control{{ $errors->has('vendor_name') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Vendors') }}" name="vendor_name" id="vendor_name" >
                         <option value="">Select Vendor</option>
                         @foreach($vendor_list as $list)
-                                <option value="{{$list->id}}">{{$list->name}}</option>
+                                <option value="{{$list->id}}" @if($jobcard[0]->vendor_id==$list->id) selected @endif>{{$list->name}}</option>
                             @endforeach
                     </select>
                     @include('alerts.feedback', ['field' => 'vendor_name'])
                 </div>
+                @endif
                 <div class="form-group">
                     <label>{{ __('Products') }}</label>
                     <select class="form-control{{ $errors->has('product_list') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Products') }}" name="product_list" id="product_list" >
                         <option value="">Select Products</option>
+                        @foreach($products as $list)
+                        <option value="{{$list->id}}" @if($jobcard[0]->product_id==$list->id) selected @endif>{{$list->name}}</option>
+                    @endforeach
                     </select>
                     @include('alerts.feedback', ['field' => 'product_list'])
                 </div>
