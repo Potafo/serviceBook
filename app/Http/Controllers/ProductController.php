@@ -70,7 +70,7 @@ class ProductController extends Controller
         //     ->paginate(5);
 
         $rows1=DB::table('products');
-        $products='';
+        $products=array();
         if(Session::get('logged_user_type') =='3')
         {
             $vendor_id=Session::get('logged_vendor_id');
