@@ -28,7 +28,7 @@ select > option {
                     @include('alerts.success')
                     <input type="hidden" name="user_id" id="user_id" value="{{  Session::get('logged_user_id') }}" >
                   <div class="form-group">
-                    <label for="exampleFormControlInput1">JobCard Number{{ Session::get('logged_user_type') }}</label>
+                    <label for="exampleFormControlInput1">JobCard Number</label>
                     <input type="text" class="form-control{{ $errors->has('jobcardnumber') ? ' is-invalid' : '' }}"  id="jobcardnumber" name="jobcardnumber" placeholder="Job Card Number" value="{{ old('jobcardnumber','JCN'.mt_rand(1000000,99999999)) }}">
                     @include('alerts.feedback', ['field' => 'jobcardnumber'])
                   </div>
