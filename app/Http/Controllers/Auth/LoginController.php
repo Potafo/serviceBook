@@ -54,12 +54,15 @@ class LoginController extends Controller
         $userlogin->save();
         Session::put('logged_user_id', $user->id);
         Session::put('logged_user_type', $user->user_type);
-        if($user->user_type == '3')
+        if($user->user_type == '3') // vendor
         {
             $vendor_id=Vendor::select('vendor.id')
             ->where('vendor.user_id','=',$user->id)
             ->get();
             Session::put('logged_vendor_id', $vendor_id[0]->id);
+        }else if($user->user_type == '1') // admin
+        {
+            Session::put('logged_vendor_id', '');
         }
     }
 }

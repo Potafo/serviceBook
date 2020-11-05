@@ -41,6 +41,11 @@
                 <th>
                   Name
                 </th>
+                @if(Session::get('logged_user_type') =='1')
+                <th>
+                    Vendor
+                  </th>
+                @endif
                 <th>
                     Image
                   </th>
@@ -60,6 +65,11 @@
                             <td>
                                 {{ $value->name }}
                             </td>
+                            @if(Session::get('logged_user_type') =='1')
+                            <td>
+                                {{ $value->vname }}
+                            </td>
+                            @endif
                             <td>
                                 <?php
                                 $url =Storage::url('app/public/'.$value->image);
