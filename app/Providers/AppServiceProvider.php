@@ -8,6 +8,7 @@ use App\SalesExecutive;
 use App\VendorCategory;
 use App\VendorType;
 use App\Package;
+use App\ServiceType;
 use App\Vendor;
 
 use Illuminate\Support\Facades\Schema;
@@ -27,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
          $this->loadVendorType();
          $this->loadPackages();
          $this->loadVendors();
+         $this->loadServicetype();
     }
 
     /**
@@ -85,6 +87,13 @@ class AppServiceProvider extends ServiceProvider
             $vendor_list = Vendor::select('name', 'id')
                 ->get();
             $view->with('vendor_list', $vendor_list);
+        });
+    }
+    private function loadServicetype() {
+        view()->composer(['*'], function($view) {
+            $servicetype = ServiceType::select('name', 'id')
+                ->get();
+            $view->with('servicetype', $servicetype);
         });
     }
 }

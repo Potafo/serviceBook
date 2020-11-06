@@ -7,6 +7,7 @@ use DB;
 use Illuminate\Http\Request;
 use App\VendorCategory;
 use App\VendorType;
+use App\ServiceType;
 use Illuminate\Support\Facades\Validator;
 
 class VendorCategoryController extends Controller
@@ -20,10 +21,15 @@ class VendorCategoryController extends Controller
             ->select('vendor_category.*')
             ->orderBy('vendor_category.name', 'ASC')
             ->paginate(5);
-        }else{
+        }else if($mode=="type"){
             $category=DB::table('vendor_type')
             ->select('vendor_type.*')
             ->orderBy('vendor_type.name', 'ASC')
+            ->paginate(5);
+        }else if($mode=="service_type"){
+            $category=DB::table('service_type')
+            ->select('service_type.*')
+            ->orderBy('service_type.name', 'ASC')
             ->paginate(5);
         }
 
@@ -38,10 +44,15 @@ class VendorCategoryController extends Controller
             ->select('vendor_category.*')
             ->orderBy('vendor_category.name', 'ASC')
             ->paginate(5);
-        }else{
+        }else if($mode=="type"){
             $category=DB::table('vendor_type')
             ->select('vendor_type.*')
             ->orderBy('vendor_type.name', 'ASC')
+            ->paginate(5);
+        }else if($mode=="service_type"){
+            $category=DB::table('service_type')
+            ->select('service_type.*')
+            ->orderBy('service_type.name', 'ASC')
             ->paginate(5);
         }
 
@@ -51,7 +62,15 @@ class VendorCategoryController extends Controller
     public function insert(Request $request)
     {
         $mode=$request['hidden_mode'];
-        if(($mode=="category")  || ($mode=="type") )
+        $message="";
+        if($mode=="category"){
+            $message="Vendor Category Added Successfully";
+        }else if($mode=="type"){
+            $message="Vendor Type Added Successfully";
+        }else if($mode=="service_type"){
+            $message="Service Type Added Successfully";
+        }
+        if(($mode=="category")  || ($mode=="type") || ($mode=="service_type"))
         {
             $validator = Validator::make($request->all(), [
                 'cat_name' => 'required|string|max:50',
@@ -66,7 +85,7 @@ class VendorCategoryController extends Controller
 
                 }else {
                     $this->insert_vendorcategory($request);
-                    return Redirect('vendor_category/'.$request['hidden_mode'])->with('status', 'Vendor '. $mode.' Added!');
+                    return Redirect('vendor_category/'.$request['hidden_mode'])->with('status', $message);
                 }
         }
 
@@ -85,6 +104,13 @@ class VendorCategoryController extends Controller
             }
         }elseif($mode=="type") {
             $vcat= new VendorType();
+            $vcat->name               =$request['cat_name'];
+            $saved=$vcat->save();
+            if ($saved) {
+                $savestatus++;
+            }
+        }elseif($mode=="service_type") {
+            $vcat= new ServiceType();
             $vcat->name               =$request['cat_name'];
             $saved=$vcat->save();
             if ($saved) {
@@ -110,10 +136,15 @@ class VendorCategoryController extends Controller
             ->where('vendor_category.id','=',$id)
             ->select('vendor_category.*')
             ->get();
-        }else{
+        }elseif($mode=="type"){
             $vendor=DB::table('vendor_type')
             ->where('vendor_type.id','=',$id)
             ->select('vendor_type.*')
+            ->get();
+        }elseif($mode=="service_type"){
+            $vendor=DB::table('service_type')
+            ->where('service_type.id','=',$id)
+            ->select('service_type.*')
             ->get();
         }
 
@@ -123,9 +154,18 @@ class VendorCategoryController extends Controller
     }
     public function update(Request $request)
     {
+        $mode=$request['hidden_mode'];
+        $message="";
+        if($mode=="category"){
+            $message="Vendor Category Updated Successfully";
+        }else if($mode=="type"){
+            $message="Vendor Type Updated Successfully";
+        }else if($mode=="service_type"){
+            $message="Service Type Updated Successfully";
+        }
       $updated = $this->update_sql($request);
         if($updated == '2'){
-            return Redirect('vendor_category/'.$request['hidden_mode'])->with('status', 'Vendor successfully Updated!');
+            return Redirect('vendor_category/'.$request['hidden_mode'])->with('status', $message);
         }else{
             return Redirect('vendor_category/'.$request['hidden_mode'])->with('status', 'Sorry!');
         }
@@ -149,6 +189,15 @@ class VendorCategoryController extends Controller
             $data['name']              =$request['cat_name'];
             $data['status']              =$request['status'];
             $vendor = VendorType::findOrFail($request['hidden_id']);
+            $saved=$vendor->update($data);
+            if ($saved) {
+                $savestatus++;
+            }
+        }else if($mode=="service_type")
+        {
+            $data['name']              =$request['cat_name'];
+            $data['status']              =$request['status'];
+            $vendor = ServiceType::findOrFail($request['hidden_id']);
             $saved=$vendor->update($data);
             if ($saved) {
                 $savestatus++;
