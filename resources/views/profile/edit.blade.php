@@ -5,7 +5,11 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
+                    @if(Session::get('logged_user_type') == "3")
+                        <h5 class="title" style="float:right"><a href="vendor_view/{{ Session::get('logged_vendor_id') }}" >{{ __('View Details') }}</a></h5>
+                    @endif
                     <h5 class="title">{{ __('Edit Profile') }}</h5>
+
                 </div>
                 <form method="post" action="{{ route('profile.update') }}" autocomplete="off">
                     <div class="card-body">

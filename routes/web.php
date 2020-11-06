@@ -82,5 +82,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('products_insert', ['as' => 'products.insert', 'uses' => 'ProductController@insert']);
     Route::get('products_edit/{id}', ['as' => 'products.products_edit', 'uses' => 'ProductController@products_edit']);
     Route::put('products_update', ['as' => 'products.update', 'uses' => 'ProductController@update']);
+
+    //services
+    Route::get('services', ['as' => 'services.services', 'uses' => 'ServiceController@services_view']);
+    Route::get('services_add', ['as' => 'services.services_add', 'uses' => 'ServiceController@services_add']);
 });
 
