@@ -61,12 +61,12 @@
                                 <p>{{ __('Services') }}</p>
                             </a>
                         </li>
-                        {{-- <li @if ($pageSlug == 'vendor_category/service_type')  class="active " @endif>
+                        <li @if ($pageSlug == 'vendor_category/service_type')  class="active " @endif>
                             <a href="{{ url('vendor_category/service_type')  }}">
                                 <i class="tim-icons icon-bullet-list-67"></i>
                                 <p>{{ __('Service Type') }}</p>
                             </a>
-                        </li> --}}
+                        </li>
                          <li @if ($pageSlug == 'vendor_category/category') class="active "  @endif>
                             <a href="{{ url('vendor_category/category')  }}">
                                 <i class="tim-icons icon-bullet-list-67"></i>
