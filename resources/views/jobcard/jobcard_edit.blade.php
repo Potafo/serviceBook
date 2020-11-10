@@ -55,6 +55,62 @@ select > option {
                     </select>
                     @include('alerts.feedback', ['field' => 'product_list'])
                 </div>
+
+                <div class="form-group" id="service_list_div">
+                    <label>{{ __('General Service') }}</label><br>
+                    <table >
+                    <?php $i=0; ?>
+                    @foreach($general_service as $list)
+                    <?php $i++; ?>
+
+                        @if($i==1 )
+                        <tr>
+                            @endif
+                            <td width="40%">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input"  type="checkbox" name="generalservice[]" id="inlineCheckbox_gs{{$list->id}}" value="{{$list->id}}"> {{$list->name}}
+                                        <span class="form-check-sign"></span>
+                                    </label>
+                                </div>
+                            </td>
+                            @if($i%3 == 0)
+                        </tr> <tr>
+                            @endif
+
+                      @endforeach
+                    </table>
+                    @include('alerts.feedback', ['field' => 'product_list'])
+                </div>
+                <br>
+                <div class="form-group" id="service_list_div">
+                    <label>{{ __('Product Service ') }}</label><br>
+                    <table >
+                    <?php $i=0; ?>
+                    @foreach($product_service as $list)
+                    <?php $i++; ?>
+
+                        @if($i==1 )
+                        <tr>
+                            @endif
+                            <td width="40%">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="checkbox" name="productservice[]" id="inlineCheckbox_ps{{$list->id}}" value="{{$list->id}}"> {{$list->name}}
+                                        <span class="form-check-sign"></span>
+                                    </label>
+                                </div>
+                            </td>
+                            @if($i%3 == 0)
+                        </tr> <tr>
+                            @endif
+
+                      @endforeach
+                    </table>
+                    @include('alerts.feedback', ['field' => 'product_list'])
+                </div>
+
+
                   <div class="form-group">
                      <div class="col-4 text-right">
                         <button type="submit" class="btn btn-fill btn-primary">{{ __('Save') }}</button>

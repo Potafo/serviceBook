@@ -46,13 +46,13 @@
                   Vendor
                 </th>
                 @endif
-                <th>
+                {{-- <th>
                     Product
-                  </th>
+                  </th> --}}
 
-                <th >
+                {{-- <th >
                     Action
-                  </th>
+                  </th> --}}
               </tr>
             </thead>
             <tbody>
@@ -70,18 +70,18 @@
                                 {{ $value->vname }}
                             </td>
                             @endif
-                            <td>
+                            {{-- <td>
                                 {{ $value->pdtname }}
-                            </td>
+                            </td> --}}
 
 
-                            <td >
+                            {{-- <td >
                                 <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
                                     <a href="jobcard_edit/{{ $value->jobid }}" ><i class="tim-icons icon-settings"></i></a>
                                 </button>
 
 
-                               </td>
+                               </td> --}}
                         </tr>
                 @endforeach
 

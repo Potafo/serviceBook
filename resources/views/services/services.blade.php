@@ -47,11 +47,11 @@
                   </th>
                 @endif
                 <th>
-                    Image
+                    Type
                   </th>
-                <th >
-                    Action
-                  </th>
+                {{-- <th >
+                    Product
+                  </th> --}}
               </tr>
             </thead>
             <tbody>
@@ -63,7 +63,7 @@
                             </td>
 
                             <td>
-                                {{ $value->name }}
+                                {{ $value->sername }}
                             </td>
                             @if(Session::get('logged_user_type') =='1')
                             <td>
@@ -71,20 +71,22 @@
                             </td>
                             @endif
                             <td>
-                                <?php
-                                $url =Storage::url('app/public/'.$value->image);
-                                ?>
-                                <div  style="width:30%; height:30%" >
-                                    <a href='{{ url($url) }}' target="_blank" >Image</a>
-                                </div>
+
+                                {{ $value->sname }}
+
                             </td>
-                            <td >
+                             {{-- <td>
+
+                                {{ $value->pdtname }}
+
+                            </td> --}}
+                            {{-- <td >
                                 <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
                                     <a href="products_edit/{{ $value->id }}" ><i class="tim-icons icon-settings"></i></a>
                                 </button>
 
 
-                               </td>
+                               </td> --}}
                         </tr>
                 @endforeach
 
