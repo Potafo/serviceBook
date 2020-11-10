@@ -20,7 +20,7 @@ select > option {
                         </ol>
                     </nav>
                 </div>
-                <form method="post" action="{{ route('products.insert') }}" autocomplete="off" enctype="multipart/form-data">
+                <form method="post" action="{{ route('services.insert') }}" autocomplete="off">
                     <div class="card-body">
                     @csrf
                     @method('put')
@@ -38,7 +38,7 @@ select > option {
                         @include('alerts.feedback', ['field' => 'product_list'])
                     </div>
                     @if(Session::get('logged_user_type') =='1')
-                        <div class="form-group">
+                        <div class="form-group" id="vendor_div" style="display: none">
                             <label>{{ __('Vendors') }}</label>
                             <select class="form-control{{ $errors->has('vendor_name') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Vendors') }}" name="vendor_name" id="vendor_name" value="{{ old('vendor_name') }}">
                                 <option value="">Select Vendor</option>
@@ -50,7 +50,7 @@ select > option {
                             </div>
                     @endif
 
-                    <div class="form-group">
+                    {{-- <div class="form-group" id="product_div" style="display: none">
                         <label>{{ __('Products') }}</label>
                         <select class="form-control{{ $errors->has('product_list') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Products') }}" name="product_list" id="product_list" value="{{ old('product_list') }}">
                             <option value="">Select Products</option>
@@ -59,7 +59,7 @@ select > option {
                                             @endforeach
                         </select>
                         @include('alerts.feedback', ['field' => 'product_list'])
-                    </div>
+                    </div> --}}
                     <div class="form-group">
                         <label for="exampleFormControlInput1">Services Name</label>
                         <input type="text" class="form-control{{ $errors->has('servicename') ? ' is-invalid' : '' }}"  id="servicename" name="servicename" placeholder="Service Name" value="{{ old('servicename') }}">
@@ -84,32 +84,65 @@ select > option {
 <script language="JavaScript" type="text/javascript">
  $(document).ready(function() {
 
-    $('select[name="vendor_name"]').on('change', function() {
-        var vendor_id = $(this).val();
-            if(vendor_id) {
-                var data={"vendor_id":vendor_id};
-                $.ajax({
-                    method: "post",
-                    url : "api/product_list",
-                    data : data,
-                    cache : false,
-                    crossDomain : true,
-                    async : false,
-                    dataType :'text',
-                    success : function(data)
-                    {
-                    $('select[name="product_list"]').empty();
-                        $('#product_list').html(data);
-                        // $.each(data, function(key, value) {
-                        //     $('select[name="product_list"]').append('<option value="'+ value +'">'+ value +'</option>');
-                        // });
+    // $('select[name="vendor_name"]').on('change', function() {
+    //     var vendor_id = $(this).val();
+    //         if(vendor_id) {
 
-                        }
-                    });
-            }else{
-                $('select[name="product_list"]').empty();
-                }
-           });
+    //             var data={"vendor_id":vendor_id};
+    //             $.ajax({
+    //                 method: "post",
+    //                 url : "api/product_list",
+    //                 data : data,
+    //                 cache : false,
+    //                 crossDomain : true,
+    //                 async : false,
+    //                 dataType :'text',
+    //                 success : function(data)
+    //                 {
+    //                 $('select[name="product_list"]').empty();
+    //                     $('#product_list').html(data);
+
+
+    //                     }
+    //                 });
+    //         }else{
+    //             $('select[name="product_list"]').empty();
+    //             }
+    //        });
+
+
+
+    //        $('select[name="servicetype_list"]').on('change', function() {
+    //     var service_type = $(this).val();
+    //     $('#vendor_div').css('display','block');
+    //         if(service_type=='1') {
+    //             $('#product_div').css('display','block');
+
+    //             var data={"vendor_id":vendor_id};
+    //             $.ajax({
+    //                 method: "post",
+    //                 url : "api/product_list",
+    //                 data : data,
+    //                 cache : false,
+    //                 crossDomain : true,
+    //                 async : false,
+    //                 dataType :'text',
+    //                 success : function(data)
+    //                 {
+    //                 $('select[name="product_list"]').empty();
+    //                     $('#product_list').html(data);
+    //                     // $.each(data, function(key, value) {
+    //                     //     $('select[name="product_list"]').append('<option value="'+ value +'">'+ value +'</option>');
+    //                     // });
+
+    //                     }
+    //                 });
+    //         }else{
+    //            $('#product_div').css('display','none');
+    //            //$('#vendor_div').css('display','none');
+    //             $('select[name="product_list"]').empty();
+    //             }
+    //        });
 
         });
 </script>

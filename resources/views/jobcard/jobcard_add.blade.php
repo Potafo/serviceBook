@@ -4,6 +4,15 @@ select > option {
     color: black;
 }
     </style>
+    {{-- <link rel="stylesheet" href="{{ asset('black') }}/css/bootstrap-4.5.2.min.css" type="text/css"/> --}}
+    <script src="{{ asset('black') }}/js/core/jquery-2.1.3.min.js"></script>
+    {{-- <script src="//ajax.googleacom/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ asset('black') }}/js/core/bootstrap.bundle-4.5.2.min.js"></script>
+     <link rel="stylesheet" href="{{ asset('black') }}/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="{{asset('black') }}/css/bootstrap-multiselect.css" type="text/css"/>
+    <script type="text/javascript" src="{{ asset('black') }}/js/core/bootstrap-multiselect.js"></script>--}}
+
+
 @section('content')
     <div class="row">
         <div class="col-md-8">
@@ -32,6 +41,26 @@ select > option {
                     <input type="text" class="form-control{{ $errors->has('jobcardnumber') ? ' is-invalid' : '' }}"  id="jobcardnumber" name="jobcardnumber" placeholder="Job Card Number" value="{{ old('jobcardnumber','JCN'.mt_rand(1000000,99999999)) }}">
                     @include('alerts.feedback', ['field' => 'jobcardnumber'])
                   </div>
+                  {{-- <div class="form-group">
+                    <label for="exampleFormControlInput1">Name</label>
+                    <input type="text" class="form-control{{ $errors->has('jobcard_name') ? ' is-invalid' : '' }}" id="jobcard_name" name="jobcard_name" placeholder="Name" value="{{ old('jobcard_name') }}">
+                    @include('alerts.feedback', ['field' => 'jobcard_name'])
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">Mobile</label>
+                    <input type="text" class="form-control{{ $errors->has('jobcard_mobile') ? ' is-invalid' : '' }}" id="jobcard_mobile" name="jobcard_mobile" placeholder="Mobile" value="{{ old('jobcard_mobile') }}">
+                    @include('alerts.feedback', ['field' => 'jobcard_mobile'])
+                  </div> --}}
+                  {{-- <div class="form-group">
+                    <label>{{ __('Service Type') }}</label>
+                    <select class="form-control{{ $errors->has('servicetype_list') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Service Type') }}" name="servicetype_list" id="servicetype_list" value="{{ old('servicetype_list') }}">
+                        <option value="">Select Service Type</option>
+                        @foreach($servicetype as $list)
+                            <option value="{{$list->id}}">{{$list->name}}</option>
+                        @endforeach
+                    </select>
+                    @include('alerts.feedback', ['field' => 'product_list'])
+                </div> --}}
                   @if(Session::get('logged_user_type') =='1')
                   <div class="form-group">
                     <label>{{ __('Vendors') }}</label>
@@ -44,14 +73,70 @@ select > option {
                     @include('alerts.feedback', ['field' => 'vendor_name'])
                 </div>
                 @endif
-                <div class="form-group">
+
+                <div class="form-group" id="product_list_div">
                     <label>{{ __('Products') }}</label>
-                    <select class="form-control{{ $errors->has('product_list') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Products') }}" name="product_list" id="product_list" value="{{ old('product_list') }}">
+
+                    <select  class="form-control{{ $errors->has('product_list') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Products') }}" name="product_list" id="product_list"    value="{{ old('product_list') }}">
                         <option value="">Select Products</option>
                         @foreach($products as $list)
                                             <option value="{{$list->id}}">{{$list->name}}</option>
                                         @endforeach
                     </select>
+
+                    @include('alerts.feedback', ['field' => 'product_list'])
+                </div>
+                <div class="form-group" id="service_list_div">
+                    <label>{{ __('General Service ') }}</label><br>
+                    <table >
+                    <?php $i=0; ?>
+                    @foreach($general_service as $list)
+                    <?php $i++; ?>
+
+                        @if($i==1 )
+                        <tr>
+                            @endif
+                            <td width="40%">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="checkbox" name="generalservice[]" id="inlineCheckbox_gs{{$list->id}}" value="{{$list->id}}"> {{$list->name}}
+                                        <span class="form-check-sign"></span>
+                                    </label>
+                                </div>
+                            </td>
+                            @if($i%3 == 0)
+                        </tr> <tr>
+                            @endif
+
+                      @endforeach
+                    </table>
+                    @include('alerts.feedback', ['field' => 'product_list'])
+                </div>
+                <br>
+                <div class="form-group" id="service_list_div">
+                    <label>{{ __('Product Service ') }}</label><br>
+                    <table >
+                    <?php $i=0; ?>
+                    @foreach($product_service as $list)
+                    <?php $i++; ?>
+
+                        @if($i==1 )
+                        <tr>
+                            @endif
+                            <td width="40%">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="checkbox"  name="productservice[]" id="inlineCheckbox_ps{{$list->id}}" value="{{$list->id}}"> {{$list->name}}
+                                        <span class="form-check-sign"></span>
+                                    </label>
+                                </div>
+                            </td>
+                            @if($i%3 == 0)
+                        </tr> <tr>
+                            @endif
+
+                      @endforeach
+                    </table>
                     @include('alerts.feedback', ['field' => 'product_list'])
                 </div>
                   <div class="form-group">
@@ -68,37 +153,37 @@ select > option {
         </div>
 
     </div>
+
 @endsection
-<script src="{{ asset('black') }}/js/core/jquery.min.js"></script>
+
 <script language="JavaScript" type="text/javascript">
  $(document).ready(function() {
+   // $('#product_list').multiselect();
+    // $('select[name="vendor_name"]').on('change', function() {
+    //     var vendor_id = $(this).val();
+    //         if(vendor_id) {
+    //             var data={"vendor_id":vendor_id};
+    //             $.ajax({
+    //                 method: "post",
+    //                 url : "api/product_list",
+    //                 data : data,
+    //                 cache : false,
+    //                 crossDomain : true,
+    //                 async : false,
+    //                 dataType :'text',
+    //                 success : function(data)
+    //                 {
+    //                 $('select[name="product_list"]').empty();
+    //                     $('#product_list').html(data);
 
-    $('select[name="vendor_name"]').on('change', function() {
-        var vendor_id = $(this).val();
-            if(vendor_id) {
-                var data={"vendor_id":vendor_id};
-                $.ajax({
-                    method: "post",
-                    url : "api/product_list",
-                    data : data,
-                    cache : false,
-                    crossDomain : true,
-                    async : false,
-                    dataType :'text',
-                    success : function(data)
-                    {
-                    $('select[name="product_list"]').empty();
-                        $('#product_list').html(data);
-                        // $.each(data, function(key, value) {
-                        //     $('select[name="product_list"]').append('<option value="'+ value +'">'+ value +'</option>');
-                        // });
 
-                        }
-                    });
-            }else{
-                $('select[name="product_list"]').empty();
-                }
-           });
+    //                     }
+    //                 });
+    //         }else{
+    //             $('select[name="product_list"]').empty();
+    //             }
+    //        });
 
         });
 </script>
+

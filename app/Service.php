@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
+    protected $fillable = [
+        'name', 'type',
+    ];
     protected $table = 'service';
     protected $primaryKey = 'id';
     public $timestamps =false;

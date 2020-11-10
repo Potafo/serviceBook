@@ -7,6 +7,7 @@ use App\Jobcard;
 use App\Vendor;
 use Response;
 use App\Product;
+use App\Service;
 use Illuminate\Support\Facades\Auth;
 use DB;
 use Illuminate\Support\Facades\Validator;
@@ -28,8 +29,13 @@ class JobcardController extends Controller
             $jobcard->vendor_id               =$request['vendor_name'];
         }
 
+        $generalservice=implode(',', $request['generalservice']);
+        $productservice=implode(',', $request['productservice']);
+
+        $jobcard->generalservice               =$generalservice;
+        $jobcard->productservice               =$productservice;
         $jobcard->product_id               =$request['product_list'];
-        $jobcard->jobcard_number               =$request['jobcardnumber'];
+        $jobcard->jobcard_number           =$request['jobcardnumber'];
         $jobcard->date               =date("Y-m-d");
         $saved=$jobcard->save();
         if ($saved) {
@@ -90,11 +96,25 @@ class JobcardController extends Controller
         {
         $products=$this->product_list_query(Session::get('logged_vendor_id'));
         }
-        return view('jobcard.jobcard_add', compact('products'));
+        $general_service= DB::table('service')
+        ->select('service.*')
+        ->where('service.type','=','1')
+        ->get();
+        $product_service= DB::table('service')
+        ->select('service.*')
+        ->where('service.type','=','2')
+        ->get();
+        return view('jobcard.jobcard_add', compact('products','general_service','product_service'));
     }
     public function getProductList(Request $request)
     {
-        $productlist=$this->product_list_query($request['vendor_id']);
+        if(Session::get('logged_user_type') =='3')
+        {
+            $productlist=$this->product_list_query(Session::get('logged_vendor_id'));
+        }else{
+            $productlist=$this->product_list_query($request['vendor_id']);
+        }
+
         $append='';
         if(count($productlist)>0)
         {
@@ -148,8 +168,15 @@ class JobcardController extends Controller
         {
         $products=$this->product_list_query($jobcard[0]->vendor_id);
         }
-
-        return view('jobcard.jobcard_edit',compact('jobcard','id','products'));
+        $general_service= DB::table('service')
+        ->select('service.*')
+        ->where('service.type','=','1')
+        ->get();
+        $product_service= DB::table('service')
+        ->select('service.*')
+        ->where('service.type','=','2')
+        ->get();
+        return view('jobcard.jobcard_edit',compact('jobcard','id','products','general_service','product_service'));
     }
 
     public function update(Request $request)

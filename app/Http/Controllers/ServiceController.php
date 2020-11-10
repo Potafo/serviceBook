@@ -8,19 +8,27 @@ use App\Product;
 use Response;
 use DB;
 use Session;
+use Illuminate\Support\Facades\Validator;
 
 class ServiceController extends Controller
 {
     //to add service
     //(`id`, `name`, `type`, `vendor_id`, `product_id`)
     public function add_service(Request $request)
-    {
+     {//servicetype_list vendor_name product_list  servicename
         $savestatus=0;
         $service= new Service();
-        $service->name               =$request['name'];
-        $service->type               =$request['type'];
-        $service->product_id         =$request['product_id'];
+        $service->name               =$request['servicename'];
+        $service->type               =$request['servicetype_list'];
+       // $service->product_id         =$request['product_list'];
         //$service->vendor_id          =$request['vendor_id']; //already in product
+        if(Session::get('logged_user_type') =='3')
+        {//$request['servicetype_list'] ==1
+            $service->vendor_id         =Session::get('logged_vendor_id');
+        }else if(Session::get('logged_user_type') =='1')
+        {
+            $service->vendor_id         =$request['vendor_name'];
+        }
         $saved=$service->save();
         if ($saved) {
             $savestatus++;
@@ -39,21 +47,25 @@ class ServiceController extends Controller
 
     public function services_view(Service $model)
     {
-        $rows1=DB::table('service');
+        //DB::enableQueryLog();
+        $rows1=DB::table('service')
+        ->join('service_type', 'service_type.id', '=', 'service.type');
+        //->join('products', 'products.id', '=', 'service.product_id');
         $services=array();
         if(Session::get('logged_user_type') =='3')
         {
             $vendor_id=Session::get('logged_vendor_id');
             $services= $rows1->where('service.vendor_id','=',$vendor_id)
+                ->select('service.*','service.name as sername','service_type.name as sname')
                 ->paginate(5);
         }
         else if(Session::get('logged_user_type') =='1')
         {
-            $services=$rows1->join('vendor', 'vendor.id', '=', 'products.vendor_id')
-            ->select('service.*','vendor.name as vname')
-            ->paginate(5);
+            $services=$rows1->join('vendor', 'vendor.id', '=', 'service.vendor_id')
+                ->select('service.*','service.name as sername','service_type.name as sname','vendor.name as vname','products.name as pdtname')
+                ->paginate(5);
         }
-
+        //dd(DB::getQueryLog());
        return view('services.services',compact('services'));
 
     }
@@ -74,5 +86,30 @@ class ServiceController extends Controller
          ->get();
         // dd(DB::getQueryLog());
         return $productlist;
+    }
+    public function validate_data(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'servicetype_list' => 'required|string|max:50',
+            //'vendor_name' => 'required|string|max:50',
+           // 'product_list' => 'required|string|max:50',
+            'servicename' => 'required|string|max:100',
+        ], [
+            'servicetype_list.required' => 'Service Type List is required',
+           //'product_list.required' => 'Product List is required',
+            'servicename.required' => 'Service Name is required'
+          ]);
+          return $validator;
+    }
+    public function insert(Request $request)
+    {
+        $validator=$this->validate_data($request);
+        if($validator->fails()) {
+             $errors = $validator->errors();
+             return Redirect()->back()->with('errors',$errors)->withInput($request->all());
+        }else {
+            $this->add_service($request);
+            return Redirect('services')->with('status', 'Services Successfully Added!');
+        }
     }
 }

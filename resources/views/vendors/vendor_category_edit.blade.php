@@ -2,10 +2,14 @@
     $vcat='vendor_category/category';
     $title="Vendor Category ";
     $homepageurl='vendor_category/category';
-} else {
+} else if($mode=="type") {
     $vcat='vendor_category/type';
     $title="Vendor Type ";
     $homepageurl='vendor_category/type';
+}else if($mode=="service_type") {
+    $vcat='vendor_category/service_type';
+    $title="Service Type ";
+    $homepageurl='vendor_category/service_type';
 }
 ?>
 
