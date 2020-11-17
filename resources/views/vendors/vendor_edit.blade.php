@@ -28,6 +28,19 @@ select > option {
                                 <input type="text" name="shortkey" class="form-control{{ $errors->has('shortkey') ? ' is-invalid' : '' }}" placeholder="{{ __('Short key') }}" value="{{ old('shortkey',$vendor[0]->shortkey) }}">
                                 @include('alerts.feedback', ['field' => 'shortkey'])
                             </div>
+                            <div class="form-group{{ $errors->has('shortcode') ? ' has-danger' : '' }}">
+                                <label>{{ __('Short Code') }}<span style="color: red"> *</span></label>
+                                <input type="text" name="shortcode" id="shortcode" class="form-control{{ $errors->has('shortcode') ? ' is-invalid' : '' }}" placeholder="{{ __('Short Code - Max 3') }}" maxlength="3" value="{{ old('shortcode',$vendor[0]->short_code) }}">
+                                @include('alerts.feedback', ['field' => 'shortcode'])
+                            </div>
+                            <div class="form-group{{ $errors->has('webname') ? ' has-danger' : '' }}">
+                                <label>{{ __('Web Name') }}<span style="color: red"> *</span></label>
+                                <input type="text" name="webname" id="webname" class="form-control{{ $errors->has('webname') ? ' is-invalid' : '' }}" placeholder="{{ __('Web Name') }}" value="{{ old('webname',$vendor[0]->web_name) }}">
+                                @include('alerts.feedback', ['field' => 'webname'])
+                                <span id="suggestions"> Web name Suggestions
+
+                                </span>
+                            </div>
                             <div class="form-group{{ $errors->has('address') ? ' has-danger' : '' }}">
                                 <label>{{ __('Address') }}</label>
                                 <input type="text" name="address" class="form-control{{ $errors->has('address') ? ' is-invalid' : '' }}" placeholder="{{ __('Address') }}" value="{{ old('address',$vendor[0]->address) }}">
@@ -110,7 +123,14 @@ select > option {
                                 </select>
                                 @include('alerts.feedback', ['field' => 'mobile'])
                             </div>
-
+                            <div class="form-group">
+                                <label>{{ __('Tax') }}</label>
+                                <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Tax - (CGST - SGST)') }}" name="tax" id="tax">
+                                            <option value="Y" @if($vendor[0]->tax_enabled =="Y") selected @endif>Active</option>
+                                            <option value="N" @if($vendor[0]->tax_enabled =="N") selected @endif>Non Active</option>
+                                </select>
+                                @include('alerts.feedback', ['field' => 'tax'])
+                            </div>
 
                             <label>{{ __('Logo') }}</label>
                             <?php

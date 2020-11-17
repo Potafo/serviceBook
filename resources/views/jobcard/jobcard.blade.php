@@ -46,10 +46,12 @@
                   Vendor
                 </th>
                 @endif
-                {{-- <th>
-                    Product
-                  </th> --}}
-
+                <th>
+                    Name
+                  </th>
+                  <th>
+                    Mobile
+                  </th>
                 {{-- <th >
                     Action
                   </th> --}}
@@ -70,10 +72,12 @@
                                 {{ $value->vname }}
                             </td>
                             @endif
-                            {{-- <td>
-                                {{ $value->pdtname }}
-                            </td> --}}
-
+                            <td>
+                                {{ $value->name }}
+                            </td>
+                            <td>
+                                {{ $value->mobile }}
+                            </td>
 
                             {{-- <td >
                                 <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">

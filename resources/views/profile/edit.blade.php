@@ -32,6 +32,9 @@
                     </div>
                     <div class="card-footer">
                         <button type="submit" class="btn btn-fill btn-primary">{{ __('Save') }}</button>
+                        @if(Session::get('logged_user_type') == "3")
+                        <h5 class="title" style="float:right"><a href="vendor_edit/{{ Session::get('logged_vendor_id') }}" >{{ __('Edit Full details') }}</a></h5>
+                         @endif
                     </div>
                 </form>
             </div>
