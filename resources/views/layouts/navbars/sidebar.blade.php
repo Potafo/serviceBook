@@ -10,14 +10,14 @@
             <a href="#" class="simple-text logo-normal">{{ __('Service Book') }}</a>
         </div>
         <ul class="nav">
-            @if(Session::get('logged_user_type') == "1")
+            {{-- @if(Session::get('logged_user_type') == "1") --}}
             <li @if ($pageSlug  == 'dashboard') class="active " @endif>
                 <a href="{{ route('home') }}">
                     <i class="tim-icons icon-chart-pie-36"></i>
                     <p>{{ __('Dashboard') }}</p>
                 </a>
             </li>
-            @endif
+            {{-- @endif --}}
 
             <li @if ($pageSlug  == 'profile') class="active " @endif>
                 <a href="{{ route('profile.edit')  }}">

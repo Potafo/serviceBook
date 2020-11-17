@@ -54,6 +54,61 @@ class VendorController extends Controller
         return view('vendors.vendors',compact('vendor'));
        // return view('vendors.vendors', ['vendor' => $model->paginate(2)]);
 
+
+    }
+    public function shorcode_generator($name,$digits)
+    {
+        $shortcode=substr(str_shuffle($name), 0, $digits);
+        return  $shortcode;
+    }
+    public function shorcode_generate(Request $request)
+    {
+        $name=$request['name'];
+        $shortcode=$this->shorcode_generator($name,'3');
+        $vendor=Vendor::select('vendor.*')
+        ->where('vendor.short_code','=',$shortcode)
+        ->get();
+        if(count($vendor)>0){
+            $shortcode=$this->shorcode_generator($name,'3');
+        }
+
+        $webname=preg_replace('/\s+/', '_', $name);
+        $vendor=Vendor::select('vendor.*')
+        ->where('vendor.web_name','=',$webname)
+        ->get();
+        if(count($vendor)>0){
+            $random=rand( 10 , 99 );
+            $webname=$webname.$random;
+        }
+
+        return response::json(['shortcode' =>$shortcode,'webname' =>$webname]);
+    }
+    public function webname_generate(Request $request)
+    {
+        $name=$request['name'];
+        $webname=preg_replace('/\s+/', '_', $name);
+        $vendor=Vendor::select('vendor.*')
+        ->where('vendor.web_name','=',$webname)
+        ->get();
+        $suggestions = "";
+        //if(count($vendor)>0){
+            $random=rand( 10 , 99 );
+            $webname=$webname.$random;
+            $link="<div onclick='loadsuggestion(\"".$webname."\")' >".$webname."</div>";
+            $suggestions .= $link;
+            //array_push($suggestions, $link);
+
+            $random=rand( 10 , 99 );
+            $webname=$webname.$random;
+            $link="<div onclick='loadsuggestion(\"".$webname."\")' >".$webname."</div>";
+            $suggestions .= $link;
+
+            $random=rand( 10 , 99 );
+            $webname=$webname.$random;
+            $link="<div onclick='loadsuggestion(\"".$webname."\")' >".$webname."</div>";
+            $suggestions .= $link;
+       // }
+        return $suggestions;
     }
     public function valid_data(Request $request)
     {
@@ -65,13 +120,17 @@ class VendorController extends Controller
             'mobile' => ['required', new PhoneNumber],
             'shortkey' => 'required|string|max:6',
             'file' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'shortcode' => 'required|string|max:3',
+            'webname' => 'required|string|max:20',
         ], [
             'name.required' => 'A Vendor name is required',
             'latitude.required' => 'Latitude is required',
             'longitude.required' => 'Longitude is required',
             'email.required' => 'Email is required',
             'mobile.required' => 'Mobile is required',
-            'shortkey.required' => 'Shortkey is required'
+            'shortkey.required' => 'Shortkey is required',
+            'shortcode.required' => 'ShortCode is required',
+            'webname.required' => 'Web name is required'
           ]);
           return $validator;
     }
@@ -109,7 +168,9 @@ class VendorController extends Controller
             $vendor->type                =$request['type'];
             $vendor->digital_profile_status     =$request['dps'];
             $vendor->shortkey       =$request['shortkey'];
-
+            $vendor->short_code       =$request['shortcode'];
+            $vendor->web_name       =$request['webname'];
+            $vendor->tax_enabled       =$request['tax'];
 
 
             // Check if a profile image has been uploaded
@@ -249,7 +310,7 @@ class VendorController extends Controller
             $data['category']            =$request['category'];
             $data['type']                =$request['type'];
             $data['digital_profile_status']     =$request['dps'];
-
+            $data['tax_enabled']     =$request['tax'];
 
 
             // Check if a profile image has been uploaded

@@ -4,6 +4,7 @@ select > option {
     color: black;
 }
     </style>
+    <script src="{{ asset('black') }}/js/core/jquery-2.1.3.min.js"></script>
 @section('content')
     <div class="row">
         <div class="col-md-8">
@@ -20,14 +21,29 @@ select > option {
 
                             <div class="form-group{{ $errors->has('name') ? ' has-danger' : '' }}">
                                 <label>{{ __('Name') }}<span style="color: red"> *</span></label>
-                                <input type="text" name="name" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" placeholder="{{ __('Name') }}" value="{{ old('name') }}">
+                                <input type="text" name="name" id="name" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" placeholder="{{ __('Name') }}" value="{{ old('name') }}">
                                 @include('alerts.feedback', ['field' => 'name'])
                             </div>
                             <div class="form-group{{ $errors->has('shortkey') ? ' has-danger' : '' }}">
                                 <label>{{ __('Short Key') }}<span style="color: red"> *</span></label>
-                                <input type="text" name="shortkey" class="form-control{{ $errors->has('shortkey') ? ' is-invalid' : '' }}" placeholder="{{ __('Short key') }}" value="{{ old('shortkey',mt_rand(100000,999999)) }}">
+                                <input type="text" name="shortkey" id="shortkey" class="form-control{{ $errors->has('shortkey') ? ' is-invalid' : '' }}" placeholder="{{ __('Short key- 6 digits') }}" maxlength="6" value="{{ old('shortkey',mt_rand(100000,999999)) }}">
                                 @include('alerts.feedback', ['field' => 'shortkey'])
                             </div>
+                            <div class="form-group{{ $errors->has('shortcode') ? ' has-danger' : '' }}">
+                                <label>{{ __('Short Code') }}<span style="color: red"> *</span></label>
+                                <input type="text" name="shortcode" id="shortcode" class="form-control{{ $errors->has('shortcode') ? ' is-invalid' : '' }}" placeholder="{{ __('Short Code - Max 3') }}" maxlength="3" value="{{ old('shortcode') }}">
+                                @include('alerts.feedback', ['field' => 'shortcode'])
+                            </div>
+                            <div class="form-group{{ $errors->has('webname') ? ' has-danger' : '' }}">
+                                <label>{{ __('Web Name') }}<span style="color: red"> *</span></label>
+                                <input type="text" name="webname" id="webname" class="form-control{{ $errors->has('webname') ? ' is-invalid' : '' }}" placeholder="{{ __('Web Name') }}" value="{{ old('webname') }}">
+                                @include('alerts.feedback', ['field' => 'webname'])
+                                <span id="suggestions"> Web name Suggestions
+
+                                </span>
+                            </div>
+
+
                             <div class="form-group{{ $errors->has('address') ? ' has-danger' : '' }}">
                                 <label>{{ __('Address') }}</label>
                                 <input type="text" name="address" class="form-control{{ $errors->has('address') ? ' is-invalid' : '' }}" placeholder="{{ __('Address') }}" value="">
@@ -111,6 +127,14 @@ select > option {
                                 </select>
                                 @include('alerts.feedback', ['field' => 'mobile'])
                             </div>
+                            <div class="form-group">
+                                <label>{{ __('Tax') }}</label>
+                                <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Tax - (CGST - SGST)') }}" name="tax" id="tax">
+                                            <option value="Y">Active</option>
+                                            <option value="N">Non Active</option>
+                                </select>
+                                @include('alerts.feedback', ['field' => 'tax'])
+                            </div>
 
                             <label>{{ __('Logo') }}</label>
                             <input type="file" name="file" class="form-control{{ $errors->has('file') ? ' is-invalid' : '' }}" />
@@ -118,33 +142,7 @@ select > option {
 
 
 
-                            {{-- <div class="form-group{{ $errors->has('file') ? ' has-danger' : '' }}">
-                                <label class="form-control{{ $errors->has('file') ? ' is-invalid' : '' }} custom-file-label" for="file">Logo upload</label>
-                                <input  type="file" class="form-control-file" id="file" value="{{old('file')}}" name="file" >
-
-                                 @include('alerts.feedback', ['field' => 'file'])
                             </div>
-
-                            <div class="form-group row">
-                                <label for="profile_image" class="col-md-4 col-form-label text-md-right">Profile Image</label>
-                                <div class="col-md-6">
-                                    <input id="profile_image" type="file" class="form-control" name="profile_image">
-                                    @if (auth()->user()->image)
-                                        <code>{{ auth()->user()->image }}</code>
-                                    @endif
-                                </div>
-                            </div>  --}}
-                            {{-- <div class="form-group">
-                                <label>{{ __('File Upload') }}</label>
-                                <input type="file" name="file" class="form-control{{ $errors->has('file') ? ' is-invalid' : '' }}">
-                                <label class="form-control custom-file-label" for="chooseFile">Select file</label>
-                                <button  class="btn btn-success" style="display: none">Upload</button>
-                                @include('alerts.feedback', ['field' => 'file'])
-                            </div> --}}
-
-
-
-                    </div>
                     <div class="card-footer" style="margin-top: 50px;">
                         <button type="submit" class="btn btn-fill btn-primary">{{ __('Save') }}</button>
                     </div>
@@ -156,3 +154,68 @@ select > option {
 
     </div>
 @endsection
+
+<script language="JavaScript" type="text/javascript">
+ function loadsuggestion(webname)
+        {
+
+            $('#webname').val(webname);
+        }
+    $(document).ready(function() {
+      // $('#product_list').multiselect();
+        $('#name').on('change', function() {
+            var name = $(this).val();
+            if(name) {
+                var data={"name":name};
+                $.ajax({
+                       method: "post",
+                       url : "api/shorcode_generate",
+                       data : data,
+                       cache : false,
+                       crossDomain : true,
+                       async : false,
+                       dataType :'text',
+                       success : function(result)
+                       {
+                            var json_x= JSON.parse(result);
+                            $('#shortcode').val(json_x.shortcode);
+                            $('#webname').val(json_x.webname);
+                       }
+                       });
+            }
+        });
+
+
+        $('#webname').on('change', function() { // act upon keyup events every 250 milliseconds when user is typing
+        $('#suggestions').html('');
+
+        var input = $(this).val();
+        if(input) {
+                var data={"name":input};
+                $.ajax({
+                       method: "post",
+                       url : "api/webname_generate",
+                       data : data,
+                       cache : false,
+                       crossDomain : true,
+                       async : false,
+                       dataType :'text',
+                       success : function(result)
+                       {
+                        document.getElementById('suggestions').innerHTML = result;
+                        document.getElementById('suggestions').style.overflow='auto';
+
+                       }
+                       });
+            }
+         });
+
+        //  $('.webnamesuggestions').on('click', function() {
+        //      alert($(this).attr('myval'));
+        //     $('#webname').val();
+        // });
+
+
+    });
+
+   </script>
