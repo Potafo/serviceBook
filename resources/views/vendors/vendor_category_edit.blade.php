@@ -10,6 +10,10 @@
     $vcat='vendor_category/service_type';
     $title="Service Type ";
     $homepageurl='vendor_category/service_type';
+}else if($mode=="status") {
+    $vcat='vendor_category/status';
+    $title="Vendor Status ";
+    $homepageurl='vendor_category/status';
 }
 ?>
 
@@ -47,14 +51,39 @@ select > option {
                     <input type="text" class="form-control{{ $errors->has('cat_name') ? ' is-invalid' : '' }}"  id="cat_name" name="cat_name" placeholder="{{ $title }} Name" value="{{ old('cat_name',$vendor[0]->name) }}">
                     @include('alerts.feedback', ['field' => 'cat_name'])
                   </div>
+                  @if($mode=="status")
+
                   <div class="form-group">
-                    <label for="exampleFormControlInput1">Status</label>
-                    <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Status') }}" name="status" id="status">
-                                <option value="Y" @if($vendor[0]->status =="Y") selected @endif>Active</option>
-                                <option value="N" @if($vendor[0]->status =="N") selected @endif>Non Active</option>
+                    <label for="exampleFormControlInput1">Notification</label>
+                    <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Notification') }}" name="notification" id="notification">
+                                <option value="Y" @if($vendor[0]->notification =="Y") selected @endif>Yes</option>
+                                <option value="N" @if($vendor[0]->notification =="N") selected @endif>No</option>
                     </select>
 
                     </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlInput1"> Display Order</label>
+                        <input type="text" class="form-control{{ $errors->has('displayorder') ? ' is-invalid' : '' }}"  id="displayorder" name="displayorder" placeholder="{{ __('Display Order') }} " value="{{ old('displayorder',$vendor[0]->display_order) }}">
+                        @include('alerts.feedback', ['field' => 'displayorder'])
+                      </div>
+                    <div class="form-group">
+                        <label for="exampleFormControlInput1">Status</label>
+                        <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Status') }}" name="status" id="status">
+                                    <option value="Y" @if($vendor[0]->active =="Y") selected @endif>Active</option>
+                                    <option value="N" @if($vendor[0]->active =="N") selected @endif>Non Active</option>
+                        </select>
+
+                        </div>
+                    @else
+                        <div class="form-group">
+                            <label for="exampleFormControlInput1">Status</label>
+                            <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Status') }}" name="status" id="status">
+                                        <option value="Y" @if($vendor[0]->status =="Y") selected @endif>Active</option>
+                                        <option value="N" @if($vendor[0]->status =="N") selected @endif>Non Active</option>
+                            </select>
+
+                        </div>
+                    @endif
                   <div class="form-group">
                      <div class="col-4 text-right">
                         <button type="submit" class="btn btn-fill btn-primary">{{ __('Update') }}</button>

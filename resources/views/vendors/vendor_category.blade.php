@@ -10,6 +10,10 @@
         $vcat='vendor_category/service_type';
         $title="Service Type ";
         $add_url='vendorcategory_add/service_type';
+    }else if($mode=="status") {
+        $vcat='vendor_category/status';
+        $title="Vendor Status";
+        $add_url='vendorcategory_add/status';
     }
     ?>
 
@@ -52,15 +56,22 @@
             <thead class=" text-primary">
             <tr>
                 <th>
-                Slno
+                    Slno
                 </th>
                 <th>
-                Name
+                    Name
                 </th>
+                @if($mode=="status")
+                    <th class="text-center">
+                        Notification
+                    </th>
+                    <th class="text-center">
+                        Display Order
+                    </th>
 
-
+                @endif
                 <th class="text-center">
-                Status
+                    Status
                 </th>
                 <th >
                     Action
@@ -77,11 +88,21 @@
                             <td>
                                 {{ $value->name }}
                             </td>
-
-
-                            <td class="text-center">
-                                {{ $value->status }}
-                            </td>
+                            @if($mode=="status")
+                                <td class="text-center">
+                                    {{ $value->notification }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $value->display_order }}
+                                </td>
+                                <td class="text-center">
+                                    {{ $value->active }}
+                                </td>
+                                @else
+                                <td class="text-center">
+                                    {{ $value->status }}
+                                </td>
+                            @endif
                             <td >
 
                                 <a href="{{ url("vendor_category_edit/".$mode."/".$value->id)  }}" >  Edit </a>

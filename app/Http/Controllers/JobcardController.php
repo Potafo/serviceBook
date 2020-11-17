@@ -9,6 +9,7 @@ use Response;
 use App\Product;
 use App\Service;
 use App\JobcardServices;
+use App\StatusChange;
 use Illuminate\Support\Facades\Auth;
 use DB;
 use Illuminate\Support\Facades\Validator;
@@ -60,11 +61,18 @@ class JobcardController extends Controller
         //$logged_user_id = Auth::id();
         //$jobcard=Jobcard::all();
 
+        // $rows1=DB::table('job_card')
+        // ->join('vendor', 'vendor.id', '=', 'job_card.vendor_id')
+        // ->select('vendor.name as vname','job_card.id as jobid','job_card.*')
+        // ->orderBy('job_card.date', 'ASC');
         $rows1=DB::table('job_card')
-        ->join('vendor', 'vendor.id', '=', 'job_card.vendor_id')
-        //->join('products', 'products.id', '=', 'job_card.product_id')
-        ->select('vendor.name as vname','job_card.id as jobid','job_card.*')
-        ->orderBy('job_card.date', 'ASC');
+        ->join('jobcard_services','job_card.jobcard_number','=','jobcard_services.jobcard_reference')
+        ->select('job_card.name as custname','status.name as statusname','job_card.mobile as custmobile','jobcard_services.*','products.name as pdtname',\DB::raw("GROUP_CONCAT(service.name) as sname"))
+        ->leftjoin("service",\DB::raw("FIND_IN_SET(service.id,jobcard_services.generalservice) OR  FIND_IN_SET(service.id,jobcard_services.productservice)"),">",\DB::raw("'0'"))
+        ->join('products', 'products.id', '=', 'jobcard_services.product_id')
+        ->join('status', 'status.id', '=', 'jobcard_services.current_status')
+         ->groupBy('jobcard_number')
+         ->orderBy('created_at','DESC');
 
        // $rows1=DB::table('job_card');
         $jobcard=array();
@@ -295,17 +303,36 @@ class JobcardController extends Controller
     {
         $savestatus=0;
         //`jobcard_reference`, `jobcard_number`, `product_id`, `generalservice`, `productservice`,
+        $jobcardnumber=Session::get('logged_vendor_shortcode').mt_rand(1000000,99999999);
         $jobcard_servcs= new JobcardServices();
         $jobcard_servcs->jobcard_reference               =$request['jobcardnumber_ref'];
-        $jobcard_servcs->jobcard_number               =Session::get('logged_vendor_shortcode').mt_rand(1000000,99999999);
+        $jobcard_servcs->jobcard_number               =$jobcardnumber;
         $jobcard_servcs->product_id               =$request['product_list'];
         $generalservice=implode(',', $request['generalservice']);
         $productservice=implode(',', $request['productservice']);
 
         $jobcard_servcs->generalservice               =$generalservice;
         $jobcard_servcs->productservice               =$productservice;
+        //$jobcard_servcs->current_status               =1;
 
         $saved=$jobcard_servcs->save();
+
+        // status updation
+        // `status_change`(`id`, `jobcard_number`, `from_status`, `to_status`, `change_by`, `date`, `created_at`, `updated_at`)
+
+        $statuslist= DB::table('status')
+        ->select('status.id')
+        ->where('status.vendor_id','=',Session::get('logged_vendor_id'))
+        ->get();
+        $status=$statuslist[0]->id;
+        $statuschange= new StatusChange();
+        $statuschange->jobcard_number               =$jobcardnumber;
+        $statuschange->from_status               =0;
+        $statuschange->to_status               =$status;
+        $statuschange->change_by               =Session::get('logged_vendor_id');
+        $statuschange->date                     =date('Y-m-d');
+        $statuschange->save();
+
         if ($saved) {
             $savestatus++;
         }
@@ -323,6 +350,7 @@ class JobcardController extends Controller
         ->join('products', 'products.id', '=', 'jobcard_services.product_id')
          ->where('jobcard_services.jobcard_reference','=',$request['ref'])
          ->groupBy('jobcard_number')
+         ->orderBy('created_at','DESC')
          ->paginate(10);
          //dd(DB::getQueryLog());
          $append ='';
