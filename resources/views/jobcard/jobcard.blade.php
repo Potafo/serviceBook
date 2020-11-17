@@ -52,6 +52,18 @@
                   <th>
                     Mobile
                   </th>
+                  <th>
+                    Product
+                  </th>
+                  <th>
+                    Service
+                  </th>
+                  <th>
+                    Days
+                  </th>
+                  <th>
+                    Status
+                  </th>
                 {{-- <th >
                     Action
                   </th> --}}
@@ -60,6 +72,39 @@
             <tbody>
                 @if(count($jobcard)>0)
                     @foreach($jobcard as $key=>$value)
+                    <?php
+                    //service length checking
+                        if (strlen($value->sname) > 20){
+                            $str = substr($value->sname, 0, 17) . '...';
+                        }
+                        else {
+                           $str=$value->sname;
+                        }
+                        //product length checking
+                        if (strlen($value->pdtname) > 20){
+                            $pdt = substr($value->pdtname, 0, 12) . '...';
+                        }
+                        else {
+                           $pdt=$value->pdtname;
+                        }
+                    //days
+                        $timezone = 'ASIA/KOLKATA';
+                        $date = new DateTime('now', new DateTimeZone($timezone));
+                        //$package_days_count=$value->days;
+                         $joined_date=date("Y-m-d",strtotime($value->created_at));
+                         $current_date=date("Y-m-d");
+                         $diff=(new DateTime($joined_date))->diff(new DateTime($current_date))->days;
+                         $pending=$diff;//intval($package_days_count) - intval($diff);
+                        if($pending==0)
+                        {
+                            $pending= "Today";
+                        }elseif($pending==1) {
+                            $pending=$pending ." Day";
+                        }elseif($pending>1) {
+                            $pending=$pending ." Days";
+                        }
+
+                    ?>
                         <tr>
                             <td>
                                 {{ $jobcard->firstItem() + $key }}
@@ -73,12 +118,23 @@
                             </td>
                             @endif
                             <td>
-                                {{ $value->name }}
+                                {{ $value->custname }}
                             </td>
                             <td>
-                                {{ $value->mobile }}
+                                {{ $value->custmobile }}
                             </td>
-
+                            <td>
+                                {{ $pdt }}
+                            </td>
+                            <td>
+                                {{ $str }}
+                            </td>
+                            <td>
+                                {{ $pending }}
+                            </td>
+                            <td>
+                                {{ $value->statusname }}
+                            </td>
                             {{-- <td >
                                 <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
                                     <a href="jobcard_edit/{{ $value->jobid }}" ><i class="tim-icons icon-settings"></i></a>

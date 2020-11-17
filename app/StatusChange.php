@@ -4,13 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Status extends Model
+class StatusChange extends Model
 {
     protected $fillable = [
-        'name', 'active','notification','display_order',
+        'jobcard_number', 'from_status','to_status','change_by','date',
     ];
-    protected $table = 'status';
+    protected $table = 'status_change';
     protected $primaryKey = 'id';
     public $timestamps =false;
-
 }
