@@ -7,7 +7,7 @@
      <link rel="stylesheet" href="{{ asset('black') }}/css/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="{{asset('black') }}/css/bootstrap-multiselect.css" type="text/css"/>
     <script type="text/javascript" src="{{ asset('black') }}/js/core/bootstrap-multiselect.js"></script>--}}
-    <script src="{{ asset('black') }}/js/jquery.min.js"></script>
+    <script src="{{ asset('black') }}/js/core/jquery.min.js"></script>
 
 @section('content')
     <div class="row">
