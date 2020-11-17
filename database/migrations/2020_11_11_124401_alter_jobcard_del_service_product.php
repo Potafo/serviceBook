@@ -13,6 +13,10 @@ class AlterJobcardDelServiceProduct extends Migration
      */
     public function up()
     {
+        Schema::table('job_card', function (Blueprint $table) {
+            $table->dropForeign('product_job_id');
+        });
+
         DB::statement("ALTER TABLE `job_card` DROP `product_id`, DROP `generalservice`, DROP `productservice`");
     }
 
