@@ -1,13 +1,13 @@
 @extends('layouts.app', ['page' => __('Job Card'), 'pageSlug' => 'jobcard'])
 
     {{-- <link rel="stylesheet" href="{{ asset('black') }}/css/bootstrap-4.5.2.min.css" type="text/css"/> --}}
-    <script src="{{ asset('black') }}/js/core/jquery-2.1.3.min.js"></script>
+    {{-- <script src="{{ asset('black') }}/js/core/jquery-2.1.3.min.js"></script> --}}
     {{-- <script src="//ajax.googleacom/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script type="text/javascript" src="{{ asset('black') }}/js/core/bootstrap.bundle-4.5.2.min.js"></script>
      <link rel="stylesheet" href="{{ asset('black') }}/css/bootstrap.min.css" type="text/css"/>
     <link rel="stylesheet" href="{{asset('black') }}/css/bootstrap-multiselect.css" type="text/css"/>
     <script type="text/javascript" src="{{ asset('black') }}/js/core/bootstrap-multiselect.js"></script>--}}
-
+    <script src="{{ asset('black') }}/js/jquery.min.js"></script>
 
 @section('content')
     <div class="row">
