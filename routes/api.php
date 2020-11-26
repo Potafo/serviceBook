@@ -31,3 +31,4 @@ Route::post('register','UserController@register_user');
 Route::post('product_list', 'JobcardController@getProductList');
 Route::post('shorcode_generate', 'VendorController@shorcode_generate');
 Route::post('webname_generate', 'VendorController@webname_generate');
+Route::post('service_list', 'JobcardController@getServiceList');

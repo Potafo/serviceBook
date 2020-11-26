@@ -4,12 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Service extends Model
+class Configuration extends Model
 {
     protected $fillable = [
-        'name', 'type','product_id',
+        'type', 'config_name', 'value', 'status', 'page_view',
     ];
-    protected $table = 'service';
+    protected $table = 'configuration';
     protected $primaryKey = 'id';
     public $timestamps =false;
 }
