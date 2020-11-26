@@ -50,7 +50,7 @@ select > option {
                             </div>
                     @endif
 
-                    {{-- <div class="form-group" id="product_div" style="display: none">
+                    <div class="form-group" id="product_div" style="display: none">
                         <label>{{ __('Products') }}</label>
                         <select class="form-control{{ $errors->has('product_list') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Products') }}" name="product_list" id="product_list" value="{{ old('product_list') }}">
                             <option value="">Select Products</option>
@@ -59,11 +59,33 @@ select > option {
                                             @endforeach
                         </select>
                         @include('alerts.feedback', ['field' => 'product_list'])
-                    </div> --}}
+                    </div>
                     <div class="form-group">
                         <label for="exampleFormControlInput1">Services Name</label>
                         <input type="text" class="form-control{{ $errors->has('servicename') ? ' is-invalid' : '' }}"  id="servicename" name="servicename" placeholder="Service Name" value="{{ old('servicename') }}">
                         @include('alerts.feedback', ['field' => 'servicename'])
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleFormControlInput1">Services Price</label>
+                        <input type="text" class="form-control{{ $errors->has('serviceprice') ? ' is-invalid' : '' }}"  id="serviceprice" name="serviceprice" placeholder="Service Price" value="{{ old('serviceprice') }}">
+                        @include('alerts.feedback', ['field' => 'serviceprice'])
+                      </div>
+                      @if(Session::get('tax_enabled')=='Y')
+                      <div class="form-group">
+                        <label for="exampleFormControlInput1">SGST</label>
+                        <input type="text" class="form-control{{ $errors->has('servicesgst') ? ' is-invalid' : '' }}"  id="servicesgst" name="servicesgst" placeholder="Service SGST" value="{{ old('servicesgst') }}">
+                        @include('alerts.feedback', ['field' => 'servicesgst'])
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleFormControlInput1">CGST</label>
+                        <input type="text" class="form-control{{ $errors->has('servicecgst') ? ' is-invalid' : '' }}"  id="servicecgst" name="servicecgst" placeholder="Service CGST" value="{{ old('servicecgst') }}">
+                        @include('alerts.feedback', ['field' => 'servicecgst'])
+                      </div>
+                      @endif
+                      <div class="form-group">
+                        <label for="exampleFormControlInput1">Services Offer Price</label>
+                        <input type="text" class="form-control{{ $errors->has('serviceoffer') ? ' is-invalid' : '' }}"  id="serviceoffer" name="serviceoffer" placeholder="Service Offer Price" value="{{ old('serviceoffer') }}">
+                        @include('alerts.feedback', ['field' => 'serviceoffer'])
                       </div>
                   <div class="form-group">
                      <div class="col-4 text-right">
@@ -112,37 +134,37 @@ select > option {
 
 
 
-    //        $('select[name="servicetype_list"]').on('change', function() {
-    //     var service_type = $(this).val();
-    //     $('#vendor_div').css('display','block');
-    //         if(service_type=='1') {
-    //             $('#product_div').css('display','block');
+           $('select[name="servicetype_list"]').on('change', function() {
+        var service_type = $(this).val();
+        $('#vendor_div').css('display','block');
+            if(service_type=='1') {
+                $('#product_div').css('display','block');
 
-    //             var data={"vendor_id":vendor_id};
-    //             $.ajax({
-    //                 method: "post",
-    //                 url : "api/product_list",
-    //                 data : data,
-    //                 cache : false,
-    //                 crossDomain : true,
-    //                 async : false,
-    //                 dataType :'text',
-    //                 success : function(data)
-    //                 {
-    //                 $('select[name="product_list"]').empty();
-    //                     $('#product_list').html(data);
-    //                     // $.each(data, function(key, value) {
-    //                     //     $('select[name="product_list"]').append('<option value="'+ value +'">'+ value +'</option>');
-    //                     // });
+                var data={"vendor_id":vendor_id};
+                $.ajax({
+                    method: "post",
+                    url : "api/product_list",
+                    data : data,
+                    cache : false,
+                    crossDomain : true,
+                    async : false,
+                    dataType :'text',
+                    success : function(data)
+                    {
+                    $('select[name="product_list"]').empty();
+                        $('#product_list').html(data);
+                        // $.each(data, function(key, value) {
+                        //     $('select[name="product_list"]').append('<option value="'+ value +'">'+ value +'</option>');
+                        // });
 
-    //                     }
-    //                 });
-    //         }else{
-    //            $('#product_div').css('display','none');
-    //            //$('#vendor_div').css('display','none');
-    //             $('select[name="product_list"]').empty();
-    //             }
-    //        });
+                        }
+                    });
+            }else{
+               $('#product_div').css('display','none');
+               //$('#vendor_div').css('display','none');
+                $('select[name="product_list"]').empty();
+                }
+           });
 
         });
 </script>

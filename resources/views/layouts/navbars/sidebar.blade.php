@@ -19,12 +19,21 @@
             </li>
             {{-- @endif --}}
 
+            @if(Session::get('logged_user_type') == "1")
+            <li @if ($pageSlug  == 'config_add') class="active " @endif>
+                <a href="{{ route('configuration.config_add')  }}">
+                    <i class="tim-icons icon-single-02"></i>
+                    <p>{{ __('Add Configurations') }}</p>
+                </a>
+            </li>
+            @endif
             <li @if ($pageSlug  == 'profile') class="active " @endif>
                 <a href="{{ route('profile.edit')  }}">
                     <i class="tim-icons icon-single-02"></i>
                     <p>{{ __('User Profile') }}</p>
                 </a>
             </li>
+
 
             <li>
                 <a data-toggle="collapse" href="#vendor_tab" aria-expanded="true">
@@ -85,7 +94,14 @@
                                 <p>{{ __('Vendor Status') }}</p>
                             </a>
                         </li>
-
+                        @if(Session::get('logged_user_type') == "3")
+                        <li @if ($pageSlug == 'vendor_configuration')  class="active " @endif>
+                            <a href="{{ url('vendor_configuration')  }}">
+                                <i class="tim-icons icon-bullet-list-67"></i>
+                                <p>{{ __('Vendor Configuration') }}</p>
+                            </a>
+                        </li>
+                        @endif
                     </ul>
                 </div>
             </li>

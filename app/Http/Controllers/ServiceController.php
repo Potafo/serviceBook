@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Service;
 use App\Product;
+use App\ServicePriceDetails;
 use Response;
 use DB;
 use Session;
@@ -20,7 +21,8 @@ class ServiceController extends Controller
         $service= new Service();
         $service->name               =$request['servicename'];
         $service->type               =$request['servicetype_list'];
-       // $service->product_id         =$request['product_list'];
+        if($request['servicetype_list']=='1')
+        $service->product_id         =$request['product_list'];
         //$service->vendor_id          =$request['vendor_id']; //already in product
         if(Session::get('logged_user_type') =='3')
         {//$request['servicetype_list'] ==1
@@ -30,6 +32,20 @@ class ServiceController extends Controller
             $service->vendor_id         =$request['vendor_name'];
         }
         $saved=$service->save();
+
+        //(`id`, `service_id`, `actual_price`, `offer_price`, `discount_percent`,
+        // `discount_amount`, `tax_sgst`, `tax_cgst`, `changed_by`, `date`,
+        $insertedId = $service->id;//serviceprice servicesgst servicecgst serviceoffer
+        $serviceprice=new ServicePriceDetails();
+        $serviceprice->service_id=$insertedId;
+        $serviceprice->actual_price=$request['serviceprice'];
+        $serviceprice->offer_price=$request['serviceoffer'];
+        $serviceprice->tax_sgst=$request['servicesgst'];
+        $serviceprice->tax_cgst=$request['servicecgst'];
+        $serviceprice->changed_by=Session::get('logged_user_id');
+        $serviceprice->date=date('Y-m-d');
+        $saved1=$serviceprice->save();
+
         if ($saved) {
             $savestatus++;
         }
@@ -49,20 +65,20 @@ class ServiceController extends Controller
     {
         //DB::enableQueryLog();
         $rows1=DB::table('service')
-        ->join('service_type', 'service_type.id', '=', 'service.type');
-        //->join('products', 'products.id', '=', 'service.product_id');
+        ->join('service_type', 'service_type.id', '=', 'service.type')
+        ->leftJoin('products', 'products.id', '=', 'service.product_id');
         $services=array();
         if(Session::get('logged_user_type') =='3')
         {
             $vendor_id=Session::get('logged_vendor_id');
             $services= $rows1->where('service.vendor_id','=',$vendor_id)
-                ->select('service.*','service.name as sername','service_type.name as sname')
+                ->select('service.*','products.name as pdtname','service.name as sername','service_type.name as sname')
                 ->paginate(5);
         }
         else if(Session::get('logged_user_type') =='1')
         {
             $services=$rows1->join('vendor', 'vendor.id', '=', 'service.vendor_id')
-                ->select('service.*','service.name as sername','service_type.name as sname','vendor.name as vname','products.name as pdtname')
+                ->select('service.*','products.name as pdtname','service.name as sername','service_type.name as sname','vendor.name as vname','products.name as pdtname')
                 ->paginate(5);
         }
         //dd(DB::getQueryLog());
@@ -91,12 +107,14 @@ class ServiceController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'servicetype_list' => 'required|string|max:50',
-            //'vendor_name' => 'required|string|max:50',
-           // 'product_list' => 'required|string|max:50',
+            'serviceprice' => 'required|string|max:50',
+            //'product_list' => 'required|string|max:50',
             'servicename' => 'required|string|max:100',
+            'servicesgst' => 'required|string|max:100',
+            'servicecgst' => 'required|string|max:100',
         ], [
             'servicetype_list.required' => 'Service Type List is required',
-           //'product_list.required' => 'Product List is required',
+           'serviceprice.required' => 'Service Price is required',
             'servicename.required' => 'Service Name is required'
           ]);
           return $validator;

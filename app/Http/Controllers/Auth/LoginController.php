@@ -13,6 +13,8 @@ use App\UserLogin;
 use App\Http\Requests\UserRequest;
 use Session;
 use App\Vendor;
+use App\Configuration;
+use App\VendorConfiguration;
 
 class LoginController extends Controller
 {
@@ -61,9 +63,19 @@ class LoginController extends Controller
             ->get();
             Session::put('logged_vendor_id', $vendor_id[0]->id);
             Session::put('logged_vendor_shortcode', $vendor_id[0]->short_code);
+
+            Session::put('tax_enabled', $this->config_settings('tax_enabled'));
+            Session::put('digital_profile_status',  $this->config_settings('digital_profile_status'));
         }else if($user->user_type == '1') // admin
         {
             Session::put('logged_vendor_id', '');
         }
+    }
+    public function config_settings($field)
+    {
+        $configuration=VendorConfiguration::select('vendor_configuration.*')
+        ->where('vendor_id','=',Session::get('logged_vendor_id'))
+        ->get();
+        return $configuration[0]->$field;
     }
 }

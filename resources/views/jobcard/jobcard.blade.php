@@ -1,5 +1,6 @@
 @extends('layouts.app', ['page' => __('Job Card'), 'pageSlug' => 'jobcard'])
-
+<script src="{{ asset('black') }}/js/core/jquery.min.js"></script>
+{{-- <meta name="csrf-token" content="{{ csrf_token() }}" /> --}}
 @section('content')
 <div class="row">
   <div class="col-md-12">
@@ -42,9 +43,9 @@
                   JobCard Number
                 </th>
                 @if(Session::get('logged_user_type') =='1')
-                <th>
-                  Vendor
-                </th>
+                    <th>
+                    Vendor
+                    </th>
                 @endif
                 <th>
                     Name
@@ -64,9 +65,9 @@
                   <th>
                     Status
                   </th>
-                {{-- <th >
+                <th >
                     Action
-                  </th> --}}
+                  </th>
               </tr>
             </thead>
             <tbody>
@@ -105,7 +106,8 @@
                         }
 
                     ?>
-                        <tr>
+                        <tr class="viewjobcards" data-id={{ $value->id }}>
+
                             <td>
                                 {{ $jobcard->firstItem() + $key }}
                             </td>
@@ -135,13 +137,20 @@
                             <td>
                                 {{ $value->statusname }}
                             </td>
-                            {{-- <td >
-                                <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
+
+                            <td >
+                                {{-- <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
                                     <a href="jobcard_edit/{{ $value->jobid }}" ><i class="tim-icons icon-settings"></i></a>
-                                </button>
+                                </button> --}}
 
+                                 <a  href="jobcard_edit/{{ $value->id }}"  >
+                                    <i class='tim-icons icon-pencil'></i>
+                                </a>
 
-                               </td> --}}
+                                <a style="color: #ba54f5; cursor: pointer;" data-toggle='modal' id='deleteButton' data-target='#delete_jobcards'  data-id='{{  $value->id }}' data-jobcardref='{{  $value->jcnmbr }}' data-jobcardnmbr='{{  $value->jobcard_number }}' title='Delete Service'>
+                                    <i class='tim-icons icon-trash-simple'></i>
+                                </a>
+                            </td>
                         </tr>
                 @endforeach
 
@@ -161,4 +170,65 @@
 
 </div>
 
+
+<div class="modal fade" id="delete_jobcards" tabindex="-1" role="dialog" aria-labelledby="smallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body" id="smallBody">
+                <div>
+                    <form action="{{ route('jobcard_delete_each') }}" method="post">
+                        <input type="hidden" id="referencenumber" name="referencenumber" >
+                        <input type="hidden" id="referenceid" name="referenceid" >
+                        <div class="modal-body">
+                            @csrf
+
+                            <div class="text-center">Are you sure you want to delete Jobcard <span id="delref"> </span>? </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Yes, Delete Service</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
+<script language="JavaScript" type="text/javascript">
+    $(document).ready(function() {
+        $(document).on('click', '#deleteButton', function(event) {
+            event.preventDefault();
+            var jobcardid =$(this).attr('data-id');
+            var jobcardref =$(this).attr('data-jobcardref');
+            var jobcard =$(this).attr('data-jobcardnmbr');
+            $('#referencenumber').val(jobcardref);
+            $('#referenceid').val(jobcardid);
+            $('#delref').html(jobcard);
+            $.ajax({
+                url: route('jobcard_delete_each')
+                , beforeSend: function() {
+                },
+                // return the result
+                success: function(result) {
+                    $('#delete_services').modal("show");
+                }
+                , complete: function() {
+                }
+                , error: function(jqXHR, testStatus, error) {
+                    console.log(error);
+                    alert("Page " + href + " cannot open. Error:" + error);
+                    $('#loader').hide();
+                }
+                , timeout: 10000
+            })
+        });
+        $(document).on('click', '.viewjobcards', function(event) {
+            //event.preventDefault();
+            var jobcardid =$(this).attr('data-id');
+
+        });
+
+    });
+</script>

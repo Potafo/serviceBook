@@ -49,9 +49,9 @@
                 <th>
                     Type
                   </th>
-                {{-- <th >
+                <th >
                     Product
-                  </th> --}}
+                  </th>
               </tr>
             </thead>
             <tbody>
@@ -75,11 +75,11 @@
                                 {{ $value->sname }}
 
                             </td>
-                             {{-- <td>
+                             <td>
 
                                 {{ $value->pdtname }}
 
-                            </td> --}}
+                            </td>
                             {{-- <td >
                                 <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
                                     <a href="products_edit/{{ $value->id }}" ><i class="tim-icons icon-settings"></i></a>

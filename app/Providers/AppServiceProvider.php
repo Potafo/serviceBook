@@ -10,6 +10,7 @@ use App\VendorType;
 use App\Package;
 use App\ServiceType;
 use App\Vendor;
+use App\ConfigurationType;
 
 use Illuminate\Support\Facades\Schema;
 
@@ -29,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
          $this->loadPackages();
          $this->loadVendors();
          $this->loadServicetype();
+         $this->loadConfigtype();
     }
 
     /**
@@ -94,6 +96,13 @@ class AppServiceProvider extends ServiceProvider
             $servicetype = ServiceType::select('name', 'id')
                 ->get();
             $view->with('servicetype', $servicetype);
+        });
+    }
+    private function loadConfigtype() {
+        view()->composer(['*'], function($view) {
+            $configtype = ConfigurationType::select('name', 'id')
+                ->get();
+            $view->with('configtype', $configtype);
         });
     }
 }

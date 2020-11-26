@@ -76,6 +76,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('jobcard_serviceinsert', ['as' => 'jobcard.service_insert', 'uses' => 'JobcardController@service_insert']);
     Route::post('jobcard_servicelist', ['as' => 'jobcard.service_list', 'uses' => 'JobcardController@load_jobcardservice_list']);
     Route::get('clear/{page}', ['as' => 'pages.clear_tables', 'uses' => 'ClearController@cleartables']);
+    Route::get('jobcard_delete/{id}', ['as' => 'jobcard.jobcard_delete', 'uses' => 'JobcardController@delete']);
+    Route::post('jobcard_delete', ['as' => 'jobcard_delete', 'uses' => 'JobcardController@fielddelete']);
+    Route::post('jobcard_serviceupdate', ['as' => 'jobcard.service_update', 'uses' => 'JobcardController@service_update']);
+    Route::post('jobcard_delete_each', ['as' => 'jobcard_delete_each', 'uses' => 'JobcardController@fielddelete_each']);
+    Route::get('jobcard_servicelist_edit', ['as' => 'jobcard.service_list_edit', 'uses' => 'JobcardController@load_jobcardservice_list_edit']);
 
     //products
     Route::get('products', ['as' => 'products.products', 'uses' => 'ProductController@products_view']);
@@ -90,5 +95,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('services', ['as' => 'services.services', 'uses' => 'ServiceController@services_view']);
     Route::get('services_add', ['as' => 'services.services_add', 'uses' => 'ServiceController@services_add']);
     Route::put('services_insert', ['as' => 'services.insert', 'uses' => 'ServiceController@insert']);
+
+    //configuration
+    Route::get('vendor_configuration', ['as' => 'configuration.vendor_configuration', 'uses' => 'ConfigurationController@vendorconfig_view']);
+    Route::get('config_add', ['as' => 'configuration.config_add', 'uses' => 'ConfigurationController@config_add']);
+    Route::put('config_insert', ['as' => 'configuration.insert', 'uses' => 'ConfigurationController@insert']);
+    Route::get('config_update', ['as' => 'configuration.config_update', 'uses' => 'ConfigurationController@config_update']);
+
+
 });
 

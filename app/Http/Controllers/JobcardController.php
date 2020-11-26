@@ -56,39 +56,42 @@ class JobcardController extends Controller
             return response::json(['status' =>$status,'response_code' =>$response_code]);
 
     }
-    public function jobcard_view(Jobcard $model)
+    public function jobcard_view(Request $request,Jobcard $model)
     {
         //$logged_user_id = Auth::id();
-        //$jobcard=Jobcard::all();
+         $status_list=DB::table('status')
+        ->select('status.*')
+        ->where('status.vendor_id','=',Session::get('logged_vendor_id'))
+        ->orderBy('status.display_order', 'DESC')
+        ->paginate(1);
 
-        // $rows1=DB::table('job_card')
-        // ->join('vendor', 'vendor.id', '=', 'job_card.vendor_id')
-        // ->select('vendor.name as vname','job_card.id as jobid','job_card.*')
-        // ->orderBy('job_card.date', 'ASC');
-        $rows1=DB::table('job_card')
-        ->join('jobcard_services','job_card.jobcard_number','=','jobcard_services.jobcard_reference')
-        ->select('job_card.name as custname','status.name as statusname','job_card.mobile as custmobile','jobcard_services.*','products.name as pdtname',\DB::raw("GROUP_CONCAT(service.name) as sname"))
+        $status_last=$status_list[0]->id;
+        $page = $request['page'];
+        //DB::enableQueryLog();
+        //$rows1=DB::table('job_card')
+        $rows1=Jobcard::join('jobcard_services','job_card.jobcard_number','=','jobcard_services.jobcard_reference')
+        ->select('job_card.name as custname','job_card.jobcard_number as jcnmbr','status.name as statusname','job_card.mobile as custmobile','jobcard_services.*','products.name as pdtname',\DB::raw("GROUP_CONCAT(service.name) as sname"))
         ->leftjoin("service",\DB::raw("FIND_IN_SET(service.id,jobcard_services.generalservice) OR  FIND_IN_SET(service.id,jobcard_services.productservice)"),">",\DB::raw("'0'"))
         ->join('products', 'products.id', '=', 'jobcard_services.product_id')
         ->join('status', 'status.id', '=', 'jobcard_services.current_status')
+        ->where('jobcard_services.current_status','!=',$status_last)
          ->groupBy('jobcard_number')
          ->orderBy('created_at','DESC');
-
-       // $rows1=DB::table('job_card');
         $jobcard=array();
         if(Session::get('logged_user_type') =='3')
         {
             $vendor_id=Session::get('logged_vendor_id');
-            $jobcard= $rows1->where('job_card.vendor_id','=',$vendor_id)
-                ->paginate(5);
+            $jobcard= $rows1->where('job_card.vendor_id','=',$vendor_id);
         }
         else if(Session::get('logged_user_type') =='1')
         {
-            $jobcard=$rows1->paginate(5);
         }
+        $jobcard=$rows1->paginate(5);
+       // $jobcard=Jobcard::paginate(5);
+        //dd(DB::getQueryLog());
         if(Session::has('jobcard_reference'))
         {
-        Session::forget('jobcard_reference');
+            Session::forget('jobcard_reference');
         }
        return view('jobcard.jobcard', compact('jobcard'));
         //return view('snippets/salary_report_tile')->with(['staff_data' => $staff_data, 'pagination' => '']);
@@ -157,15 +160,24 @@ class JobcardController extends Controller
     }//product_list vendor_name jobcardnumber
     public function validate_data(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'product_list' => 'required|string|max:50',
-           // 'generalservice.*' => 'required|string|max:50',
-          // 'productservice.*' => 'required|string|max:50',
-        ], [
-            'product_list.required' => 'Product List is required',
-            //'vendor_name.required' => 'Vendor List is required',
-           // 'jobcardnumber.required' => 'JobCard Number is required'
-          ]);
+
+            $validator = Validator::make($request->all(), [
+                'product_list' => 'required|string|max:50',
+              // 'generalservice.*' => 'required|string|max:50',
+             // 'productservice.*' => 'required|string|max:50',
+            ], [
+                'product_list.required' => 'Product List is required',
+                //'vendor_name.required' => 'Vendor List is required',
+               // 'jobcardnumber.required' => 'JobCard Number is required'
+              ]);
+            $validator->sometimes('generalservice.*', 'required', function ($request) {
+                return $request['productservice'] === "";
+            });
+            $validator->sometimes('productservice.*', 'required', function ($request) {
+                return $request['generalservice'] === "";
+            });
+
+
           return $validator;
     }
     public function validate_jobcard(Request $request)
@@ -194,18 +206,40 @@ class JobcardController extends Controller
     }
     public function jobcard_edit(Request $request,$id)
     {
-
-        $jobcard=DB::table('job_card')
-        ->select('job_card.*')
-        ->where('job_card.id','=',$id)
+        //`jobcard_services`(`id`, `jobcard_reference`, `jobcard_number`, `product_id`, `generalservice`, `productservice`, `created_at`, `updated_at`, `current_status`
+        //`job_card`(`id`, `user_id`, `vendor_id`, `jobcard_number`, `date`, `created_at`, `updated_at`, `name`, `mobile`)
+        //DB::enableQueryLog();
+        $jobcard_cust=array();
+       // $id='13';
+        //$jobcard_cust=DB::select("select `job_card`.`name`, jobcard_services.jobcard_number,`job_card`.`mobile`, `jobcard_services`.`jobcard_reference`, `job_card`.`vendor_id` from `job_card` inner join `jobcard_services` on `jobcard_services`.`jobcard_reference` = `job_card`.`jobcard_number` where `jobcard_services`.`id` ='".$id."'");
+        $jobcard_cust=Jobcard::select('job_card.name','jobcard_services.jobcard_number','job_card.mobile','jobcard_services.jobcard_reference','job_card.vendor_id')//DB::table('job_card')
+        ->join('jobcard_services','jobcard_services.jobcard_reference','=','job_card.jobcard_number')
+        ->where('jobcard_services.id','=',$id)
         ->get();
+        //echo $jobcard_cust[0]->jobcard_reference;
+        // if(Session::has('jobcard_reference'))
+        // {
+        // Session::forget('jobcard_reference');
+        // }
+        // if(count($jobcard_cust)>0)
+        // {
+        //    foreach($jobcard_cust as $value)
+        //    {
+           Session::put('jobcard_reference',$jobcard_cust[0]->jobcard_reference);
+        //    }
+        // }
+        // /echo ($jobcard_cust[0]->name);
+
+       // dd(DB::getQueryLog());
+
+
         $products=array();
         if(Session::get('logged_user_type') =='3')
         {
         $products=$this->product_list_query(Session::get('logged_vendor_id'));
         }else if(Session::get('logged_user_type') =='1')
         {
-        $products=$this->product_list_query($jobcard[0]->vendor_id);
+        $products=$this->product_list_query($jobcard_cust[0]->vendor_id);
         }
         $general_service= DB::table('service')
         ->select('service.*')
@@ -215,7 +249,8 @@ class JobcardController extends Controller
         ->select('service.*')
         ->where('service.type','=','2')
         ->get();
-        return view('jobcard.jobcard_edit',compact('jobcard','id','products','general_service','product_service'));
+
+        return view('jobcard.jobcard_edit',compact('jobcard_cust','id','products','general_service','product_service'));
     }
 
     public function update(Request $request)
@@ -250,53 +285,13 @@ class JobcardController extends Controller
 
     public function service_insert(Request $request)
     {
-        // echo "sadasd";
-        // dd($request);
-         $validator=$this->validate_data($request);
+        $validator=$this->validate_data($request);
         if($validator->fails()) {
-        //    $errors = $validator->errors();
-        //   return Redirect()->back()->with('errors',$errors)->withInput($request->all());
-
         return Response::json(['errors' => $validator->errors()]);
-
      }else {
-
-
-       // $jobcard_reference=Session::get('logged_vendor_shortcode').mt_rand(1000000,99999999);
-       // return view('jobcard.jobcard_add', compact('products','general_service','product_service','jobcard_reference'));
-
-
             $jobcard_reference=$request['jobcardnumber_ref'];
              $saved=$this->insert_jobcardservices($request);
              return Response::json(['success' => 1]);
-             if($saved==1)
-             {
-
-            //     $products=array();
-            //     if(Session::get('logged_user_type') =='3')
-            //     {
-            //     $products=$this->product_list_query(Session::get('logged_vendor_id'));
-            //     }
-            //     $general_service= DB::table('service')
-            //     ->select('service.*')
-            //     ->where('service.type','=','1')
-            //     ->get();
-            //     $product_service= DB::table('service')
-            //     ->select('service.*')
-            //     ->where('service.type','=','2')
-            //     ->get();
-            //     $servicelist=JobcardServices::select('jobcard_services.*')// DB::table('jobcard_services')
-            //    // ->select('jobcard_services.*')
-            //     ->where('jobcard_services.jobcard_reference','=',$jobcard_reference)
-            //     ->paginate(5);
-            //    $status="Jobcard services Successfully Added!";
-            //     return view('jobcard.jobcard_add',compact('status','products','general_service','product_service','jobcard_reference','servicelist'));
-
-                //return Redirect()->back()->with(compact('status','products','general_service','product_service','jobcard_reference','servicelist'));
-             }
-              //  return Redirect()->back()
-            //  ->withInput($request->only('jobcardnumber_ref'))
-            //  ->with('status', 'Jobcard services Successfully Added!');
      }
     }
     public function insert_jobcardservices(Request $request)
@@ -308,11 +303,16 @@ class JobcardController extends Controller
         $jobcard_servcs->jobcard_reference               =$request['jobcardnumber_ref'];
         $jobcard_servcs->jobcard_number               =$jobcardnumber;
         $jobcard_servcs->product_id               =$request['product_list'];
-        $generalservice=implode(',', $request['generalservice']);
-        $productservice=implode(',', $request['productservice']);
+        if(isset($request['generalservice'])){
+            $generalservice=implode(',', $request['generalservice']);
+            $jobcard_servcs->generalservice               =$generalservice;
+        }
 
-        $jobcard_servcs->generalservice               =$generalservice;
-        $jobcard_servcs->productservice               =$productservice;
+        if(isset($request['productservice'])){
+            $productservice=implode(',', $request['productservice']);
+            $jobcard_servcs->productservice               =$productservice;
+        }
+
         //$jobcard_servcs->current_status               =1;
 
         $saved=$jobcard_servcs->save();
@@ -345,7 +345,8 @@ class JobcardController extends Controller
     }
     public function load_jobcardservice_list(Request $request)
     {//DB::enableQueryLog();
-        $servicelist=JobcardServices::select('jobcard_services.*','products.name as pdtname',\DB::raw("GROUP_CONCAT(service.name) as sname"))
+
+        $servicelist=JobcardServices::select('jobcard_services.*','products.id as pid','products.name as pdtname',\DB::raw("GROUP_CONCAT(service.name) as sname"))
         ->leftjoin("service",\DB::raw("FIND_IN_SET(service.id,jobcard_services.generalservice) OR  FIND_IN_SET(service.id,jobcard_services.productservice)"),">",\DB::raw("'0'"))
         ->join('products', 'products.id', '=', 'jobcard_services.product_id')
          ->where('jobcard_services.jobcard_reference','=',$request['ref'])
@@ -353,11 +354,12 @@ class JobcardController extends Controller
          ->orderBy('created_at','DESC')
          ->paginate(10);
          //dd(DB::getQueryLog());
+
          $append ='';
          if(count($servicelist)>0)
          {
              $i=1;
-            foreach($servicelist as $key=>$value)
+            foreach($servicelist as $value)
             {
 
                 $append .= "
@@ -374,7 +376,15 @@ class JobcardController extends Controller
                 <td>
                    $value->sname
                 </td>
+                <td>
+                <a style='color: #ba54f5; cursor: pointer;'  data-toggle='modal' data-target='#productsInsert' data-type='update' data-pdtservice='".$value->productservice."' data-genservice='".$value->generalservice."' data-pdtid='".$value->pid."' data-jobcardref ='".Session::get('jobcard_reference')."' data-jobcardnmbr='".$value->jobcard_number."' data-id='".$value->id."' >
+                <i class='tim-icons icon-pencil'></i>
+                          </a>
 
+                    <a style='color: #ba54f5; cursor: pointer;' data-toggle='modal' id='deleteButton' data-target='#delete_services' data-jobcardnmbr='".$value->jobcard_number."' data-id='".$value->id."' title='Delete Service'>
+                    <i class='tim-icons icon-trash-simple'></i>
+                </a>
+                     </td>
 
                 </tr>";
                 $i++;
@@ -387,5 +397,225 @@ class JobcardController extends Controller
         //return $append;
 
 
+    }
+    public function getServiceList(Request $request)
+    {
+       // dd($request['gservice']);
+        $product_id=$request['product_id'];
+        $general_service= DB::table('service')
+        ->select('service.*')
+        ->where('service.type','=','2')
+        ->get();
+        $product_service= DB::table('service')
+        ->select('service.*')
+        ->where('service.type','=','1')
+        ->where('service.product_id','=',$product_id)
+        ->get();
+        $productservice=array();
+        $generalservice=array();
+        $append='';
+        $append.='<div class="form-group" >';
+        $append.='<label>General Service</label><br>';
+        $append.='<table >';
+                 if(isset($request['gservice']))
+                    {
+                       $generalservice=explode(',', $request['gservice']);
+                    }
+                $i=0;
+                foreach($general_service as $list)
+                {
+                    $checked='';
+                    if (in_array($list->id, $generalservice))
+                    $checked=" checked ";
+                    $i++;
+                    if($i==1)
+                    {
+                        $append.='<tr>';
+                    }
+                    $append.='            <td width="40%">';
+                    $append.='                <div class="form-check form-check-inline">';
+                    $append.='                    <label class="form-check-label">';
+                    $append.='                        <input class="form-check-input" type="checkbox" name="generalservice[]" '.$checked.'  id="inlineCheckbox_gs'.$list->id.'" value="'.$list->id.'">'.$request['gservice'].$list->name;
+                    $append.='                        <span class="form-check-sign"></span>';
+                    $append.='                    </label>';
+                    $append.='                </div>';
+                    $append.='            </td>';
+                                if($i%3 == 0)
+                                {
+                                    $append.='                </tr> <tr>';
+                                }
+                }
+        $append.='    </table>';
+    $append.='</div>';
+    $append.='<br>';
+    $append.='<div class="form-group" >';
+        $append.='<label>Product Service</label><br>';
+        $append.='<table >';
+                $i=0;
+                if(isset($request['pservice']))
+                    {
+                       $productservice=explode(',', $request['pservice']);
+                    }
+
+                foreach($product_service as $list)
+                {
+                    $checked='';
+                    if (in_array($list->id, $productservice))
+                    $checked=" checked ";
+
+                    $i++;
+                    if($i==1)
+                    {
+                        $append.='<tr>';
+                    }
+                    $append.='            <td width="40%">';
+                    $append.='                <div class="form-check form-check-inline">';
+                    $append.='                    <label class="form-check-label">';
+                    $append.='                        <input class="form-check-input" type="checkbox" name="productservice[]" '.$checked.' id="inlineCheckbox_gs'.$list->id.'" value="'.$list->id.'">'.$list->name;
+                    $append.='                        <span class="form-check-sign"></span>';
+                    $append.='                    </label>';
+                    $append.='                </div>';
+                    $append.='            </td>';
+                                if($i%3 == 0)
+                                {
+                                    $append.='                </tr> <tr>';
+                                }
+                }
+                        $append.='    </table>';
+
+                        $append.='</div>';
+                        $append.='<br>';
+
+
+        return $append;
+
+    }
+    public function delete($id)
+    {
+        $project = JobcardServices::find($id);
+        return view('jobcard.jobcard_delete', compact('project'));
+    }
+    public function fielddelete(Request $request)
+    {
+        $jobcard = JobcardServices::findOrFail($request['referenceid']);
+        $saved=$jobcard->delete($jobcard);
+        //$request['referencenumber']);referenceid
+        // $project = JobcardServices::find($id);
+        if(isset($request['fromeditpage']) ==1){
+            return Redirect('jobcard')->with('status', 'JobCard Deleted successfully!');
+        }else{
+            return Redirect('jobcard_add')->with('status', 'JobCard Deleted successfully!');
+        }
+
+    }
+    public function service_update(Request $request)
+    {
+        $validator=$this->validate_data($request);
+        if($validator->fails()) {
+        return Response::json(['errors' => $validator->errors()]);
+     }else {
+            //$jobcard_reference=$request['jobcardnumber_ref'];
+             $saved=$this->update_jobcardservices($request);
+             return Response::json(['success' => 1]);
+     }
+    }
+    public function update_jobcardservices(Request $request)
+    {
+
+        $savestatus=1;
+
+        //$data['name']              =$request['jobcard_id'];
+         //$data['product_id']           =$request['product_list'];
+         //$data['vendor_id']       =$request['vendor_name'];
+         if(isset($request['generalservice'])){
+            $generalservice=implode(',', $request['generalservice']);
+            $data['generalservice']               =$generalservice;
+        }else{
+            $data['generalservice']               =null;
+        }
+
+        if(isset($request['productservice'])){
+            $productservice=implode(',', $request['productservice']);
+            $data['productservice']              =$productservice;
+        }else{
+            $data['productservice']  =null;
+        }
+
+         $jobcard = JobcardServices::findOrFail($request['jobcardid_update']);
+
+        if($data['productservice']  == null  &&  $data['generalservice']  ==null)
+        {
+            $saved=$jobcard->delete($data);
+        }else{
+            $saved=$jobcard->update($data);
+        }
+
+         if ($saved) {
+             $savestatus++;
+         }
+
+    }
+
+    public function fielddelete_each(Request $request)
+    {
+        $jobcard = JobcardServices::findOrFail($request['referenceid']);
+        $saved=$jobcard->delete($jobcard);
+        //$request['referencenumber']);referenceid
+        // $project = JobcardServices::find($id);
+        return Redirect('jobcard')->with('status', 'JobCard Deleted successfully!');
+    }
+    public function load_jobcardservice_list_edit(Request $request)
+    {
+        //DB::enableQueryLog();
+
+        $servicelist=JobcardServices::select('jobcard_services.*','products.id as pid','products.name as pdtname',\DB::raw("GROUP_CONCAT(service.name) as sname"))
+        ->leftjoin("service",\DB::raw("FIND_IN_SET(service.id,jobcard_services.generalservice) OR  FIND_IN_SET(service.id,jobcard_services.productservice)"),">",\DB::raw("'0'"))
+        ->join('products', 'products.id', '=', 'jobcard_services.product_id')
+         ->where('jobcard_services.jobcard_number','=',$request['ref'])//$request['ref'])
+         ->groupBy('jobcard_number')
+         ->orderBy('created_at','DESC')
+         ->paginate(10);
+        // dd(DB::getQueryLog());
+
+         $append ='';
+
+         if(count($servicelist)>0)
+         {
+             $i=1;
+            foreach($servicelist as $value)
+            {
+
+                $append .= "
+                <tr>
+                <td>
+                    $i
+                </td>
+                <td>
+                     $value->jobcard_number
+                </td>
+                <td>
+                     $value->pdtname
+                </td>
+                <td>
+                   $value->sname
+                </td>
+                <td>
+                <a style='color: #ba54f5; cursor: pointer;' class='loadeditpage' data-toggle='modal' data-target='#productsInsert' data-type='update' data-pdtservice='".$value->productservice."' data-genservice='".$value->generalservice."' data-pdtid='".$value->pid."' data-jobcardref ='".Session::get('jobcard_reference')."' data-jobcardnmbr='".$value->jobcard_number."' data-id='".$value->id."' >
+                <i class='tim-icons icon-pencil'></i>
+                          </a>
+
+                    <a style='color: #ba54f5; cursor: pointer;' data-toggle='modal' id='deleteButton' data-target='#delete_services' data-jobcardnmbr='".$value->jobcard_number."' data-id='".$value->id."' title='Delete Service'>
+                    <i class='tim-icons icon-trash-simple'></i>
+                </a>
+                     </td>
+
+                </tr>";
+                $i++;
+
+            }
+            $links=$servicelist->links()->render();
+
+         }
+         return Response::json(['append' => ($append),'links'=>$links]);
     }
 }

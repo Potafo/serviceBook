@@ -44,4 +44,5 @@ class UserController extends Controller
             $response_code = '200';
             return response::json(['status' =>$status,'response_code' =>$response_code]);
     }
+
 }
