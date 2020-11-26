@@ -1,5 +1,5 @@
 @extends('layouts.app', ['page' => __('Job Card'), 'pageSlug' => 'jobcard'])
-<script src="{{ asset('black') }}/js/core/jquery.min.js"></script>
+{{-- <script src="{{ asset('black') }}/js/core/jquery.min.js"></script> --}}
 {{-- <meta name="csrf-token" content="{{ csrf_token() }}" /> --}}
 <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 
