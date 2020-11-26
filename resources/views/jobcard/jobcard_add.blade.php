@@ -1,5 +1,6 @@
 @extends('layouts.app', ['page' => __('Job Card'), 'pageSlug' => 'jobcard'])
-<script src="{{ asset('black') }}/js/core/jquery.min.js"></script>
+{{-- <script src="{{ asset('black') }}/js/core/jquery.min.js"></script> --}}
+<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 <style>
     #servicelist  tbody>tr:hover td{background: #fff  !important;}
 
