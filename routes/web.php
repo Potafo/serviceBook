@@ -81,6 +81,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('jobcard_serviceupdate', ['as' => 'jobcard.service_update', 'uses' => 'JobcardController@service_update']);
     Route::post('jobcard_delete_each', ['as' => 'jobcard_delete_each', 'uses' => 'JobcardController@fielddelete_each']);
     Route::get('jobcard_servicelist_edit', ['as' => 'jobcard.service_list_edit', 'uses' => 'JobcardController@load_jobcardservice_list_edit']);
+    Route::get('jobcard_view/{id}', ['as' => 'jobcard.jobcard_view', 'uses' => 'JobcardController@jobcard_view_each']);
+    Route::get('jobcard_servicelist_view', ['as' => 'jobcard.service_list_view', 'uses' => 'JobcardController@load_jobcardservice_list_view']);
 
     //products
     Route::get('products', ['as' => 'products.products', 'uses' => 'ProductController@products_view']);

@@ -1,10 +1,6 @@
 @extends('layouts.app', ['page' => __('Job Card'), 'pageSlug' => 'jobcard'])
 <script src="{{ asset('black') }}/js/core/jquery.min.js"></script>
 <meta name="csrf-token" content="{{ csrf_token() }}" />
-<style>
-    #servicelist  tbody>tr:hover td{background: #fff  !important;}
-
-</style>
 @section('content')
 
     <div class="row">
@@ -18,7 +14,7 @@
                         <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="home">Home</a></li>
                         <li class="breadcrumb-item "><a href="{{ url('jobcard') }}">Job Card</a></li>
-                        <li class="breadcrumb-item active" aria-current="page" id="bc_current">Edit</li>
+                        <li class="breadcrumb-item active" aria-current="page" id="bc_current">View</li>
                         </ol>
                     </nav>
                 </div>
@@ -66,11 +62,11 @@
                           </button>
                  </div> --}}
 
-                 <div class="form-group">
+                 {{-- <div class="form-group">
                     <div class="col-4 text-right">
                        <button type="submit" class="btn btn-fill btn-primary">{{ __('Submit') }}</button>
                    </div>
-                 </div>
+                 </div> --}}
                     </div>
                 </form>
 
@@ -91,9 +87,9 @@
                           <th>
                             Service
                           </th>
-                        <th >
+                        {{-- <th >
                             Action
-                          </th>
+                          </th> --}}
                       </tr>
                     </thead>
                     <tbody id="service_full_list">
@@ -179,7 +175,7 @@
                         @foreach($general_service as $list)
                             <?php $i++; ?>
                             @if($i==1)
-                                <tr >
+                                <tr>
                             @endif
                                 <td width="40%">
                                     <div class="form-check form-check-inline">
@@ -272,9 +268,9 @@
                 }
             });
 
-    setTimeout(function() {
-        $("table#tableservicelist  .loadeditpage").trigger('click');
-    },10);
+    // setTimeout(function() {
+    //     $("table#tableservicelist  .loadeditpage").trigger('click');
+    // },10);
 
 
     var ref=$('#jobcardnumber').val();
@@ -494,7 +490,7 @@
 //alert(ref);
             $('#service_full_list').html('');
             $.ajax({
-                url: '../jobcard_servicelist_edit',
+                url: '../jobcard_servicelist_view',
                 method:'get',
                 data:data,
                 cache : false,
