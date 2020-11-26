@@ -292,6 +292,8 @@
                     $(":checkbox"). attr("checked", false);
                     $('#type_title').html("Add");
                     $('#product_list').val("");
+                    modal.find('.modal-body #product_list').attr("style", "pointer-events: auto;");
+                    modal.find('.modal-body #product_list').css("color", "black");
                     $('#servicelist').css('display','none');
                     $('#submitForm').css('display','block');
                     $('#updateForm').css('display','none');
