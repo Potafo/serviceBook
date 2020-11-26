@@ -415,7 +415,7 @@ class JobcardController extends Controller
                     $append.='            <td width="40%">';
                     $append.='                <div class="form-check form-check-inline">';
                     $append.='                    <label class="form-check-label">';
-                    $append.='                        <input class="form-check-input" type="checkbox" name="generalservice[]" '.$checked.'  id="inlineCheckbox_gs'.$list->id.'" value="'.$list->id.'">'.$request['gservice'].$list->name;
+                    $append.='                        <input class="form-check-input" type="checkbox" name="generalservice[]" '.$checked.'  id="inlineCheckbox_gs'.$list->id.'" value="'.$list->id.'">'.$list->name;
                     $append.='                        <span class="form-check-sign"></span>';
                     $append.='                    </label>';
                     $append.='                </div>';
