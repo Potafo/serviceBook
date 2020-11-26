@@ -57,8 +57,6 @@
             </div>
         </div>
     </div>
-
-    @endsection
     <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
     {{-- <link rel="stylesheet" href="{{ asset('black') }}/css/switchery.min.css"> --}}
     <script src="{{ asset('black') }}/js/core/switchery.min.js"></script>
@@ -111,3 +109,5 @@
 
 
 </script>
+    @endsection
+
