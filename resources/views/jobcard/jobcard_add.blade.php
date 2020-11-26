@@ -1,6 +1,9 @@
 @extends('layouts.app', ['page' => __('Job Card'), 'pageSlug' => 'jobcard'])
 <script src="{{ asset('black') }}/js/core/jquery.min.js"></script>
+<style>
+    #servicelist  tbody>tr:hover td{background: #fff  !important;}
 
+</style>
 @section('content')
     <div class="row">
         <div class="col-md-12">
@@ -12,7 +15,7 @@
                     <nav aria-label="breadcrumb" role="navigation">
                         <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="home">Home</a></li>
-                        <li class="breadcrumb-item "><a href="jobcard">Job Card</a></li>
+                        <li class="breadcrumb-item "><a href="{{ url('jobcard') }}">Job Card</a></li>
                         <li class="breadcrumb-item active" aria-current="page" id="bc_current">Add</li>
                         </ol>
                     </nav>

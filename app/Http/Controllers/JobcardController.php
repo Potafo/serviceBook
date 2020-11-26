@@ -206,33 +206,12 @@ class JobcardController extends Controller
     }
     public function jobcard_edit(Request $request,$id)
     {
-        //`jobcard_services`(`id`, `jobcard_reference`, `jobcard_number`, `product_id`, `generalservice`, `productservice`, `created_at`, `updated_at`, `current_status`
-        //`job_card`(`id`, `user_id`, `vendor_id`, `jobcard_number`, `date`, `created_at`, `updated_at`, `name`, `mobile`)
-        //DB::enableQueryLog();
         $jobcard_cust=array();
-       // $id='13';
-        //$jobcard_cust=DB::select("select `job_card`.`name`, jobcard_services.jobcard_number,`job_card`.`mobile`, `jobcard_services`.`jobcard_reference`, `job_card`.`vendor_id` from `job_card` inner join `jobcard_services` on `jobcard_services`.`jobcard_reference` = `job_card`.`jobcard_number` where `jobcard_services`.`id` ='".$id."'");
         $jobcard_cust=Jobcard::select('job_card.name','jobcard_services.jobcard_number','job_card.mobile','jobcard_services.jobcard_reference','job_card.vendor_id')//DB::table('job_card')
         ->join('jobcard_services','jobcard_services.jobcard_reference','=','job_card.jobcard_number')
         ->where('jobcard_services.id','=',$id)
         ->get();
-        //echo $jobcard_cust[0]->jobcard_reference;
-        // if(Session::has('jobcard_reference'))
-        // {
-        // Session::forget('jobcard_reference');
-        // }
-        // if(count($jobcard_cust)>0)
-        // {
-        //    foreach($jobcard_cust as $value)
-        //    {
-           Session::put('jobcard_reference',$jobcard_cust[0]->jobcard_reference);
-        //    }
-        // }
-        // /echo ($jobcard_cust[0]->name);
-
-       // dd(DB::getQueryLog());
-
-
+        Session::put('jobcard_reference',$jobcard_cust[0]->jobcard_reference);
         $products=array();
         if(Session::get('logged_user_type') =='3')
         {
@@ -249,7 +228,6 @@ class JobcardController extends Controller
         ->select('service.*')
         ->where('service.type','=','2')
         ->get();
-
         return view('jobcard.jobcard_edit',compact('jobcard_cust','id','products','general_service','product_service'));
     }
 
@@ -344,7 +322,9 @@ class JobcardController extends Controller
 
     }
     public function load_jobcardservice_list(Request $request)
-    {//DB::enableQueryLog();
+    {
+
+        //DB::enableQueryLog();
 
         $servicelist=JobcardServices::select('jobcard_services.*','products.id as pid','products.name as pdtname',\DB::raw("GROUP_CONCAT(service.name) as sname"))
         ->leftjoin("service",\DB::raw("FIND_IN_SET(service.id,jobcard_services.generalservice) OR  FIND_IN_SET(service.id,jobcard_services.productservice)"),">",\DB::raw("'0'"))
@@ -430,7 +410,7 @@ class JobcardController extends Controller
                     $i++;
                     if($i==1)
                     {
-                        $append.='<tr>';
+                        $append.='<tr >';
                     }
                     $append.='            <td width="40%">';
                     $append.='                <div class="form-check form-check-inline">';
@@ -466,7 +446,7 @@ class JobcardController extends Controller
                     $i++;
                     if($i==1)
                     {
-                        $append.='<tr>';
+                        $append.='<tr >';
                     }
                     $append.='            <td width="40%">';
                     $append.='                <div class="form-check form-check-inline">';
@@ -618,4 +598,76 @@ class JobcardController extends Controller
          }
          return Response::json(['append' => ($append),'links'=>$links]);
     }
+    public function jobcard_view_each(Request $request,$id)
+    {
+        $jobcard_cust=array();
+        $jobcard_cust=Jobcard::select('job_card.name','jobcard_services.jobcard_number','job_card.mobile','jobcard_services.jobcard_reference','job_card.vendor_id')//DB::table('job_card')
+        ->join('jobcard_services','jobcard_services.jobcard_reference','=','job_card.jobcard_number')
+        ->where('jobcard_services.id','=',$id)
+        ->get();
+        Session::put('jobcard_reference',$jobcard_cust[0]->jobcard_reference);
+        $products=array();
+        if(Session::get('logged_user_type') =='3')
+        {
+        $products=$this->product_list_query(Session::get('logged_vendor_id'));
+        }else if(Session::get('logged_user_type') =='1')
+        {
+        $products=$this->product_list_query($jobcard_cust[0]->vendor_id);
+        }
+        $general_service= DB::table('service')
+        ->select('service.*')
+        ->where('service.type','=','1')
+        ->get();
+        $product_service= DB::table('service')
+        ->select('service.*')
+        ->where('service.type','=','2')
+        ->get();
+        return view('jobcard.jobcard_view',compact('jobcard_cust','id','products','general_service','product_service'));
+    }
+    public function load_jobcardservice_list_view(Request $request)
+    {
+        //DB::enableQueryLog();
+
+        $servicelist=JobcardServices::select('jobcard_services.*','products.id as pid','products.name as pdtname',\DB::raw("GROUP_CONCAT(service.name) as sname"))
+        ->leftjoin("service",\DB::raw("FIND_IN_SET(service.id,jobcard_services.generalservice) OR  FIND_IN_SET(service.id,jobcard_services.productservice)"),">",\DB::raw("'0'"))
+        ->join('products', 'products.id', '=', 'jobcard_services.product_id')
+         ->where('jobcard_services.jobcard_number','=',$request['ref'])//$request['ref'])
+         ->groupBy('jobcard_number')
+         ->orderBy('created_at','DESC')
+         ->paginate(10);
+        // dd(DB::getQueryLog());
+
+         $append ='';
+
+         if(count($servicelist)>0)
+         {
+             $i=1;
+            foreach($servicelist as $value)
+            {
+
+                $append .= "
+                <tr>
+                <td>
+                    $i
+                </td>
+                <td>
+                     $value->jobcard_number
+                </td>
+                <td>
+                     $value->pdtname
+                </td>
+                <td>
+                   $value->sname
+                </td>
+
+                </tr>";
+                $i++;
+
+            }
+            $links=$servicelist->links()->render();
+
+         }
+         return Response::json(['append' => ($append),'links'=>$links]);
+    }
+
 }

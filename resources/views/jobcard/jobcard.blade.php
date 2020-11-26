@@ -1,6 +1,8 @@
 @extends('layouts.app', ['page' => __('Job Card'), 'pageSlug' => 'jobcard'])
 <script src="{{ asset('black') }}/js/core/jquery.min.js"></script>
 {{-- <meta name="csrf-token" content="{{ csrf_token() }}" /> --}}
+
+
 @section('content')
 <div class="row">
   <div class="col-md-12">
@@ -34,7 +36,7 @@
       <div class="card-body" style="display: block" id="view_package">
         <div class="table-responsive">
           <table class="table tablesorter " id="">
-            <thead class=" text-primary">
+            <thead class=" text-primary" >
               <tr>
                 <th>
                   Slno
@@ -106,7 +108,7 @@
                         }
 
                     ?>
-                        <tr class="viewjobcards" data-id={{ $value->id }}>
+                        <tr class="viewjobcards" data-id='{{ $value->id }}' style="cursor: pointer">
 
                             <td>
                                 {{ $jobcard->firstItem() + $key }}
@@ -227,6 +229,7 @@
         $(document).on('click', '.viewjobcards', function(event) {
             //event.preventDefault();
             var jobcardid =$(this).attr('data-id');
+            window.location='jobcard_view/'+jobcardid;
 
         });
 
