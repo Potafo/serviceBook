@@ -1,22 +1,6 @@
 @extends('layouts.app', ['page' => __('User Profile'), 'pageSlug' => 'vendors'])
 
-<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
-{{-- <link rel="stylesheet" href="{{ asset('black') }}/css/switchery.min.css"> --}}
-<script src="{{ asset('black') }}/js/core/switchery.min.js"></script>
-<link rel="stylesheet" href="{{ asset('black') }}/css/toastr.min.css">
-<script src="{{ asset('black') }}/js/core/toastr.min.js"></script>
-    <style>
-        select > option {
-            color: black;
-        }
-.switchery{background-color:#fff;border:1px solid #dfdfdf;border-radius:20px;cursor:pointer;display:inline-block;height:30px;position:relative;vertical-align:middle;width:50px;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;box-sizing:content-box;background-clip:content-box}
-.switchery>small{background:#fff;border-radius:100%;box-shadow:0 1px 3px rgba(0,0,0,0.4);height:30px;position:absolute;top:0;width:30px}
-.switchery-small{border-radius:20px;height:20px;width:33px}
-.switchery-small>small{height:20px;width:20px}
-.switchery-large{border-radius:40px;height:40px;width:66px}
-.switchery-large>small{height:40px;width:40px}
 
-            </style>
 @section('content')
     <div class="row container">
         <div class="col-md-8">
@@ -75,7 +59,23 @@
     </div>
 
     @endsection
+    <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
+    {{-- <link rel="stylesheet" href="{{ asset('black') }}/css/switchery.min.css"> --}}
+    <script src="{{ asset('black') }}/js/core/switchery.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('black') }}/css/toastr.min.css">
+    <script src="{{ asset('black') }}/js/core/toastr.min.js"></script>
+        <style>
+            select > option {
+                color: black;
+            }
+    .switchery{background-color:#fff;border:1px solid #dfdfdf;border-radius:20px;cursor:pointer;display:inline-block;height:30px;position:relative;vertical-align:middle;width:50px;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;box-sizing:content-box;background-clip:content-box}
+    .switchery>small{background:#fff;border-radius:100%;box-shadow:0 1px 3px rgba(0,0,0,0.4);height:30px;position:absolute;top:0;width:30px}
+    .switchery-small{border-radius:20px;height:20px;width:33px}
+    .switchery-small>small{height:20px;width:20px}
+    .switchery-large{border-radius:40px;height:40px;width:66px}
+    .switchery-large>small{height:40px;width:40px}
 
+                </style>
 
 <script>
  $(document).ready(function(){
