@@ -59,9 +59,9 @@
     </div>
     <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
     {{-- <link rel="stylesheet" href="{{ asset('black') }}/css/switchery.min.css"> --}}
-    <script src="{{ asset('black') }}/js/core/switchery.min.js"></script>
+    <script src="{{ asset('black') }}/js/plugins/switchery.min.js"></script>
     <link rel="stylesheet" href="{{ asset('black') }}/css/toastr.min.css">
-    <script src="{{ asset('black') }}/js/core/toastr.min.js"></script>
+    <script src="{{ asset('black') }}/js/plugins/toastr.min.js"></script>
         <style>
             select > option {
                 color: black;
