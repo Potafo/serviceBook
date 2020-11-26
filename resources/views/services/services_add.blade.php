@@ -103,7 +103,7 @@ select > option {
     </div>
 @endsection
 {{-- <script src="{{ asset('black') }}/js/jquery.min.js"></script> --}}
-<script src="{{ asset('black') }}/js/core/jquery-2.1.3.min.js"></script>
+<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 <script language="JavaScript" type="text/javascript">
  $(document).ready(function() {
 
