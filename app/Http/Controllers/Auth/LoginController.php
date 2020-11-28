@@ -64,8 +64,10 @@ class LoginController extends Controller
             Session::put('logged_vendor_id', $vendor_id[0]->id);
             Session::put('logged_vendor_shortcode', $vendor_id[0]->short_code);
 
-            Session::put('tax_enabled', $this->config_settings('tax_enabled'));
-            Session::put('digital_profile_status',  $this->config_settings('digital_profile_status'));
+            // Session::put('tax_enabled', $this->config_settings('tax_enabled'));
+            // Session::put('digital_profile_status',  $this->config_settings('digital_profile_status'));
+             Session::put('tax_enabled', 'Y');
+            Session::put('digital_profile_status',  'Y');
         }else if($user->user_type == '1') // admin
         {
             Session::put('logged_vendor_id', '');

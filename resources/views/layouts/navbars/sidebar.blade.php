@@ -95,12 +95,12 @@
                             </a>
                         </li>
                         @if(Session::get('logged_user_type') == "3")
-                        <li @if ($pageSlug == 'vendor_configuration')  class="active " @endif>
+                        {{-- <li @if ($pageSlug == 'vendor_configuration')  class="active " @endif>
                             <a href="{{ url('vendor_configuration')  }}">
                                 <i class="tim-icons icon-bullet-list-67"></i>
                                 <p>{{ __('Vendor Configuration') }}</p>
                             </a>
-                        </li>
+                        </li> --}}
                         @endif
                     </ul>
                 </div>
