@@ -74,7 +74,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('jobcard_edit/{id}', ['as' => 'jobcard.jobcard_edit', 'uses' => 'JobcardController@jobcard_edit']);
     Route::put('jobcard_update', ['as' => 'jobcard.update', 'uses' => 'JobcardController@update']);
     Route::post('jobcard_serviceinsert', ['as' => 'jobcard.service_insert', 'uses' => 'JobcardController@service_insert']);
-    Route::post('jobcard_servicelist', ['as' => 'jobcard.service_list', 'uses' => 'JobcardController@load_jobcardservice_list']);
+    Route::get('jobcard_servicelist', ['as' => 'jobcard.service_list', 'uses' => 'JobcardController@load_jobcardservice_list']);
     Route::get('clear/{page}', ['as' => 'pages.clear_tables', 'uses' => 'ClearController@cleartables']);
     Route::get('jobcard_delete/{id}', ['as' => 'jobcard.jobcard_delete', 'uses' => 'JobcardController@delete']);
     Route::post('jobcard_delete', ['as' => 'jobcard_delete', 'uses' => 'JobcardController@fielddelete']);
@@ -83,7 +83,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('jobcard_servicelist_edit', ['as' => 'jobcard.service_list_edit', 'uses' => 'JobcardController@load_jobcardservice_list_edit']);
     Route::get('jobcard_view/{id}', ['as' => 'jobcard.jobcard_view', 'uses' => 'JobcardController@jobcard_view_each']);
     Route::get('jobcard_servicelist_view', ['as' => 'jobcard.service_list_view', 'uses' => 'JobcardController@load_jobcardservice_list_view']);
-
+    Route::post('jobcard_autocomplete', ['as' => 'jobcard.searchnumber', 'uses' => 'JobcardController@load_jobcard_number']);
+    Route::get('jobcard_updatestatus', ['as' => 'jobcard.updatestatus', 'uses' => 'JobcardController@updatestatus']);
     //products
     Route::get('products', ['as' => 'products.products', 'uses' => 'ProductController@products_view']);
     Route::get('products_add', function() {

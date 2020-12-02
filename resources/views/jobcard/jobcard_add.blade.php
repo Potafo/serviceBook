@@ -441,7 +441,7 @@
             $('#service_full_list').html('');
             $.ajax({
                 url: 'jobcard_servicelist',
-                method:'post',
+                method:'get',
                 data:data,
                 cache : false,
                 crossDomain : true,

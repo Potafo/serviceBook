@@ -76,6 +76,7 @@
                                 <p>{{ __('Service Type') }}</p>
                             </a>
                         </li> --}}
+                        @if(Session::get('logged_user_type') == "1")
                          <li @if ($pageSlug == 'vendor_category/category') class="active "  @endif>
                             <a href="{{ url('vendor_category/category')  }}">
                                 <i class="tim-icons icon-bullet-list-67"></i>
@@ -88,6 +89,7 @@
                                 <p>{{ __('Vendor Type') }}</p>
                             </a>
                         </li>
+                        @endif
                         <li @if ($pageSlug == 'vendor_category/status')  class="active " @endif>
                             <a href="{{ url('vendor_category/status')  }}">
                                 <i class="tim-icons icon-bullet-list-67"></i>

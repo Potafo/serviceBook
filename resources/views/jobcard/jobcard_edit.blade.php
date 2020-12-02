@@ -47,6 +47,16 @@
                     <input type="text" class="form-control{{ $errors->has('jobcard_mobile') ? ' is-invalid' : '' }}" id="jobcard_mobile" name="jobcard_mobile" style="color: white" readonly placeholder="Mobile" value="{{ old('jobcard_mobile',$jobcard_cust[0]->mobile) }}">
                     @include('alerts.feedback', ['field' => 'jobcard_mobile'])
                   </div>
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">Jobcard Number</label>
+                    <input type="text" class="form-control{{ $errors->has('jobcard_number') ? ' is-invalid' : '' }}" id="jobcard_number" name="jobcard_number" style="color: white" readonly placeholder="Jobcard Number" value="{{ $jobcard_cust[0]->jobcard_number }}">
+                    @include('alerts.feedback', ['field' => 'jobcard_number'])
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleFormControlInput1">Product</label>
+                    <input type="text" class="form-control{{ $errors->has('jobcard_pdt') ? ' is-invalid' : '' }}" id="jobcard_pdt" name="jobcard_pdt" style="color: white" readonly placeholder="Product Name" value="{{ $servicelist[0]->pdtname }}">
+                    @include('alerts.feedback', ['field' => 'jobcard_pdt'])
+                  </div>
                   @if(Session::get('logged_user_type') =='1')
                   <div class="form-group">
                     <label>{{ __('Vendors') }}</label>
@@ -59,6 +69,14 @@
                     @include('alerts.feedback', ['field' => 'vendor_name'])
                 </div>
                 @endif
+
+                              <div class="form-group">
+                                <div class="col-4 text-right">
+                                    <button type="button" class="btn btn-primary" data-toggle='modal' data-target='#productsInsert' data-type='update' data-pdtservice='{{ $servicelist[0]->productservice }}' data-genservice='{{ $servicelist[0]->generalservice }}' data-pdtid='{{ $servicelist[0]->pid }}' data-jobcardref ='{{ Session::get('jobcard_reference') }}' data-jobcardnmbr='{{ $servicelist[0]->jobcard_number }}' data-id='{{ $id }}' >
+                                       Edit Services
+                                                  </button>
+                               </div>
+                             </div>
                 {{-- <div class="form-group">
                     <label>{{ __('Products') }}</label>
                         <button type="button" class="btn btn-primary" data-type='add' data-toggle="modal" data-target="#productsInsert" data-jobcardref ="{{   Session::get('jobcard_reference') }}" >
@@ -66,11 +84,11 @@
                           </button>
                  </div> --}}
 
-                 <div class="form-group">
+                 {{-- <div class="form-group">
                     <div class="col-4 text-right">
                        <button type="submit" class="btn btn-fill btn-primary">{{ __('Submit') }}</button>
                    </div>
-                 </div>
+                 </div> --}}
                     </div>
                 </form>
 
@@ -81,18 +99,30 @@
                         <th>
                           Slno
                         </th>
-                        <th>
+                        {{-- <th>
                           JobCard Number
                         </th>
 
                         <th>
                             Product
-                          </th>
+                          </th> --}}
                           <th>
                             Service
                           </th>
                         <th >
-                            Action
+                            Price
+                          </th>
+                          @if(Session::get('tax_enabled')=='Y' )
+                          <th>
+                            SGST %
+                          </th>
+                        <th >
+                            CGST %
+                          </th>
+
+                          @endif
+                          <th >
+                            Total
                           </th>
                       </tr>
                     </thead>
@@ -142,7 +172,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title" id="exampleModalLabel" style="    text-align: center !important;color: purple;margin-left: 28%;
-          "><span id="type_title"> </span>  Product</h1>
+          "><span id="type_title"> </span></h1>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -160,7 +190,7 @@
                     <input type="hidden" name="jobcardnumber_ref" id="jobcardnumber_ref"  >
                     <input type="hidden" name="jobcardnumber_update" id="jobcardnumber_update"  >
                     <input type="hidden" name="jobcardid_update" id="jobcardid_update"  >
-                    <div class="form-group" id="product_list_div">
+                    <div class="form-group" id="product_list_div" style="display: none">
                         <label>{{ __('Products') }}</label>
                         <select  class="  productstyle form-control"  title="Single Select" data-size="7" placeholder="{{ __('Products') }}" name="product_list" id="product_list"  style="color: black;"  value="{{ old('product_list') }}">
                             <option value="">Select Products</option>
@@ -343,14 +373,14 @@
                 {
                     $(":checkbox"). attr("checked", false);
                     $('#product_list').val("");
-                    $('#type_title').html("Add");
+                    $('#type_title').html("Add Products");
                     $('#servicelist').css('display','none');
                     $('#submitForm').css('display','block');
                     $('#updateForm').css('display','none');
                 }
                 else if(type=="update")
                 {
-                    $('#type_title').html("Update");
+
                     var pid = button.data('pdtid');
                     var pservice = button.data('pdtservice');
                     var gservice = button.data('genservice');
@@ -361,6 +391,8 @@
                 modal.find('.modal-body #jobcardid_update').val(id);
                 modal.find('.modal-body #product_list').attr("style", "pointer-events: none;");
                 modal.find('.modal-body #product_list').css("color", "black");
+                var product=$( "#product_list option:selected" ).text();
+                $('#type_title').html(product+" - Update");
                 var data={"product_id":pid,"pservice":pservice,"gservice":gservice};
                 //$('#servicelist').css('display','block');
                              //   $('#servicelist').html(result);
