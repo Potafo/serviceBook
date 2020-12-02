@@ -9,6 +9,7 @@ use Response;
 use App\Product;
 use App\Service;
 use App\JobcardServices;
+use App\ServicePriceDetails;
 use App\StatusChange;
 use Illuminate\Support\Facades\Auth;
 use DB;
@@ -228,7 +229,8 @@ class JobcardController extends Controller
         ->select('service.*')
         ->where('service.type','=','2')
         ->get();
-        return view('jobcard.jobcard_edit',compact('jobcard_cust','id','products','general_service','product_service'));
+        $servicelist=$this->service_full_listedit($jobcard_cust[0]->jobcard_number);
+        return view('jobcard.jobcard_edit',compact('jobcard_cust','id','products','general_service','product_service','servicelist'));
     }
 
     public function update(Request $request)
@@ -336,6 +338,7 @@ class JobcardController extends Controller
          //dd(DB::getQueryLog());
 
          $append ='';
+         $links='';
          if(count($servicelist)>0)
          {
              $i=1;
@@ -544,15 +547,35 @@ class JobcardController extends Controller
         // $project = JobcardServices::find($id);
         return Redirect('jobcard')->with('status', 'JobCard Deleted successfully!');
     }
-    public function load_jobcardservice_list_edit(Request $request)
+    public function service_full_listedit($jobcardnumber)
     {
         //DB::enableQueryLog();
-
         $servicelist=JobcardServices::select('jobcard_services.*','products.id as pid','products.name as pdtname',\DB::raw("GROUP_CONCAT(service.name) as sname"))
         ->leftjoin("service",\DB::raw("FIND_IN_SET(service.id,jobcard_services.generalservice) OR  FIND_IN_SET(service.id,jobcard_services.productservice)"),">",\DB::raw("'0'"))
         ->join('products', 'products.id', '=', 'jobcard_services.product_id')
-         ->where('jobcard_services.jobcard_number','=',$request['ref'])//$request['ref'])
+         ->where('jobcard_services.jobcard_number','=',$jobcardnumber)//$request['ref'])
          ->groupBy('jobcard_number')
+         ->orderBy('created_at','DESC')
+         ->paginate(10);
+         //dd(DB::getQueryLog());
+         return $servicelist;
+    }
+    public function service_price_list($servceid)
+    {
+        $pricelist=ServicePriceDetails::select('*')
+        ->where('service_id','=',$servceid)
+        ->get();
+        return $pricelist;
+    }
+    public function load_jobcardservice_list_edit(Request $request)
+    {
+       // DB::enableQueryLog();
+      //  $servicelist=$this->service_full_listedit($request['ref']);
+        $servicelist=JobcardServices::select('jobcard_services.*','service.id  as sid','products.id as pid','products.name as pdtname',\DB::raw("(service.name) as sname"))
+        ->leftjoin("service",\DB::raw("FIND_IN_SET(service.id,jobcard_services.generalservice) OR  FIND_IN_SET(service.id,jobcard_services.productservice)"),">",\DB::raw("'0'"))
+        ->join('products', 'products.id', '=', 'jobcard_services.product_id')
+         ->where('jobcard_services.jobcard_number','=',$request['ref'])//$request['ref'])
+         //->groupBy('jobcard_number')
          ->orderBy('created_at','DESC')
          ->paginate(10);
         // dd(DB::getQueryLog());
@@ -561,38 +584,67 @@ class JobcardController extends Controller
 
          if(count($servicelist)>0)
          {
-             $i=1;
+             $i=1;$final = 0;
             foreach($servicelist as $value)
             {
+                $price=$this->service_price_list( $value->sid);
+                $price_each=$price[0]->actual_price;
+                $taxval=0; $total=0;
+               if(Session::get('tax_enabled')=='Y' )
+               {
+                $tax_sgst=$price[0]->tax_sgst;
+                $tax_cgst=$price[0]->tax_cgst;
+                $sgst = ($price_each * $tax_sgst) /100;
+                $cgst = ($price_each * $tax_cgst) /100;
+                $taxval= $sgst  +  $cgst;
 
+               }
+
+                $total=$taxval +  $price_each;
+                $final =$final + $total;
                 $append .= "
                 <tr>
                 <td>
                     $i
                 </td>
-                <td>
-                     $value->jobcard_number
-                </td>
-                <td>
-                     $value->pdtname
-                </td>
+
                 <td>
                    $value->sname
                 </td>
                 <td>
-                <a style='color: #ba54f5; cursor: pointer;' class='loadeditpage' data-toggle='modal' data-target='#productsInsert' data-type='update' data-pdtservice='".$value->productservice."' data-genservice='".$value->generalservice."' data-pdtid='".$value->pid."' data-jobcardref ='".Session::get('jobcard_reference')."' data-jobcardnmbr='".$value->jobcard_number."' data-id='".$value->id."' >
-                <i class='tim-icons icon-pencil'></i>
-                          </a>
+                $price_each
+             </td>
+            ";
+          if(Session::get('tax_enabled')=='Y' )
+          {
+              $append .="<td>
+                        $tax_sgst
+                    </td>
+                    <td>
+                        $tax_cgst
+                    </td>";
+          }
+          $append .="<td>
+          $total
+      </td>";
 
-                    <a style='color: #ba54f5; cursor: pointer;' data-toggle='modal' id='deleteButton' data-target='#delete_services' data-jobcardnmbr='".$value->jobcard_number."' data-id='".$value->id."' title='Delete Service'>
-                    <i class='tim-icons icon-trash-simple'></i>
-                </a>
-                     </td>
 
-                </tr>";
+                $append.="</tr>";
+                // <td>
+                // <a style='color: #ba54f5; cursor: pointer;' class='loadeditpage' data-toggle='modal' data-target='#productsInsert' data-type='update' data-pdtservice='".$value->productservice."' data-genservice='".$value->generalservice."' data-pdtid='".$value->pid."' data-jobcardref ='".Session::get('jobcard_reference')."' data-jobcardnmbr='".$value->jobcard_number."' data-id='".$value->id."' >
+                // <i class='tim-icons icon-pencil'></i>
+                //           </a>
+
+                //     <a style='color: #ba54f5; cursor: pointer;' data-toggle='modal' id='deleteButton' data-target='#delete_services' data-jobcardnmbr='".$value->jobcard_number."' data-id='".$value->id."' title='Delete Service'>
+                //     <i class='tim-icons icon-trash-simple'></i>
+                // </a>
+                //      </td>
                 $i++;
 
             }
+            $append .= "<tr>
+            <td> </td><td> </td><td> </td><td> </td>
+            <td>Total =</td><td>".$final   ."</td></tr>";
             $links=$servicelist->links()->render();
 
          }
@@ -622,12 +674,36 @@ class JobcardController extends Controller
         ->select('service.*')
         ->where('service.type','=','2')
         ->get();
-        return view('jobcard.jobcard_view',compact('jobcard_cust','id','products','general_service','product_service'));
+       // DB::enableQueryLog();
+        $vendor_current_status= StatusChange::select('status.display_order','status.name as stname','status.id as id')
+        ->join('status','status_change.to_status','=','status.id')
+        ->where('status_change.jobcard_number','=',$jobcard_cust[0]->jobcard_number)
+        ->orderBy('status_change.created_at','DESC')
+        ->get();
+        //dd(DB::getQueryLog());
+        //DB::enableQueryLog();
+        $vendor_status= DB::table('status')
+        ->select('status.*')
+        ->where('status.vendor_id','=',Session::get('logged_vendor_id'))
+        ->where('status.display_order','>',$vendor_current_status[0]->display_order)
+        ->orderBy('status.display_order','ASC')
+        ->get();
+        $vendor_status_last= DB::table('status')
+        ->select('status.*')
+        ->where('status.vendor_id','=',Session::get('logged_vendor_id'))
+        ->orderBy('status.display_order','DESC')
+        ->get(1);
+        //dd(DB::getQueryLog());
+        return view('jobcard.jobcard_view',compact('jobcard_cust','id','products','general_service','product_service','vendor_status','vendor_current_status','vendor_status_last'));
     }
     public function load_jobcardservice_list_view(Request $request)
     {
-        //DB::enableQueryLog();
-
+        //DB::enableQueryLog(); dd(DB::getQueryLog());
+        $vendor_status_last= DB::table('status')
+        ->select('status.*')
+        ->where('status.vendor_id','=',Session::get('logged_vendor_id'))
+        ->orderBy('status.display_order','DESC')
+        ->get(1);
         $servicelist=JobcardServices::select('jobcard_services.*','products.id as pid','products.name as pdtname',\DB::raw("GROUP_CONCAT(service.name) as sname"))
         ->leftjoin("service",\DB::raw("FIND_IN_SET(service.id,jobcard_services.generalservice) OR  FIND_IN_SET(service.id,jobcard_services.productservice)"),">",\DB::raw("'0'"))
         ->join('products', 'products.id', '=', 'jobcard_services.product_id')
@@ -658,9 +734,17 @@ class JobcardController extends Controller
                 </td>
                 <td>
                    $value->sname
-                </td>
+                </td>";
+                    if($value->current_status != $vendor_status_last[0]->id){
+                        $append.= "<td>
+                        <a style='color: #ba54f5; cursor: pointer;' class='loadeditpage' data-toggle='modal' data-target='#productsInsert' data-type='update' data-pdtservice='".$value->productservice."' data-genservice='".$value->generalservice."' data-pdtid='".$value->pid."' data-jobcardref ='".Session::get('jobcard_reference')."' data-jobcardnmbr='".$value->jobcard_number."' data-id='".$value->id."' >
+                        <i class='tim-icons icon-pencil'></i>
+                                  </a>
+                                  </td>";
+                    }
 
-                </tr>";
+
+               $append.="</tr>";
                 $i++;
 
             }
@@ -669,5 +753,54 @@ class JobcardController extends Controller
          }
          return Response::json(['append' => ($append),'links'=>$links]);
     }
+    public function load_jobcard_number(Request $request)
+    {
+        $search = $request->search;
 
+      if($search == ''){
+         $employees = Vendor::orderby('name','asc')->select('id','name')->limit(5)->get();
+      }else{
+         $employees = Vendor::orderby('name','asc')->select('id','name')->where('name', 'like', '%' .$search . '%')->limit(5)->get();
+      }
+
+      $response = array();
+      foreach($employees as $employee){
+         $response[] = array("value"=>$employee->id,"label"=>$employee->name);
+      }
+
+      return response()->json($response);
+    }
+    public function updatestatus(Request $request){
+        // /jobcardnumber_up
+        //echo $request['jobcardnumber_up'];
+        $data['current_status']       =$request['vendor_status'];
+        $jobcard = JobcardServices::where('jobcard_number', $request['jobcardnumber_up'])->firstOrFail();
+        $saved=$jobcard->update($data);
+
+
+        $vendor_current_status=array();
+        $vendor_current_status= StatusChange::select('status_change.to_status')
+        ->where('status_change.jobcard_number','=',$request['jobcardnumber_up'])
+        ->orderBy('status_change.created_at','DESC')
+        ->get();
+
+
+        $statuschange= new StatusChange();
+        $statuschange->jobcard_number               =$request['jobcardnumber_up'];
+        $statuschange->from_status               =$vendor_current_status[0]->to_status;
+        $statuschange->to_status               =$request['vendor_status'];
+        $statuschange->change_by               =Session::get('logged_vendor_id');
+        $statuschange->date                     =date('Y-m-d');
+        $statuschange->save();
+
+        return Redirect()->back()->with('status', 'Status Updated successfully!');
+            // if($request['vendor_status'] ==''){
+            //     return Response::json(['errors' => 1]);
+            // }else
+            // {
+            //     return Response::json(['success' => 1]);
+            // }
+
+//17192270
+    }
 }
