@@ -57,6 +57,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('vendor_category_insert', ['as' => 'vendorcategory.insert', 'uses' => 'VendorCategoryController@insert']);
     Route::get('vendor_category_edit/{mode}/{id}', ['as' => 'vendors.vendor_category_edit', 'uses' => 'VendorCategoryController@vendor_category_edit']);
     Route::put('vendor_category_update', ['as' => 'vendorcategory.update', 'uses' => 'VendorCategoryController@update']);
+    Route::get('filter_by_vendorid', ['as' => 'vendorcategory.filter_by_vendorid', 'uses' => 'VendorCategoryController@filter_by_vendorid']);
     //package
     Route::put('package_insert', ['as' => 'package.insert', 'uses' => 'PackageController@insert']);
     Route::get('packages', ['as' => 'package.packages', 'uses' => 'PackageController@packages_view']);
@@ -85,6 +86,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('jobcard_servicelist_view', ['as' => 'jobcard.service_list_view', 'uses' => 'JobcardController@load_jobcardservice_list_view']);
     Route::post('jobcard_autocomplete', ['as' => 'jobcard.searchnumber', 'uses' => 'JobcardController@load_jobcard_number']);
     Route::get('jobcard_updatestatus', ['as' => 'jobcard.updatestatus', 'uses' => 'JobcardController@updatestatus']);
+    Route::post('jobcard_partsinsert', ['as' => 'jobcard.parts_insert', 'uses' => 'JobcardController@parts_insert']);
+    Route::post('edit_jobcardservice', ['as' => 'jobcard.service_edit', 'uses' => 'JobcardController@cart_edit']);
+
     //products
     Route::get('products', ['as' => 'products.products', 'uses' => 'ProductController@products_view']);
     Route::get('products_add', function() {
@@ -97,14 +101,16 @@ Route::group(['middleware' => 'auth'], function () {
     //services
     Route::get('services', ['as' => 'services.services', 'uses' => 'ServiceController@services_view']);
     Route::get('services_add', ['as' => 'services.services_add', 'uses' => 'ServiceController@services_add']);
-    Route::put('services_insert', ['as' => 'services.insert', 'uses' => 'ServiceController@insert']);
+    Route::post('services_insert', ['as' => 'services.insert', 'uses' => 'ServiceController@insert']);
 
     //configuration
     Route::get('vendor_configuration', ['as' => 'configuration.vendor_configuration', 'uses' => 'ConfigurationController@vendorconfig_view']);
     Route::get('config_add', ['as' => 'configuration.config_add', 'uses' => 'ConfigurationController@config_add']);
     Route::put('config_insert', ['as' => 'configuration.insert', 'uses' => 'ConfigurationController@insert']);
     Route::get('config_update', ['as' => 'configuration.config_update', 'uses' => 'ConfigurationController@config_update']);
-
+    Route::get('config_view', ['as' => 'configuration.config_view', 'uses' => 'ConfigurationController@config_view']);
+    Route::get('main_configuration', ['as' => 'configuration.main_configuration', 'uses' => 'ConfigurationController@mainconfig_view']);
+    Route::get('config_main_update', ['as' => 'configuration.config_main_update', 'uses' => 'ConfigurationController@config_main_update']);
 
 });
 

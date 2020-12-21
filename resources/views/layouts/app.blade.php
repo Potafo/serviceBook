@@ -90,7 +90,8 @@
                 </ul>
             </div>
         </div>-->
-        <script src="{{ asset('black') }}/js/core/jquery.min.js"></script>
+        {{-- <script src="{{ asset('black') }}/js/core/jquery.min.js"></script> --}}
+        {{-- <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script> --}}
         <script src="{{ asset('black') }}/js/core/popper.min.js"></script>
         <script src="{{ asset('black') }}/js/core/bootstrap.min.js"></script>
         <script src="{{ asset('black') }}/js/plugins/perfect-scrollbar.jquery.min.js"></script>

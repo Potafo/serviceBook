@@ -18,12 +18,19 @@
                 </a>
             </li>
             {{-- @endif --}}
-
             @if(Session::get('logged_user_type') == "1")
-            <li @if ($pageSlug  == 'config_add') class="active " @endif>
-                <a href="{{ route('configuration.config_add')  }}">
-                    <i class="tim-icons icon-single-02"></i>
-                    <p>{{ __('Add Configurations') }}</p>
+            <li @if ($pageSlug == 'main_configuration')  class="active " @endif>
+                <a href="{{ url('main_configuration')  }}">
+                    <i class="tim-icons icon-settings"></i>
+                    <p>{{ __('Main Configuration') }}</p>
+                </a>
+            </li>
+            @endif
+            @if(Session::get('logged_user_type') == "1")
+            <li @if ($pageSlug  == 'config_view') class="active " @endif>
+                <a href="{{ route('configuration.config_view')  }}">
+                    <i class="tim-icons icon-settings-gear-63"></i>
+                    <p>{{ __('All Configurations') }}</p>
                 </a>
             </li>
             @endif
@@ -70,13 +77,14 @@
                                 <p>{{ __('Services') }}</p>
                             </a>
                         </li>
-                        {{-- <li @if ($pageSlug == 'vendor_category/service_type')  class="active " @endif>
+                        @if(Session::get('logged_user_type') == "1")
+                        <li @if ($pageSlug == 'vendor_category/service_type')  class="active " @endif>
                             <a href="{{ url('vendor_category/service_type')  }}">
                                 <i class="tim-icons icon-bullet-list-67"></i>
                                 <p>{{ __('Service Type') }}</p>
                             </a>
-                        </li> --}}
-                        @if(Session::get('logged_user_type') == "1")
+                        </li>
+
                          <li @if ($pageSlug == 'vendor_category/category') class="active "  @endif>
                             <a href="{{ url('vendor_category/category')  }}">
                                 <i class="tim-icons icon-bullet-list-67"></i>
@@ -90,19 +98,21 @@
                             </a>
                         </li>
                         @endif
+                        @if(Session::get('logged_user_type') == "3")
                         <li @if ($pageSlug == 'vendor_category/status')  class="active " @endif>
                             <a href="{{ url('vendor_category/status')  }}">
                                 <i class="tim-icons icon-bullet-list-67"></i>
                                 <p>{{ __('Vendor Status') }}</p>
                             </a>
                         </li>
+                        @endif
                         @if(Session::get('logged_user_type') == "3")
-                        {{-- <li @if ($pageSlug == 'vendor_configuration')  class="active " @endif>
+                        <li @if ($pageSlug == 'vendor_configuration')  class="active " @endif>
                             <a href="{{ url('vendor_configuration')  }}">
-                                <i class="tim-icons icon-bullet-list-67"></i>
+                                <i class="tim-icons icon-settings-gear-63"></i>
                                 <p>{{ __('Vendor Configuration') }}</p>
                             </a>
-                        </li> --}}
+                        </li>
                         @endif
                     </ul>
                 </div>

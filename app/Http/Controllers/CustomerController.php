@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Customer;
 use Response;
-
+use Session;
 class CustomerController extends Controller
 {
    public function add_customer(Request $request)

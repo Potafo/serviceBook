@@ -75,7 +75,7 @@ select > option {
 
     </div>
 @endsection
-<script src="{{ asset('black') }}/js/jquery.min.js"></script>
+
 <script language="JavaScript" type="text/javascript">
  $(document).ready(function() {
 

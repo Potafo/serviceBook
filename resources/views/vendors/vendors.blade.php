@@ -99,7 +99,7 @@
                         }
 
                         ?>
-                        <tr>
+                        <tr class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
                             <td>
                                 {{ $vendor->firstItem() + $key }}
                             </td>
@@ -123,16 +123,16 @@
                                 {{ $pending }}
                                                         </td>
                             <td >
-                                <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
-                                    <a href="vendor_view/{{ $value->vid }}" ><i class="tim-icons icon-single-02"></i></a>
-                                </button>
+                                {{-- <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon"> --}}
+                                    <a href="vendor_view/{{ $value->vid }}" ><i class="tim-icons icon-zoom-split"></i></a>
+                                {{-- </button> --}}
 
 
                             </td>
                             <td >
-                                <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-icon">
-                                    <a href="vendor_edit/{{ $value->vid }}" ><i class="tim-icons icon-settings"></i> </a>
-                                </button>
+                                {{-- <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-icon"> --}}
+                                    <a href="vendor_edit/{{ $value->vid }}" ><i class='tim-icons icon-pencil'></i></a>
+                                {{-- </button> --}}
                                 {{-- <button type="button" rel="tooltip" class="btn btn-danger btn-sm btn-icon">
                                     <i class="tim-icons icon-simple-remove"></i>
                                 </button> --}}
@@ -174,7 +174,13 @@
 <script src="{{ asset('black') }}/js/jquery.min.js"></script>
 
     <script language="JavaScript" type="text/javascript">
+ $(document).on('click', '.viewvendors', function(event) {
+            //event.preventDefault();
+            var vendorid =$(this).attr('data-id');
+            //window.location='jobcard_view/'+jobcardid;
+            window.location='vendor_view/'+vendorid;
 
+        });
     </script>
 
 @endsection

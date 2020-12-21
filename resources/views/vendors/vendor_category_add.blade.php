@@ -18,6 +18,7 @@
 ?>
 
 @extends('layouts.app', ['page' => __($title), 'pageSlug' =>$vcat])
+<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 <style>
 select > option {
     color: black;
@@ -45,27 +46,112 @@ select > option {
                     @method('put')
                     @include('alerts.success')
                     <input type="hidden" id="hidden_mode" name="hidden_mode" value="{{ $mode }}" >
-                  <div class="form-group">
-                    <label for="exampleFormControlInput1">{{ $title }} Name</label>
-                    <input type="text" class="form-control{{ $errors->has('cat_name') ? ' is-invalid' : '' }}"  id="cat_name" name="cat_name" placeholder="{{ $title }} Name" value="{{ old('cat_name') }}">
-                    @include('alerts.feedback', ['field' => 'cat_name'])
-                  </div>
                     @if($mode=="status")
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="exampleFormControlInput1">{{ $title }} Name</label>
+                                <input type="text" class="form-control{{ $errors->has('cat_name') ? ' is-invalid' : '' }}"  id="cat_name" name="cat_name" placeholder="{{ $title }} Name" value="{{ old('cat_name') }}">
+                                @include('alerts.feedback', ['field' => 'cat_name'])
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="exampleFormControlInput1">OR</label>
+                                <select class="form-control{{ $errors->has('cat_status') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Status') }}" name="cat_status" id="cat_status" value="{{ old('cat_status') }}">
+                                    <option value="">{{ $title }}</option>
+                                    @foreach($category as $list)
+                                            <option value="{{$list->id}}" @if(old('cat_status')==$list->id) selected @endif>{{$list->name}}</option>
+                                        @endforeach
+                                </select>
+                                @include('alerts.feedback', ['field' => 'cat_status'])
+                            </div>
+                        </div>
                         <div class="form-group">
-                            <label for="exampleFormControlInput1">Notification</label>
-                            <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Notification') }}" name="notification" id="notification" value="{{ old('notification') }}">
+                            <label for="exampleFormControlInput1">Send Sms</label>
+                            <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Send Sms') }}" name="send_sms" id="send_sms">
+
+                                        <option value="N" >No</option>
+                                        <option value="Y" >Yes</option>
+                            </select>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleFormControlInput1">Send email</label>
+                            <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Send Email') }}" name="send_email" id="send_email">
                                 <option value="N" >No</option>
-                                <option value="Y" >Yes</option>
+                                <option value="Y">Yes</option>
 
                             </select>
 
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleFormControlInput1">Display Order</label>
+                            <input type="text" class="form-control{{ $errors->has('displayorder') ? ' is-invalid' : '' }}"  id="displayorder" name="displayorder" placeholder="{{ __('Display Order') }} " value="{{ old('displayorder') }}">
+                            @include('alerts.feedback', ['field' => 'displayorder'])
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleFormControlInput1">Ending Status</label>
+                            <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Ending Status') }}" name="ending_status" id="ending_status">
+                                <option value="0">No</option>
+                                <option value="1" >Yes</option>
+
+                            </select>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleFormControlInput1">Status</label>
+                            <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Status') }}" name="status" id="status">
+                                        <option value="Y">Active</option>
+                                        <option value="N">Non Active</option>
+                            </select>
+
+                        </div>
+                        @elseif($mode=="service_type")
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="exampleFormControlInput1">{{ $title }} Name</label>
+                                    <input type="text" class="form-control{{ $errors->has('cat_name') ? ' is-invalid' : '' }}"  id="cat_name" name="cat_name" placeholder="{{ $title }} Name" value="{{ old('cat_name') }}">
+                                    @include('alerts.feedback', ['field' => 'cat_name'])
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="exampleFormControlInput1">OR</label>
+                                    <select class="form-control{{ $errors->has('cat_status') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Status') }}" name="cat_status" id="cat_status" value="{{ old('cat_status') }}">
+                                        <option value="">{{ $title }}</option>
+                                        @foreach($category as $list)
+                                                <option value="{{$list->id}}" @if(old('cat_status')==$list->id) selected @endif>{{$list->name}}</option>
+                                            @endforeach
+                                    </select>
+                                    @include('alerts.feedback', ['field' => 'cat_status'])
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label for="exampleFormControlInput1"> Display Order</label>
-                                <input type="text" class="form-control{{ $errors->has('displayorder') ? ' is-invalid' : '' }}"  id="displayorder" name="displayorder" placeholder="{{ __('Display Order') }} " value="{{ old('displayorder') }}">
-                                @include('alerts.feedback', ['field' => 'displayorder'])
+                                <label for="exampleFormControlInput1">Service Category</label>
+                                <select class="form-control{{ $errors->has('serv_cat') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Servie Category') }}" name="serv_cat" id="serv_cat" value="{{ old('serv_cat') }}">
+
+                                    @foreach($servicecategory as $list)
+                                            <option value="{{$list->id}}" @if(old('serv_cat')==$list->id) selected @endif>{{$list->name}}</option>
+                                        @endforeach
+                                </select>
+                                @include('alerts.feedback', ['field' => 'serv_cat'])
                             </div>
-                    @endif
+                                @if(Session::get('logged_user_type') =='1')
+                                    <div class="form-group">
+                                        <label>{{ __('Vendors') }}</label>
+                                        <select class="form-control{{ $errors->has('vendor_name') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Vendors') }}" name="vendor_name" id="vendor_name" value="{{ old('vendor_name') }}">
+                                            <option value="">Select Vendor</option>
+                                            @foreach($vendor_list as $list)
+                                                    <option value="{{$list->id}}">{{$list->name}}</option>
+                                                @endforeach
+                                        </select>
+                                        @include('alerts.feedback', ['field' => 'vendor_name'])
+                                        </div>
+                                @endif
+                        @else
+                            <div class="form-group">
+                                <label for="exampleFormControlInput1">{{ $title }} Name</label>
+                                <input type="text" class="form-control{{ $errors->has('cat_name') ? ' is-invalid' : '' }}"  id="cat_name" name="cat_name" placeholder="{{ $title }} Name" value="{{ old('cat_name') }}">
+                                @include('alerts.feedback', ['field' => 'cat_name'])
+                            </div>
+                        @endif
+
                   <div class="form-group">
                      <div class="col-4 text-right">
                         <button type="submit" class="btn btn-fill btn-primary">{{ __('Save') }}</button>

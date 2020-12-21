@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Session;
 use Response;
 use App\VendorConfiguration;
+use App\MainConfiguration;
 
 class ConfigurationController extends Controller
 {
@@ -35,11 +36,11 @@ class ConfigurationController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'config_name' => 'required|string|max:50',
-            'config_value' => 'required|string|max:50',
+            //'config_value' => 'required|string|max:50',
             'config_type' => 'required|string|max:50',
         ], [
             'config_name.required' => 'Name is required',
-            'config_value.required' => 'Value is required',
+            //'config_value.required' => 'Value is required',
             'config_type.required' => 'Type is required'
 
           ]);
@@ -53,13 +54,16 @@ class ConfigurationController extends Controller
              return Redirect()->back()->with('errors',$errors)->withInput($request->all());
         }else {
            $this->insert_configuration($request);
-            return Redirect('config_add')->with('status', 'Configuration Successfully Added!');
+            return Redirect('config_view')->with('status', 'Configuration Successfully Added!');
         }
     }
     public function insert_configuration(Request $request)
     {
        //config_view  config_status config_type config_value config_name
        //`id`, `type`, `config_name`, `value`, `status`, `page_view`, `
+
+       //update to configuration and vendor config table
+
         $savestatus=0;
         $config= new Configuration();
         $config->type           =$request['config_type'];
@@ -74,6 +78,16 @@ class ConfigurationController extends Controller
             $fieldname = strtolower(str_replace(" ", "_", $request['config_name']));
             $sql = "ALTER TABLE  `vendor_configuration` ADD  $fieldname varchar(100) default 'N';";
             DB::select($sql);
+        }
+        if($request['config_type']=="1" || $request['config_type']=="2"){
+            $fieldname = strtolower(str_replace(" ", "_", $request['config_name']));
+            //`type`, `name`, `value`, `config_id`
+            $mainconfig= new MainConfiguration();
+            $mainconfig->type           =$request['config_type'];
+            $mainconfig->name    =$fieldname;
+            $mainconfig->value    =null;
+            $mainconfig->config_id    =$config->id;
+            $saved=$mainconfig->save();
         }
 
         if ($saved) {
@@ -96,6 +110,39 @@ class ConfigurationController extends Controller
         $jobcard = VendorConfiguration::firstOrFail()->where('vendor_id', Session::get('logged_vendor_id'));
         $saved=$jobcard->update($data);
         Session::put($field, $request['status']);
+        return response()->json(['message' => 'Configuration updated successfully.']);
+    }
+
+    public function config_view(Request $request)
+    {
+        $services='';
+       // $users = User::all();
+      // DB::enableQueryLog();
+
+       $configurations= Configuration::select('ct.name as typename','configuration.*')
+       ->join('configuration_type as ct','ct.id','=','configuration.type')->paginate(Session::get('paginate'));
+       //dd(DB::getQueryLog());
+        return view('configuration.config_view', compact('configurations'));
+    }
+
+    public function mainconfig_view(Request $request)
+    {
+        $services='';
+
+      // DB::enableQueryLog();
+       $configurations= MainConfiguration::select('main_configuration.*','cf.input_type')
+       ->join('configuration as cf','cf.id','=','main_configuration.config_id')->get();
+       //dd(DB::getQueryLog());
+        return view('configuration.main_configuration', compact('configurations'));
+    }
+    public function config_main_update(Request $request)
+    {
+        $field=$request['field'];
+        $data['value']       =$request['textvalue'];
+        $config = MainConfiguration::findOrFail($request['id']);
+        $saved=$config->update($data);
+        $fieldname = strtolower(str_replace(" ", "_", $field));
+        Session::put($fieldname, $request['textvalue']);
         return response()->json(['message' => 'Configuration updated successfully.']);
     }
 
