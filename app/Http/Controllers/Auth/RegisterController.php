@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Vendor;
 use App\SalesExecutive;
+use App\UserLogin;
+use DateTime;
+use DateTimeZone;
+use App\Http\Requests\UserRequest;
+use Session;
+use App\VendorConfiguration;
+use App\Traits\AuthSessions;
 
 class RegisterController extends Controller
 {
@@ -26,7 +33,7 @@ class RegisterController extends Controller
     */
 
     use RegistersUsers;
-
+    use AuthSessions;
     /**
      * Where to redirect users after registration.
      *
@@ -68,12 +75,15 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        //DROP TRIGGER IF EXISTS `insert_to_vendor`;CREATE DEFINER=`root`@`localhost` TRIGGER `insert_to_vendor` AFTER INSERT ON `users` FOR EACH ROW begin IF new.user_type ='3' THEN insert into vendor(name,mail_id) values (new.name, new.email); ELSEIF new.user_type='4' THEN insert into sales_executive(name,email) values (new.name, new.email); end IF; end;
-        return User::create([
+        $user= User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'user_type' => $data['usertype'],
         ]);
+        $this->getsessionsAfterAuth($user);
+        return $user;
+
     }
+
 }

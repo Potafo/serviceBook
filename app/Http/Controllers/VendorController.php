@@ -19,6 +19,9 @@ use App\Rules\PhoneNumber;
 use App\Http\Controllers\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Session;
+
+
 class VendorController extends Controller
 {
      /**
@@ -37,10 +40,10 @@ class VendorController extends Controller
         ->orderBy('vendor.name', 'ASC');
         if($logged_user_id=="1")
         {
-            $vendor=$rows1->paginate(5);
+            $vendor=$rows1->paginate(Session::get('paginate'));
         }else{
            $vendor= $rows1->where('vendor.user_id','=',$logged_user_id)
-            ->paginate(5);
+            ->paginate(Session::get('paginate'));
         }
         return $vendor;
     }
@@ -166,11 +169,11 @@ class VendorController extends Controller
             $vendor->current_package     =$request['packid'];
             $vendor->category            =$request['category'];
             $vendor->type                =$request['type'];
-            $vendor->digital_profile_status     =$request['dps'];
+           // $vendor->digital_profile_status     =$request['dps'];
             $vendor->shortkey       =$request['shortkey'];
             $vendor->short_code       =$request['shortcode'];
             $vendor->web_name       =$request['webname'];
-            $vendor->tax_enabled       =$request['tax'];
+           // $vendor->tax_enabled       =$request['tax'];
 
 
             // Check if a profile image has been uploaded
@@ -222,7 +225,7 @@ class VendorController extends Controller
         $renewal=RenewalList::select("renewal_list.*","package.*")
         ->join('package', 'package.id', '=', 'renewal_list.package')
         ->where("renewal_list.vendor_id","=",$id)
-        ->paginate(5);
+        ->paginate(Session::get('paginate'));
         //SELECT MAX(`login_time`) FROM `user_logindetails` WHERE userid='2'
         $userlogin=UserLogin::select(DB::raw('MAX(user_logindetails.login_time) AS logintime'))
         ->where("user_logindetails.userid","=",$id)

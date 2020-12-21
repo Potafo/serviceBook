@@ -1,11 +1,62 @@
 @extends('layouts.app', ['page' => __('Job Card'), 'pageSlug' => 'jobcard'])
-<script src="{{ asset('black') }}/js/core/jquery.min.js"></script>
-<meta name="csrf-token" content="{{ csrf_token() }}" />
+<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
+{{-- <meta name="csrf-token" content="{{ csrf_token() }}" /> --}}
 <style>
     #servicelist  tbody>tr:hover td{background: #fff  !important;}
 
-</style>
+    select > option {
+        color: black;
+    }
+    .edit{
+    width: 100%;
+    height: 25px;
+}
+    .editMode{
+    border: 1px solid black;
+
+}
+
+.txtedit{
+    display: none;
+    width: 30%;
+    height: 30px;
+}
+        </style>
 @section('content')
+
+<script language="JavaScript" type="text/javascript">
+
+    $(document).ready(function() {
+        $('.edit').click(function(){
+        $(this).addClass('editMode');
+
+    });
+    $(".edit").focusout(function(){
+        //alert("dsdfsd");
+        $(this).removeClass("editMode");
+
+        var id = this.id;
+        var split_id = id.split("_");
+        var field_name = split_id[0];
+        var edit_id = split_id[1];
+
+        var value = $(this).text();
+
+        $.ajax({
+            url: '../edit_jobcardservice',
+            method: 'post',
+            data: { field:field_name, value:value, id:edit_id },
+
+            success:function(response){//alert("dsfsd");
+                var ref=$('#jobcardnumber').val();
+                load_service_list(ref);
+            }
+        });
+
+    });
+
+    });
+    </script>
 
     <div class="row">
         <div class="col-md-12">
@@ -13,7 +64,7 @@
                 <div class="card-header">
                     <h5 class="title">{{ __('Add Jobcard') }}</h5>
                 </div>
-                <div class="col-8">
+                <div class="col-12">
                     <nav aria-label="breadcrumb" role="navigation">
                         <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="home">Home</a></li>
@@ -22,6 +73,39 @@
                         </ol>
                     </nav>
                 </div>
+                <div class="col-12" >
+                    <div class="card-body">
+                    <form method="get"  action="../jobcard_updatestatus" autocomplete="off" id="updatestatusform">
+                        @csrf
+                        {{-- @method('put') --}}
+                        <div class="form-row">
+                        <input type="hidden" name="jobcardnumber_up" id="jobcardnumber_up" value="{{ $jobcard_cust[0]->jobcard_reference }}" >
+                        <div class="form-group col-md-4" >
+                            <label for="exampleFormControlInput1">Current Status</label>
+                            <input type="text" class="form-control" id="jobcard_crstatus" name="jobcard_crstatus" style="color: white" readonly placeholder="Name" value="{{ $vendor_current_status[0]->stname }}">
+                        </div>
+                        <div class="form-group col-md-4" >
+                            <label for="exampleFormControlInput1">Change to</label>
+                            <select class="form-control{{ $errors->has('vendor_status') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Status') }}" name="vendor_status" id="vendor_status" value="{{ old('vendor_status') }}">
+                                <option value="">Select Status</option>
+                                    @foreach($vendor_status as $list)
+                                        <option value="{{$list->id}}">{{$list->name}}</option>
+                                    @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group col-md-2" >
+                            <label for="exampleFormControlInput1">Update</label>
+                            <button type="submit" id="updatestatus" class="btn btn-fill btn-primary">{{ __('Update Status') }}</button>
+
+                        </div>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+                <div class="col-12" >
+                    <div class="card-header">
+                        <h5 class="title">{{ __('Details') }}</h5>
+                    </div>
                 <form method="post" action="{{ route('jobcard.insert') }}" autocomplete="off">
                     <div class="card-body">
                     @csrf
@@ -37,26 +121,33 @@
                     <input type="hidden" name="user_id" id="user_id" value="{{  Session::get('logged_user_id') }}" >
                     <input type="hidden" name="jobcardrefnumber" id="jobcardrefnumber" value="{{  Session::get('jobcard_reference') }}" >
                     <input type="hidden" name="jobcardnumber" id="jobcardnumber" value="{{ $jobcard_cust[0]->jobcard_number }}" >
-                  <div class="form-group">
-                    <label for="exampleFormControlInput1">Name</label>
-                    <input type="text" class="form-control{{ $errors->has('jobcard_name') ? ' is-invalid' : '' }}" id="jobcard_name" name="jobcard_name" style="color: white" readonly placeholder="Name" value="{{ old('jobcard_name',$jobcard_cust[0]->name) }}">
-                    @include('alerts.feedback', ['field' => 'jobcard_name'])
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleFormControlInput1">Mobile</label>
-                    <input type="text" class="form-control{{ $errors->has('jobcard_mobile') ? ' is-invalid' : '' }}" id="jobcard_mobile" name="jobcard_mobile" style="color: white" readonly placeholder="Mobile" value="{{ old('jobcard_mobile',$jobcard_cust[0]->mobile) }}">
-                    @include('alerts.feedback', ['field' => 'jobcard_mobile'])
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleFormControlInput1">Jobcard Number</label>
-                    <input type="text" class="form-control{{ $errors->has('jobcard_number') ? ' is-invalid' : '' }}" id="jobcard_number" name="jobcard_number" style="color: white" readonly placeholder="Jobcard Number" value="{{ $jobcard_cust[0]->jobcard_number }}">
-                    @include('alerts.feedback', ['field' => 'jobcard_number'])
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleFormControlInput1">Product</label>
-                    <input type="text" class="form-control{{ $errors->has('jobcard_pdt') ? ' is-invalid' : '' }}" id="jobcard_pdt" name="jobcard_pdt" style="color: white" readonly placeholder="Product Name" value="{{ $servicelist[0]->pdtname }}">
-                    @include('alerts.feedback', ['field' => 'jobcard_pdt'])
-                  </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="exampleFormControlInput1">Name</label>
+                            <input type="text" class="form-control{{ $errors->has('jobcard_name') ? ' is-invalid' : '' }}" id="jobcard_name" name="jobcard_name" style="color: white" readonly placeholder="Name" value="{{ old('jobcard_name',$jobcard_cust[0]->name) }}">
+                            @include('alerts.feedback', ['field' => 'jobcard_name'])
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleFormControlInput1">Mobile</label>
+                            <input type="text" class="form-control{{ $errors->has('jobcard_mobile') ? ' is-invalid' : '' }}" id="jobcard_mobile" name="jobcard_mobile" style="color: white" readonly placeholder="Mobile" value="{{ old('jobcard_mobile',$jobcard_cust[0]->mobile) }}">
+                            @include('alerts.feedback', ['field' => 'jobcard_mobile'])
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleFormControlInput1">Jobcard Number</label>
+                            <input type="text" class="form-control{{ $errors->has('jobcard_number') ? ' is-invalid' : '' }}" id="jobcard_number" name="jobcard_number" style="color: white" readonly placeholder="Jobcard Number" value="{{ $jobcard_cust[0]->jobcard_number }}">
+                            @include('alerts.feedback', ['field' => 'jobcard_number'])
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleFormControlInput1">Product</label>
+                            <input type="text" class="form-control{{ $errors->has('jobcard_pdt') ? ' is-invalid' : '' }}" id="jobcard_pdt" name="jobcard_pdt" style="color: white" readonly placeholder="Product Name" value="{{ $jobcard_cust[0]->pdtname }}">
+                            @include('alerts.feedback', ['field' => 'jobcard_pdt'])
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="exampleFormControlInput1">Remarks</label>
+                            <input type="text" class="form-control{{ $errors->has('jobcard_rmrks') ? ' is-invalid' : '' }}" id="jobcard_rmrks" name="jobcard_rmrks" style="color: white" readonly placeholder="Remarks" value="{{ $jobcard_cust[0]->remarks }}">
+                            @include('alerts.feedback', ['field' => 'jobcard_rmrks'])
+                        </div>
+                    </div>
                   @if(Session::get('logged_user_type') =='1')
                   <div class="form-group">
                     <label>{{ __('Vendors') }}</label>
@@ -69,14 +160,24 @@
                     @include('alerts.feedback', ['field' => 'vendor_name'])
                 </div>
                 @endif
-
-                              <div class="form-group">
+                <div class="form-row">
+                              <div class="form-group col-md-4">
                                 <div class="col-4 text-right">
                                     <button type="button" class="btn btn-primary" data-toggle='modal' data-target='#productsInsert' data-type='update' data-pdtservice='{{ $servicelist[0]->productservice }}' data-genservice='{{ $servicelist[0]->generalservice }}' data-pdtid='{{ $servicelist[0]->pid }}' data-jobcardref ='{{ Session::get('jobcard_reference') }}' data-jobcardnmbr='{{ $servicelist[0]->jobcard_number }}' data-id='{{ $id }}' >
-                                       Edit Services
-                                                  </button>
+                                       Add Services
+                                    </button>
                                </div>
                              </div>
+                             @if(Session::get('Parts_status') == 'Y')
+                             <div class="form-group col-md-4">
+                                <div class="col-4 text-right">
+                                    <button type="button" class="btn btn-primary" data-toggle='modal' data-target='#partsSelect' data-type='update'  data-pdtid='{{ $servicelist[0]->pid }}' data-jobcardref ='{{ Session::get('jobcard_reference') }}' data-jobcardnmbr='{{ $servicelist[0]->jobcard_number }}' data-id='{{ $id }}' >
+                                       Add Parts
+                                    </button>
+                               </div>
+                             </div>
+                             @endif
+                </div>
                 {{-- <div class="form-group">
                     <label>{{ __('Products') }}</label>
                         <button type="button" class="btn btn-primary" data-type='add' data-toggle="modal" data-target="#productsInsert" data-jobcardref ="{{   Session::get('jobcard_reference') }}" >
@@ -114,11 +215,9 @@
                           </th>
                           @if(Session::get('tax_enabled')=='Y' )
                           <th>
-                            SGST %
+                            Tax %
                           </th>
-                        <th >
-                            CGST %
-                          </th>
+
 
                           @endif
                           <th >
@@ -160,6 +259,7 @@
 
                     </tbody>
                   </table>
+                </div>
                 <div class="card-footer py-4 loadpagination">
                 </div>
             </div>
@@ -172,7 +272,8 @@
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title" id="exampleModalLabel" style="    text-align: center !important;color: purple;margin-left: 28%;
-          "><span id="type_title"> </span></h1>
+          "><span> Select Services</span></h1>
+          {{--  id="type_title" --}}
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -200,7 +301,7 @@
                         </select>
                         @include('alerts.feedback', ['field' => 'product_list'])
                     </div>
-                <div id="servicelist" style="display: none">
+                <div >
                     {{-- id="servicelist" style="display: none" --}}
                     <div class="form-group" >
                         <label>{{ __('General Service ') }}</label><br>
@@ -214,7 +315,7 @@
                                 <td width="40%">
                                     <div class="form-check form-check-inline">
                                         <label class="form-check-label">
-                                            <input class="form-check-input" type="checkbox" name="generalservice[]" id="inlineCheckbox_gs{{$list->id}}" value="{{$list->id}}"> {{$list->name}}
+                                            <input class="form-check-input" type="checkbox" name="service[]" id="inlineCheckbox_gs{{$list->id}}" value="{{$list->id}}" @if(in_array($list->id,$serviceids)) checked @endif > {{$list->name}}
                                             <span class="form-check-sign"></span>
                                         </label>
                                     </div>
@@ -239,7 +340,7 @@
                                 <td width="40%">
                                     <div class="form-check form-check-inline">
                                         <label class="form-check-label">
-                                            <input class="form-check-input" type="checkbox"  name="productservice[]" id="inlineCheckbox_ps{{$list->id}}" value="{{$list->id}}"> {{$list->name}}
+                                            <input class="form-check-input" type="checkbox"  name="service[]" id="inlineCheckbox_ps{{$list->id}}" value="{{$list->id}}" @if(in_array($list->id,$serviceids)) checked @endif> {{$list->name}}
                                             <span class="form-check-sign"></span>
                                         </label>
                                     </div>
@@ -262,7 +363,76 @@
 
           </div>
         </div>
-      </div>
+    </div>
+
+
+
+
+
+    <div class="modal fade " id="partsSelect" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title" id="exampleModalLabel" style="    text-align: center !important;color: purple;margin-left: 28%;
+          "><span> Select Parts</span></h1>
+          {{--  id="type_title" --}}
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form method="post" action="" autocomplete="off" id="partsinsert">
+                @csrf
+                <div class="modal-body">
+                    <div class="alert alert-danger" style="display: none">
+                        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+                          <i class="tim-icons icon-simple-remove"></i>
+                        </button>
+                        <span>
+                          <b> Warning - </b> Select any parts</span>
+                      </div>
+                      <input type="hidden" name="jobcardref_parts" id="jobcardref_parts"  >
+                      <input type="hidden" name="jobcardnumber_ref" id="jobcardnumber_ref"  >
+                    {{--
+                    <input type="hidden" name="jobcardnumber_update" id="jobcardnumber_update"  >
+                    <input type="hidden" name="jobcardid_update" id="jobcardid_update"  > --}}
+                    <div class="form-group"  >
+                        <label>{{ __('Parts') }}</label>
+                        <select  class="form-control"  title="Single Select" data-size="7" placeholder="{{ __('Parts') }}" name="parts_list" id="parts_list"  style="color: black;"  value="{{ old('parts_list') }}">
+                            <option value="">Select parts</option>
+                            @foreach($vendor_partslist as $list)
+                                <option value="{{$list->id}}" jobcardref="{{ $jobcard_cust[0]->jobcard_number }}"  fieldtext="{{$list->name}}" price="{{$list->actual_price}}">{{$list->name}}</option>
+                            @endforeach
+                        </select>
+                        @include('alerts.feedback', ['field' => 'parts_list'])
+                    </div>
+
+                    <div class="form-group ">
+                        <label for="exampleFormControlInput1">Name</label>
+                        <input type="text" class="form-control{{ $errors->has('parts_name') ? ' is-invalid' : '' }}" id="parts_name" name="parts_name" style="color: black;"  placeholder="Name" >
+                        @include('alerts.feedback', ['field' => 'parts_name'])
+                    </div>
+                    <div class="form-group ">
+                        <label for="exampleFormControlInput1">Price</label>
+                        <input type="text" class="form-control{{ $errors->has('parts_price') ? ' is-invalid' : '' }}" id="parts_price" name="parts_price" style="color: black;"  placeholder="Price" >
+                        @include('alerts.feedback', ['field' => 'parts_price'])
+                    </div>
+                <div >
+
+
+                </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" id="submitParts" class="btn btn-primary" style="display: none">Save </button>
+                    <button type="button" id="updateParts" class="btn btn-primary" style="display: none">Update </button>
+                </div>
+            </form>
+
+          </div>
+        </div>
+    </div>
+
+
 
 
     <div class="modal fade" id="delete_services" tabindex="-1" role="dialog" aria-labelledby="smallModalLabel" aria-hidden="true">
@@ -271,6 +441,7 @@
                 <div class="modal-body" id="smallBody">
                     <div>
                         <form action="{{ route('jobcard_delete') }}" method="post">
+                            <input type="hidden" id="jobcardnumber" name="jobcardnumber" >
                             <input type="hidden" id="referencenumber" name="referencenumber" >
                             <input type="hidden" id="referenceid" name="referenceid" >
                             <input type="hidden" id="fromeditpage" name="fromeditpage" value="1" >
@@ -302,9 +473,13 @@
                 }
             });
 
-    setTimeout(function() {
-        $("table#tableservicelist  .loadeditpage").trigger('click');
-    },10);
+
+
+
+
+    // setTimeout(function() {
+    //     $("table#tableservicelist  .loadeditpage").trigger('click');
+    // },10);
 
 
     var ref=$('#jobcardnumber').val();
@@ -357,6 +532,43 @@
                     }else{
                         //$('select[name="product_list"]').empty();
                         }
+            });
+           // parts_list part_name part_price
+
+           $('select[name="parts_list"]').on('change', function() {
+                var element = $(this).find('option:selected');
+                var serv_name = element.attr("fieldtext");
+                var serv_price = element.attr("price");
+                var jobcard=element.attr("jobcardref");//alert(jobcard);
+                $('#parts_name').val(serv_name);
+                $('#parts_price').val(serv_price);
+                $('#jobcardref_parts').val(jobcard);
+
+                $('#submitParts').css('display','block');
+
+            });
+            $(document).on('click', '#submitParts', function(){
+                var ref=$('#jobcardref_parts').val();
+                var registerForm = $("#partsinsert");
+                registerForm.find('#jobcardnumber_ref').val(ref);
+                var formData = registerForm.serialize();
+
+                $.ajax({
+                    url: '../jobcard_partsinsert' ,
+                    method:'post',
+                    data:formData,
+                    success:function(data) {//alert(data);
+
+                            $( '.alert-success' ).show().delay(1000).hide('slow');
+                            $('#partsSelect').modal('hide');
+                        load_service_list(ref);
+location.reload();
+
+
+                    },
+                });
+
+
             });
 //jobcardref jobcardnmbr
 //$.noConflict();
@@ -429,29 +641,33 @@
     $(document).on('click', '#deleteButton', function(event) {
         //event.preventDefault();
         var jobcardid =$(this).attr('data-id');
-        var jobcardref =$(this).attr('data-jobcardnmbr');
-        $('#referencenumber').val(jobcardref);
+        var jobcardnmbr =$(this).attr('data-jobcardnmbr');
+        var jobcardrefnmbr =$(this).attr('data-jobcardrefnmbr');//alert(jobcardref);
+        $('#referencenumber').val(jobcardrefnmbr);
+        $('#jobcardnumber').val(jobcardnmbr);
         $('#referenceid').val(jobcardid);
-        $('#delref').html(jobcardref);
-        $.ajax({
-            url: route('jobcard_delete')
-            , beforeSend: function() {
-            },
-            // return the result
-            success: function(result) {
-                $('#delete_services').modal("show");
-            }
-            , complete: function() {
-            }
-            , error: function(jqXHR, testStatus, error) {
-                console.log(error);
-                alert("Page " + href + " cannot open. Error:" + error);
-                $('#loader').hide();
-            }
-            , timeout: 10000
-        })
+        //jobcardnumber referencenumber
+        //$('#delref').html(jobcardref);
+        $('#delete_services').modal("show");
+        // $.ajax({
+        //     url: route('jobcard_delete')
+        //     , beforeSend: function() {
+        //     },
+        //     // return the result
+        //     success: function(result) {
+        //         $('#delete_services').modal("show");
+        //     }
+        //     , complete: function() {
+        //     }
+        //     , error: function(jqXHR, testStatus, error) {
+        //         console.log(error);
+        //         alert("Page " + href + " cannot open. Error:" + error);
+        //         $('#loader').hide();
+        //     }
+        //     , timeout: 10000
+        // })
     });
-    $(document).on('click', '#submitForm', function(){
+    $(document).on('click', '#submitForm', function(){alert("sdfsdf");
         var registerForm = $("#jobcardcreate");
         var formData = registerForm.serialize();
         var ref=$('#jobcardnumber_ref').val();
@@ -481,6 +697,7 @@
 
             },
         });
+
 
     });
 
@@ -512,7 +729,7 @@
                     $( '.alert-success' ).show().delay(1000).hide('slow');
                     $('#productsInsert').modal('hide');
                    // location.reload();
-                   load_service_list(ref1);
+                   load_service_list(ref);
                 }
 
 
@@ -536,8 +753,8 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                success:function(data) {//alert(data);
-                    var json_x= JSON.parse(data);
+                success:function(data) {
+                    var json_x= JSON.parse(data);//alert(json_x.append);
                    // $( '.alert-success' ).css('display','block');
                     $('#service_full_list').append(json_x.append);
                     $('.loadpagination').html(json_x.links);

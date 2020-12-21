@@ -28,7 +28,7 @@ Route::post('insert_packages','PackageController@insert_packages');
 Route::post('insert_jobcard','JobcardController@insert_jobcard');
 Route::post('register','UserController@register_user');
 
-Route::post('product_list', 'JobcardController@getProductList');
+Route::post('product_list', 'CommonController@getProductList');
 Route::post('shorcode_generate', 'VendorController@shorcode_generate');
 Route::post('webname_generate', 'VendorController@webname_generate');
 Route::post('service_list', 'JobcardController@getServiceList');

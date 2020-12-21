@@ -1,4 +1,5 @@
 @extends('layouts.app', ['page' => __('Add Configuration'), 'pageSlug' => 'config_add'])
+<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 <style>
 select > option {
     color: black;
@@ -23,11 +24,11 @@ select > option {
                     <input type="text" class="form-control{{ $errors->has('config_name') ? ' is-invalid' : '' }}"  id="config_name" name="config_name" placeholder="Configuration Name" value="{{ old('config_name') }}">
                     @include('alerts.feedback', ['field' => 'config_name'])
                   </div>
-                  <div class="form-group">
+                  {{-- <div class="form-group">
                     <label for="exampleFormControlInput1">Value</label>
                     <input type="text" class="form-control{{ $errors->has('config_value') ? ' is-invalid' : '' }}" id="config_value" name="config_value" placeholder="Configuration value" value="{{ old('config_value') }}">
                     @include('alerts.feedback', ['field' => 'config_value'])
-                  </div>
+                  </div> --}}
                   <div class="form-group">
                     <label for="exampleFormControlInput1">Type</label>
                     <select class="form-control{{ $errors->has('config_type') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('COnfiguration Type') }}" name="config_type" id="config_type" value="{{ old('config_type') }}">
@@ -56,8 +57,9 @@ select > option {
                   <div class="form-group">
                     <label for="exampleFormControlInput1">Input Type</label>
                     <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Input Type') }}" name="config_input" id="config_input">
-                        {{-- <option value="textbox" >TextBox</option> --}}
+
                         <option value="checkbox" >CheckBox</option>
+                        <option value="textbox" >TextBox</option>
                     </select>
                     @include('alerts.feedback', ['field' => 'config_view'])
                   </div>

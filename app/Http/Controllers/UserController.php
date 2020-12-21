@@ -7,7 +7,7 @@ use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Response;
-
+use Session;
 
 class UserController extends Controller
 {
@@ -19,7 +19,7 @@ class UserController extends Controller
      */
     public function index(User $model)
     {
-        return view('users.index', ['users' => $model->paginate(15)]);
+        return view('users.index', ['users' => $model->paginate(Session::get('paginate'))]);
     }
     public function register_user(Request $request)
     {

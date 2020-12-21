@@ -58,15 +58,15 @@
                   <th>
                     Product
                   </th>
-                  <th>
+                  {{-- <th>
                     Service
-                  </th>
+                  </th> --}}
                   <th>
                     Days
                   </th>
-                  <th>
+                  {{-- <th>
                     Status
-                  </th>
+                  </th> --}}
                 <th >
                     Action
                   </th>
@@ -77,12 +77,12 @@
                     @foreach($jobcard as $key=>$value)
                     <?php
                     //service length checking
-                        if (strlen($value->sname) > 20){
-                            $str = substr($value->sname, 0, 17) . '...';
-                        }
-                        else {
-                           $str=$value->sname;
-                        }
+                        // if (strlen($value->serv_name) > 20){
+                        //     $str = substr($value->sname, 0, 17) . '...';
+                        // }
+                        // else {
+                        //    $str=$value->sname;
+                        // }
                         //product length checking
                         if (strlen($value->pdtname) > 20){
                             $pdt = substr($value->pdtname, 0, 12) . '...';
@@ -130,26 +130,26 @@
                             <td>
                                 {{ $pdt }}
                             </td>
-                            <td>
+                            {{-- <td>
                                 {{ $str }}
-                            </td>
+                            </td> --}}
                             <td>
                                 {{ $pending }}
                             </td>
-                            <td>
+                            {{-- <td>
                                 {{ $value->statusname }}
-                            </td>
+                            </td> --}}
 
                             <td >
                                 {{-- <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
                                     <a href="jobcard_edit/{{ $value->jobid }}" ><i class="tim-icons icon-settings"></i></a>
                                 </button> --}}
 
-                                 <a  href="jobcard_edit/{{ $value->id }}"  >
+                                 {{-- <a  href="jobcard_edit/{{ $value->id }}"  >
                                     <i class='tim-icons icon-pencil'></i>
-                                </a>
+                                </a> --}}
 
-                                <a style="color: #ba54f5; cursor: pointer;" data-toggle='modal' id='deleteButton' data-target='#delete_jobcards'  data-id='{{  $value->id }}' data-jobcardref='{{  $value->jcnmbr }}' data-jobcardnmbr='{{  $value->jobcard_number }}' title='Delete Service'>
+                                <a style="color: #ba54f5; cursor: pointer;" data-toggle='modal' id='deleteButton' data-target='#delete_jobcards' data-custid='{{  $value->custid }}'  data-id='{{  $value->id }}' data-jobcardref='{{  $value->jobcard_number }}' data-jobcardnmbr='{{  $value->jobcard_number }}' title='Delete Service'>
                                     <i class='tim-icons icon-trash-simple'></i>
                                 </a>
                             </td>
@@ -162,7 +162,9 @@
 
         </div>
         <div class="card-footer py-4">
+            @if(count($jobcard)>0)
             {{ $jobcard->links() }}
+            @endif
         </div>
       </div>
 
@@ -180,6 +182,7 @@
                 <div>
                     <form action="{{ route('jobcard_delete_each') }}" method="post">
                         <input type="hidden" id="referencenumber" name="referencenumber" >
+                        <input type="hidden" id="customerid" name="customerid" >
                         <input type="hidden" id="referenceid" name="referenceid" >
                         <div class="modal-body">
                             @csrf
@@ -205,8 +208,10 @@
             var jobcardid =$(this).attr('data-id');
             var jobcardref =$(this).attr('data-jobcardref');
             var jobcard =$(this).attr('data-jobcardnmbr');
+            var cust =$(this).attr('data-custid');
             $('#referencenumber').val(jobcardref);
             $('#referenceid').val(jobcardid);
+            $('#customerid').val(cust);
             $('#delref').html(jobcard);
             $.ajax({
                 url: route('jobcard_delete_each')
@@ -229,7 +234,8 @@
         $(document).on('click', '.viewjobcards', function(event) {
             //event.preventDefault();
             var jobcardid =$(this).attr('data-id');
-            window.location='jobcard_view/'+jobcardid;
+            //window.location='jobcard_view/'+jobcardid;
+            window.location='jobcard_edit/'+jobcardid;
 
         });
 

@@ -14,39 +14,18 @@ class ProductController extends Controller
 {
     public function insert_products(Request $request)
     {
-        //`products`(`id`, `name`, `image`, `vendor_id`, `created_at`, `modified_at`)
         $savestatus=0;
         $product= new Product();
         $product->name               =$request['productname'];
-
         if(Session::get('logged_user_type') =='3')
             $product->vendor_id          =Session::get('logged_vendor_id');
         else if(Session::get('logged_user_type') =='1')
             $product->vendor_id          =$request['vendor_name'];
-
-        // Check if a profile image has been uploaded
         if ($request->has('file')) {
-            // Get image file
-            $image = $request->file('file');
-            // Make a image name based on user name and current timestamp
-            $name = Str::slug($request->input('productname')).'_'.time();
-            // Define folder path
-            $folder = 'uploads/vendor_products/';
-            // Make a file path where image will be stored [ folder path + file name + file extension]
-            $filePath = $folder . $name. '.' . $image->getClientOriginalExtension();
-            // Upload image
-            //$this->uploadOne($image, $folder, 'public', $name);
-            $filename=$name;
-            $name = !is_null($filename) ? $filename : Str::random(25);
-
-            $file = $image->storeAs($folder, $name.'.'.$image->getClientOriginalExtension(), 'public');
-
+            $filePath=$this->insertimage($request);
             // Set user profile image path in database to filePath
             $product->image=$filePath;
         }
-
-
-
         $saved=$product->save();
         if ($saved) {
             $savestatus++;
@@ -57,31 +36,25 @@ class ProductController extends Controller
             $status = 'fail';
            }
 
-            $response_code = '200';
-            return response::json(['status' =>$status,'response_code' =>$response_code]);
+        $response_code = '200';
+        return response::json(['status' =>$status,'response_code' =>$response_code]);
 
     }
     public function products_view(Product $model)
     {
-
-        //$products=Product::all();
-        // $products=Product::select('products.*')
-        //     ->where('products.vendor_id','=',$vendor_id)
-        //     ->paginate(5);
-
         $rows1=DB::table('products');
         $products=array();
         if(Session::get('logged_user_type') =='3')
         {
             $vendor_id=Session::get('logged_vendor_id');
             $products= $rows1->where('products.vendor_id','=',$vendor_id)
-                ->paginate(5);
+                ->paginate(Session::get('paginate'));
         }
         else if(Session::get('logged_user_type') =='1')
         {
             $products=$rows1->join('vendor', 'vendor.id', '=', 'products.vendor_id')
             ->select('products.*','vendor.name as vname')
-            ->paginate(5);
+            ->paginate(Session::get('paginate'));
         }
 
        return view('products.products',compact('products'));
@@ -116,8 +89,6 @@ class ProductController extends Controller
         ->select('products.*')
         ->where('products.id','=',$id)
         ->get();
-
-        //dd(DB::getQueryLog());
         return view('products.products_edit',compact('products','id'));
     }
     public function update(Request $request)
@@ -135,34 +106,13 @@ class ProductController extends Controller
     }
     public function update_sql(Request $request)
     {
-        //$vendor= new Vendor();
         $savestatus=1;
-
-           //$data['name']              =$request['jobcard_id'];
-           $data['name']           =$request['productname'];
-
-           if(Session::get('logged_user_type') =='1')
+        $data['name']           =$request['productname'];
+        if(Session::get('logged_user_type') =='1')
             $data['vendor_id']          =$request['vendor_name'];
-
-
-        //    / $data['product_id']           =$request['productname'];
             // Check if a profile image has been uploaded
             if ($request->has('file')) {
-                // Get image file
-                $image = $request->file('file');
-                // Make a image name based on user name and current timestamp
-                $name = Str::slug($request->input('productname')).'_'.time();
-                // Define folder path
-                $folder = 'uploads/vendor_logo/';
-                // Make a file path where image will be stored [ folder path + file name + file extension]
-                $filePath = $folder . $name. '.' . $image->getClientOriginalExtension();
-                // Upload image
-                //$this->uploadOne($image, $folder, 'public', $name);
-                $filename=$name;
-                $name = !is_null($filename) ? $filename : Str::random(25);
-
-                $file = $image->storeAs($folder, $name.'.'.$image->getClientOriginalExtension(), 'public');
-
+                $filePath=$this->insertimage($request);
                 // Set user profile image path in database to filePath
                 $data['image']=$filePath;
             }
@@ -173,6 +123,25 @@ class ProductController extends Controller
             }
 
         return $savestatus;
+    }
+    public function insertimage(Request $request)
+    {
+        // Get image file
+        $image = $request->file('file');
+        // Make a image name based on user name and current timestamp
+        $name = Str::slug($request->input('productname')).'_'.time();
+        // Define folder path
+        $folder = 'uploads/vendor_products/';
+        // Make a file path where image will be stored [ folder path + file name + file extension]
+        $filePath = $folder . $name. '.' . $image->getClientOriginalExtension();
+        // Upload image
+        //$this->uploadOne($image, $folder, 'public', $name);
+        $filename=$name;
+        $name = !is_null($filename) ? $filename : Str::random(25);
+
+        $file = $image->storeAs($folder, $name.'.'.$image->getClientOriginalExtension(), 'public');
+
+        return $filePath;
     }
 
 }

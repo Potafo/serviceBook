@@ -1,15 +1,11 @@
 @extends('layouts.app', ['page' => __('Services'), 'pageSlug' => 'services'])
-
+<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 @section('content')
 <div class="row">
   <div class="col-md-12">
     <div class="card ">
       <div class="card-header">
         <div class="row">
-
-
-
-
             <div class="col-8">
                 <h4 class="card-title">Services List</h4>
             </div>

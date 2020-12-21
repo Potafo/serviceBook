@@ -23,7 +23,7 @@ class PackageController extends Controller
     {
         $package=Package::all();
         //return view('pages.packages',compact('package'));
-        return view('package.packages', ['package' => $model->paginate(5)]);
+        return view('package.packages', ['package' => $model->paginate(Session::get('paginate'))]);
         //return view('snippets/salary_report_tile')->with(['staff_data' => $staff_data, 'pagination' => '']);
     }
     public function insert(Request $request)
@@ -74,7 +74,7 @@ class PackageController extends Controller
     public function load_package(Package $model)
     {
         $package=Package::all();
-        return view('snippets/package_list')->with(['package' =>$model->paginate(5)]);
+        return view('snippets/package_list')->with(['package' =>$model->paginate(Session::get('paginate'))]);
     }
     public function package_edit($id)
     {

@@ -1,4 +1,5 @@
 @extends('layouts.app', ['page' => __('Products'), 'pageSlug' => 'products'])
+<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 <style>
 select > option {
     color: black;
@@ -6,12 +7,12 @@ select > option {
     </style>
 @section('content')
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
                     <h5 class="title">{{ __('Add Products') }}</h5>
                 </div>
-                <div class="col-8">
+                <div class="col-12">
                     <nav aria-label="breadcrumb" role="navigation">
                         <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="home">Home</a></li>
@@ -64,36 +65,3 @@ select > option {
 
     </div>
 @endsection
-<script src="{{ asset('black') }}/js/jquery.min.js"></script>
-<script language="JavaScript" type="text/javascript">
- $(document).ready(function() {
-
-    $('select[name="vendor_name"]').on('change', function() {
-        var vendor_id = $(this).val();
-            if(vendor_id) {
-                var data={"vendor_id":vendor_id};
-                $.ajax({
-                    method: "post",
-                    url : "api/product_list",
-                    data : data,
-                    cache : false,
-                    crossDomain : true,
-                    async : false,
-                    dataType :'text',
-                    success : function(data)
-                    {
-                    $('select[name="product_list"]').empty();
-                        $('#product_list').html(data);
-                        // $.each(data, function(key, value) {
-                        //     $('select[name="product_list"]').append('<option value="'+ value +'">'+ value +'</option>');
-                        // });
-
-                        }
-                    });
-            }else{
-                $('select[name="product_list"]').empty();
-                }
-           });
-
-        });
-</script>
