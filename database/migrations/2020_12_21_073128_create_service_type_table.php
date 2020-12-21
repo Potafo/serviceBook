@@ -27,8 +27,8 @@ class CreateServiceTypeTable extends Migration {
 
         $data = [
             ['name'=>'Products', 'status'=> 'Y','table_connected'=>'products','service_category'=>'1'],
-            ['name'=>'General', 'status'=> 'Y','service_category'=>'1'],
-            ['name'=>'Parts', 'status'=> 'Y','service_category'=>'2'],
+            ['name'=>'General', 'status'=> 'Y','table_connected'=>null,'service_category'=>'1'],
+            ['name'=>'Parts', 'status'=> 'Y','table_connected'=>null,'service_category'=>'2'],
         ];
         DB::table('service_type')->insert($data);
 	}
