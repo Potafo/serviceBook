@@ -96,7 +96,7 @@
                             <div class="col-8 text-right">
                             <button type="submit" class="btn btn-fill btn-primary">{{ __('Submit Job Card') }}</button>
                         </div>
-                        </div>
+                    </div>
                     </div>
                 </form>
                 <div class="card-body">
@@ -107,18 +107,24 @@
                         <th>
                           Slno
                         </th>
-                        <th>
+                        {{-- <th>
                           JobCard Number
-                        </th>
+                        </th> --}}
 
                         <th>
                             Product
                           </th>
                           <th>
+                            Product Remarks
+                          </th>
+                          <th>
                             Service
                           </th>
+                          <th>
+                            Service Remarks
+                          </th>
                         <th >
-                            Action
+
                           </th>
                       </tr>
                     </thead>
@@ -168,7 +174,7 @@
                         @include('alerts.feedback', ['field' => 'product_list'])
                     </div>
                     <div class="form-group ">
-                        <label for="exampleFormControlInput1">Remarks</label>
+                        <label for="exampleFormControlInput1">Product Remarks</label>
                         <input type="text" class="form-control{{ $errors->has('jobcard_remarks') ? ' is-invalid' : '' }} " id="jobcard_remarks" style=" color: black;" name="jobcard_remarks" placeholder="Remarks" value="{{ old('jobcard_remarks') }}">
                         @include('alerts.feedback', ['field' => 'jobcard_remarks'])
                     </div>

@@ -69,19 +69,24 @@ class JobcardController extends Controller
     }
     public function jobcard_view(Request $request, Jobcard $model)
     {
-        if (Session::has('jobcard_reference')) {
-            $jobcard = Jobcard::firstOrFail()->where('jobcard_number','like', Session::get('jobcard_reference').'%');
-            $saved = $jobcard->delete($jobcard);
+        if(strpos(Session::has('jobcard_reference'),"Temp-") === true){
 
-            $jobcard = Cart::firstOrFail()->where('jobcard_reference','like',  Session::get('jobcard_reference').'%');
-            $saved = $jobcard->delete($jobcard);
 
-            $jobcard = StatusChange::firstOrFail()->where('jobcard_number','like', Session::get('jobcard_reference').'%');
-            $saved = $jobcard->delete($jobcard);
+            if (Session::has('jobcard_reference')) {
+                $jobcard = Jobcard::firstOrFail()->where('jobcard_number','like', Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
 
-            // $jobcard = Customer::firstOrFail()->where('id', $request['customerid']);
-            // $saved = $jobcard->delete($jobcard);
+                $jobcard = Cart::firstOrFail()->where('jobcard_reference','like',  Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
+
+                $jobcard = StatusChange::firstOrFail()->where('jobcard_number','like', Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
+
+                // $jobcard = Customer::firstOrFail()->where('id', $request['customerid']);
+                // $saved = $jobcard->delete($jobcard);
+            }
         }
+
         Session::forget('jobcard_reference');
         Session::forget('customerid');
 
@@ -95,7 +100,8 @@ class JobcardController extends Controller
         $rows1 = Jobcard::leftjoin('products', 'products.id', '=', 'job_card.product_id')
             ->leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
             ->select('customers.name as custname', 'customers.id as custid', 'customers.contact_number as custmobile', 'products.name as pdtname', 'job_card.jobcard_number', 'job_card.created_at', 'job_card.id')
-            ->orderBy('job_card.created_at', 'DESC');
+            ->orderBy('job_card.created_at', 'DESC')
+            ->where('job_card.jobcard_number','not like','Temp-%');
         $jobcard = array();
         if (Session::get('logged_user_type') == '3') {
             $vendor_id = Session::get('logged_vendor_id');
@@ -355,6 +361,7 @@ class JobcardController extends Controller
         $jobcard->customer_id           = $insertedId;
         $jobcard->product_id            = $request['product_list'];
         $jobcard->remarks               = $request['jobcard_remarks'];
+        $jobcard->service_remarks               = $request['service_remarks'];
         $jobcard->date               = date("Y-m-d");
         $saved = $jobcard->save();
 
@@ -384,7 +391,7 @@ class JobcardController extends Controller
     }
     public function load_jobcardservice_list(Request $request)
     {
-        $servicelist = Cart::select('cart.*', 'service.name as sname', 'products.name as pdtname', 'service.id as sid', 'cart.id as cid', 'job_card.id as jid', 'job_card.customer_id as customer_id')
+        $servicelist = Cart::select('cart.*',  'products.name as pdtname', 'service.id as sid', 'cart.id as cid', 'job_card.id as jid', 'job_card.customer_id as customer_id','job_card.remarks','job_card.service_remarks',\DB::raw("GROUP_CONCAT(service.name) as sname"))
             ->leftjoin("service", "service.id", '=', 'service_id')
             ->join('job_card', 'job_card.jobcard_number', '=', 'cart.jobcard_reference')
             ->join('products', 'products.id', '=', 'job_card.product_id')
@@ -399,26 +406,34 @@ class JobcardController extends Controller
                 if (!Session::has('customerid')) {
                     Session::put('customerid', $value->customer_id);
                 }
+                //$value->jobcard_number
                 $append .= "
                 <tr>
                 <td>
                     $i
                 </td>
-                <td>
-                     $value->jobcard_number
-                </td>
+
                 <td>
                      $value->pdtname
+                </td>
+                <td>
+                $value->remarks
                 </td>
                 <td>
                    $value->sname
                 </td>
                 <td>
-
-                    <a style='color: #ba54f5; cursor: pointer;' data-toggle='modal' id='deleteButton' data-target='#delete_services' data-jobcardid='" . $value->jid . "'  data-customerid='" . $value->customer_id . "' data-jobcardref='" . $value->jobcard_reference . "' data-jobcardnmbr='" . $value->jobcard_number . "' data-id='" . $value->cid . "' title='Delete Service'>
+                $value->service_remarks
+                </td>
+                <td>";
+               // if (count($servicelist)>1) {
+                    $append .="   <a style='color: #ba54f5; cursor: pointer;' data-toggle='modal' id='deleteButton' data-target='#delete_services' data-jobcardid='" . $value->jid . "'  data-customerid='" . $value->customer_id . "' data-jobcardref='" . $value->jobcard_reference . "' data-jobcardnmbr='" . $value->jobcard_number . "' data-id='" . $value->cid . "' title='Delete Service'>
                     <i class='tim-icons icon-trash-simple'></i>
-                </a>
-                     </td>
+                </a>";
+                //}else{
+                    //$append .="<i style='color:red' class='tim-icons icon-simple-remove'></i>";
+                //}
+                $append .="</td>
 
                 </tr>";
                 // <a style='color: #ba54f5; cursor: pointer;'  data-toggle='modal' data-target='#productsInsert' data-type='update' data-service='".$value->sid."'  data-pdtid='".$value->id."' data-jobcardref ='".Session::get('jobcard_reference')."' data-jobcardnmbr='".$value->jobcard_number."' data-id='".$value->id."' >
@@ -515,6 +530,11 @@ class JobcardController extends Controller
 
         $append .= '</div>';
         $append .= '<br>';
+
+        $append .='<div class="form-group ">';
+        $append .=                '<label for="exampleFormControlInput1">Service Remarks</label>';
+        $append .=               '<input type="text" class="form-control" id="service_remarks" style=" color: black;" name="service_remarks" placeholder="Service Remarks" >';
+        $append .=            '</div>';
 
 
         return $append;
@@ -714,7 +734,7 @@ class JobcardController extends Controller
     public function load_jobcardservice_list_edit(Request $request)
     {
 
-        $servicelist = Cart::select('cart.*')
+        $servicelist = Cart::select('cart.*','job_card.remarks','job_card.service_remarks')
             ->leftjoin("service", 'service.id', '=', 'cart.service_id')
             ->join('job_card', 'job_card.jobcard_number', '=', 'cart.jobcard_reference')
             ->where('cart.jobcard_reference', '=', $request['ref'])
@@ -747,6 +767,9 @@ class JobcardController extends Controller
 
                 </td>
                 <td>
+                $value->service_remarks
+            </td>
+                <td>
                 <div contentEditable='true' class='edit' id='serviceprice_" . $value->id . "'> " . $price_each . "</div>
 
              </td>
@@ -760,12 +783,19 @@ class JobcardController extends Controller
                 $append .= "<td>
           $total
             </td>
-            <td>
-                    <a style='color: #ba54f5; cursor: pointer;' data-toggle='modal' id='deleteButton' data-target='#delete_services' data-jobcardrefnmbr='" . $value->jobcard_reference . "' data-jobcardnmbr='" . $value->jobcard_number . "' data-id='" . $value->id . "' title='Delete Service'>
-                    <i class='tim-icons icon-trash-simple'></i>
+            <td>";
+
+            if (count($servicelist)>1){
+                $append .= "
+                <a style='color: #ba54f5; cursor: pointer;' data-toggle='modal' id='deleteButton' data-target='#delete_services' data-jobcardrefnmbr='" . $value->jobcard_reference . "' data-jobcardnmbr='" . $value->jobcard_number . "' data-id='" . $value->id . "' title='Delete Service'>
+                <i class='tim-icons icon-trash-simple'></i>
                 </a>
-                     </td>";
-                $append .= "</tr>";
+                ";
+            }else{
+                $append .="<i style='color:red' class='tim-icons icon-simple-remove'></i>";
+            }
+            $append .= "     </td>
+                </tr>";
                 // <a style='color: #ba54f5; cursor: pointer;' class='loadeditpage' data-toggle='modal' data-target='#productsInsert' data-type='update' data-pdtservice='".$value->productservice."' data-genservice='".$value->generalservice."' data-pdtid='".$value->pid."' data-jobcardref ='".Session::get('jobcard_reference')."' data-jobcardnmbr='".$value->jobcard_number."' data-id='".$value->id."' >
                 // <i class='tim-icons icon-pencil'></i>
                 //           </a>

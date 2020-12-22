@@ -220,6 +220,9 @@
 
 
                           @endif
+                          <th>
+                            Service Remarks
+                          </th>
                           <th >
                             Total
                           </th>
