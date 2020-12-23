@@ -91,11 +91,13 @@ class ServiceController extends Controller
         //`vendor_servicetype`(`id`, `service_type`, `vendor_id`, `status`, `deleted_at`, `created_at`,
         //`service_type`(`id`, `name`, `status`, `created_at`, `updated_
         //DB::enableQueryLog();
+        $category=Session::get('Parts');
         $servicelist_vendor=DB::table('service_type')
         ->select('service_type.*')
         ->join('vendor_servicetype', 'service_type.id', '=', 'vendor_servicetype.service_type')
          ->where('vendor_servicetype.vendor_id','=',Session::get('logged_vendor_id'))
          ->where('vendor_servicetype.status','=','Y')
+         ->where( 'service_type.id', '!=', $category)
          ->paginate(Session::get('paginate'));
          //dd(DB::getQueryLog());
         return view('services.services_add', compact('products','servicelist_vendor'));
