@@ -71,6 +71,14 @@
                                 <p>{{ __('Products') }}</p>
                             </a>
                         </li>
+                        @if(Session::get('Parts_status') == 'Y')
+                        <li @if ($pageSlug == 'vendorservice/parts')  class="active " @endif>
+                            <a href="{{ url('vendorservice/parts')  }}">
+                                <i class="tim-icons icon-bullet-list-67"></i>
+                                <p>{{ __('Parts') }}</p>
+                            </a>
+                        </li>
+                        @endif
                         <li @if ($pageSlug == 'services')  class="active " @endif>
                             <a href="{{ route('services.services')  }}">
                                 <i class="tim-icons icon-bullet-list-67"></i>
