@@ -112,5 +112,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('main_configuration', ['as' => 'configuration.main_configuration', 'uses' => 'ConfigurationController@mainconfig_view']);
     Route::get('config_main_update', ['as' => 'configuration.config_main_update', 'uses' => 'ConfigurationController@config_main_update']);
 
+     //vendor services
+     Route::get('vendorservice/{mode}', ['as' => 'vendor_service.vendorservice', 'uses' => 'VendorServiceController@services_view']);
+     Route::get('vendorservice_add/{mode}', ['as' => 'vendor_service.vendorservice_add', 'uses' => 'VendorServiceController@services_add']);
+     Route::post('vendorservice_insert', ['as' => 'vendor_service.insert', 'uses' => 'VendorServiceController@insert']);
+
 });
 
