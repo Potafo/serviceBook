@@ -974,4 +974,112 @@ class JobcardController extends Controller
 
         return Redirect()->back()->with('status', 'Status Updated successfully!');
     }
+
+    public function jobcard_history_view(Request $request)
+    {
+        if(strpos(Session::has('jobcard_reference'),"Temp-") === true){
+
+
+            if (Session::has('jobcard_reference')) {
+                $jobcard = Jobcard::firstOrFail()->where('jobcard_number','like', Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
+
+                $jobcard = Cart::firstOrFail()->where('jobcard_reference','like',  Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
+
+                $jobcard = StatusChange::firstOrFail()->where('jobcard_number','like', Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
+
+                // $jobcard = Customer::firstOrFail()->where('id', $request['customerid']);
+                // $saved = $jobcard->delete($jobcard);
+            }
+        }
+
+        Session::forget('jobcard_reference');
+        Session::forget('customerid');
+        //DB::enableQueryLog();
+        $status_list = DB::table('vendor_status')
+            //->select('vendor_status.status_id')
+            ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
+            ->where('vendor_status.active', '=', 'Y')
+            ->where('vendor_status.ending_status', '=', '0')
+            ->pluck('vendor_status.status_id')->toArray();;
+            //print_r($status_list);dd();
+         //   dd(DB::getQueryLog());
+        $rows1 = Jobcard::leftjoin('products', 'products.id', '=', 'job_card.product_id')
+            ->leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
+            ->select('customers.name as custname', 'customers.id as custid', 'customers.contact_number as custmobile', 'products.name as pdtname', 'job_card.jobcard_number', 'job_card.created_at', 'job_card.id')
+            ->orderBy('job_card.created_at', 'DESC')
+            ->where('job_card.jobcard_number','not like','Temp-%')
+            //->where('job_card.current_status',\DB::raw($status_list),">",\DB::raw("'0'"))
+            ->whereNotIn('job_card.current_status',$status_list);
+        $jobcard = array();
+        if (Session::get('logged_user_type') == '3') {
+            $vendor_id = Session::get('logged_vendor_id');
+            $jobcard = $rows1->where('job_card.vendor_id', '=', $vendor_id);
+        } else if (Session::get('logged_user_type') == '1') {
+        }
+        $jobcard = $rows1->paginate(Session::get('paginate'));
+        //dd(DB::getQueryLog());
+        //     DB::enableQueryLog();
+        return view('jobcard.jobcard_history', compact('jobcard'));
+    }
+    public function jobcard_history_pageview(Request $request, $id)
+    {
+        $jobcard_cust = array();
+        // DB::enableQueryLog();
+        $jobcard_cust = Jobcard::select('products.name as pdtname', 'products.id as pdtid', 'job_card.remarks', 'customers.name', 'job_card.jobcard_number', 'customers.contact_number as mobile', 'job_card.vendor_id', 'cart.jobcard_reference') //DB::table('job_card')
+            ->join('cart', 'cart.jobcard_reference', '=', 'job_card.jobcard_number')
+            ->join('customers', 'customers.id', '=', 'job_card.customer_id')
+            ->join('products', 'products.id', '=', 'job_card.product_id')
+            ->where('job_card.id', '=', $id)
+            ->get();
+        // dd(DB::getQueryLog());
+        Session::put('jobcard_reference', $jobcard_cust[0]->jobcard_reference);
+        $products = array();
+        if (Session::get('logged_user_type') == '3') {
+            $products = $this->product_list_query(Session::get('logged_vendor_id'));
+        } else if (Session::get('logged_user_type') == '1') {
+            $products = $this->product_list_query($jobcard_cust[0]->vendor_id);
+        }
+        $product_id = $jobcard_cust[0]->pdtid;
+
+        $productservice_id = Session::get('Products');
+        $Generalservice_id = Session::get('General');
+        $product_service = DB::table('service')
+            ->select('service.*')
+            ->where('service.type', '=', $productservice_id)
+            ->where('service.product_id', '=', $product_id)
+            ->get();
+        $general_service = DB::table('service')
+            ->select('service.*')
+            ->where('service.type', '=', $Generalservice_id)
+            ->get();
+        $servicelist = $this->service_full_listedit($jobcard_cust[0]->jobcard_reference);
+        $serviceids = Cart::where('cart.jobcard_reference', '=', $jobcard_cust[0]->jobcard_reference)
+            ->pluck('cart.service_id')->toArray();
+        $vendor_current_status = StatusChange::select('vendor_status.display_order', 'status.name as stname', 'status.id as id')
+            ->join('status', 'status_change.to_status', '=', 'status.id')
+            ->join('vendor_status', 'vendor_status.status_id', '=', 'status.id')
+            ->where('status_change.jobcard_number', '=', $jobcard_cust[0]->jobcard_reference)
+            ->orderBy('status_change.created_at', 'DESC')
+            ->get();
+        $vendor_status = DB::table('vendor_status')
+            ->select('status.name', 'status.id','vendor_status.ending_status')
+            ->join('status', 'status.id', '=', 'vendor_status.status_id')
+            ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
+            ->where('vendor_status.display_order', '>', $vendor_current_status[0]->display_order)
+            ->orderBy('vendor_status.display_order', 'ASC')
+            ->get();
+        $vendor_partslist = array();
+        if (Session::get('Parts_status') == 'Y') {
+            $vendor_partslist = DB::table('service')
+                ->select('service.id', 'service.name', 'service_pricedetails.actual_price')
+                ->join('service_pricedetails', 'service_pricedetails.service_id', '=', 'service.id')
+                ->where('service.type', '=', Session::get('Parts'))
+                ->get();
+        }
+
+        return view('jobcard.jobcard_history_view', compact('jobcard_cust', 'id', 'vendor_partslist', 'products', 'serviceids', 'general_service', 'product_service', 'servicelist', 'vendor_status', 'vendor_current_status'));
+    }
 }
