@@ -62,14 +62,14 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="title">{{ __('Jobcard') }}</h5>
+                    <h5 class="title">{{ __('Jobcard History View') }}</h5>
                 </div>
                 <div class="col-12">
                     <nav aria-label="breadcrumb" role="navigation">
                         <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="home">Home</a></li>
-                        <li class="breadcrumb-item "><a href="{{ url('jobcard') }}">Job Card</a></li>
-                        <li class="breadcrumb-item active" aria-current="page" id="bc_current">Edit</li>
+                        <li class="breadcrumb-item "><a href="{{ url('jobcard_history') }}">Job Card History</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" id="bc_current">View</li>
                         </ol>
                     </nav>
                 </div>
@@ -132,8 +132,8 @@
                     @include('alerts.feedback', ['field' => 'vendor_name'])
                     </div>
                     @endif
-                    <div class="form-row">
-                              <div class="form-group col-md-4">
+                        <div class="form-row">
+                              {{-- <div class="form-group col-md-4">
                                 <div class="col-4 text-right">
                                     <button type="button" class="btn btn-primary" data-toggle='modal' data-target='#productsInsert' data-type='update' data-pdtservice='{{ $servicelist[0]->productservice }}' data-genservice='{{ $servicelist[0]->generalservice }}' data-pdtid='{{ $servicelist[0]->pid }}' data-jobcardref ='{{ Session::get('jobcard_reference') }}' data-jobcardnmbr='{{ $servicelist[0]->jobcard_number }}' data-id='{{ $id }}' >
                                        Add Services
@@ -148,8 +148,8 @@
                                     </button>
                                </div>
                              </div>
-                             @endif
-                </div>
+                             @endif --}}
+                    </div>
                 {{-- <div class="form-group">
                     <label>{{ __('Products') }}</label>
                         <button type="button" class="btn btn-primary" data-type='add' data-toggle="modal" data-target="#productsInsert" data-jobcardref ="{{   Session::get('jobcard_reference') }}" >
@@ -238,11 +238,11 @@
                 <div class="card-footer py-4 loadpagination">
                 </div>
 
-                <div class="col-12" >
+                {{-- <div class="col-12" >
                     <div class="card-body">
                     <form method="get"  action="../jobcard_updatestatus" autocomplete="off" id="updatestatusform">
                         @csrf
-                        {{-- @method('put') --}}
+
                         <div class="form-row">
                             <input type="hidden" name="jobcardnumber_up" id="jobcardnumber_up" value="{{ $jobcard_cust[0]->jobcard_reference }}" >
                             <input type="hidden" name="jobcardendingstatus" id="jobcardendingstatus"  >
@@ -261,7 +261,7 @@
                             </div>
                             <br/>
 
-                        {{-- <span style="display: none" id="finish_jobcard" class="col-md-12"> --}}
+
                             <div class="form-group col-md-6 finish_jobcard" style="display: none" >
                                 <label for="exampleFormControlInput1">Bill Amount</label>
                                 <input type="text" class="form-control" id="bill_amount" name="bill_amount" style="color: white" readonly   placeholder="Bill Amount"  >
@@ -274,10 +274,10 @@
                                 <label for="exampleFormControlInput1">Received Amount</label>
                                 <input type="text" class="form-control" id="received_amount" name="received_amount"   placeholder="Received Amount"  >
                             </div>
-                        {{-- </span> --}}
+
                         <br/>
                         <div class="form-group col-md-4" >
-                            {{-- <label for="exampleFormControlInput1">Update</label> --}}
+
                             <button type="submit" id="updatestatus" class="btn btn-fill btn-primary">{{ __('Update Status') }}</button>
 
                         </div>
@@ -285,7 +285,7 @@
                         </div>
                     </form>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -490,6 +490,8 @@
 <script language="JavaScript" type="text/javascript">
 
  $(document).ready(function() {
+
+
 
     $.ajaxSetup({
                 headers: {
@@ -715,76 +717,9 @@ location.reload();
         //     , timeout: 10000
         // })
     });
-    $(document).on('click', '#submitForm', function(){alert("sdfsdf");
-        var registerForm = $("#jobcardcreate");
-        var formData = registerForm.serialize();
-        var ref=$('#jobcardnumber_ref').val();
-        $.ajax({
-            url: 'jobcard_serviceinsert' ,
-            method:'post',
-            data:formData,
-            success:function(data) {
-                if(data.errors) {
-                    if(data.errors.product_list){
-                        $( '#product_list' ).addClass( ' is-invalid' );
-                    }else{
-                        $( '#product_list' ).removeClass( ' is-invalid' );
-                    }
-                    // if(data.errors.generalservice || data.errors.productservice){
-                    //     $( '.alert-danger' ).css('display','block');
-                    // }else{
-                    //     $( '.alert-danger' ).css('display','none');
-                    // }
-
-                }else{
-                    $( '.alert-success' ).show().delay(1000).hide('slow');
-                    $('#productsInsert').modal('hide');
-                   load_service_list(ref);
-                }
 
 
-            },
-        });
 
-
-    });
-
-
-    $(document).on('click', '#updateForm', function(){
-        var registerForm = $("#jobcardcreate");
-        var formData = registerForm.serialize();
-        var ref=$('#jobcardnumber_ref').val();
-        var ref1=$('#jobcardnumber_update').val();
-        $.ajax({
-            url: '../jobcard_serviceupdate' ,
-            method:'post',
-            data:formData,
-            success:function(data) {
-               // console.log(data);
-                if(data.errors) {
-                    if(data.errors.product_list){
-                        $( '#product_list' ).addClass( ' is-invalid' );
-                    }else{
-                        $( '#product_list' ).removeClass( ' is-invalid' );
-                    }
-                    // if(data.errors.generalservice || data.errors.productservice){
-                    //     $( '.alert-danger' ).css('display','block');
-                    // }else{
-                    //     $( '.alert-danger' ).css('display','none');
-                    // }
-
-                }else{
-                    $( '.alert-success' ).show().delay(1000).hide('slow');
-                    $('#productsInsert').modal('hide');
-                   // location.reload();
-                   load_service_list(ref);
-                }
-
-
-            },
-        });
-
-    });
 
     function load_service_list(ref){
             var data={'ref':ref};
@@ -807,6 +742,7 @@ location.reload();
                     $('#service_full_list').append(json_x.append);
                     $('.loadpagination').html(json_x.links);
                     $('#bill_amount').val(json_x.final);
+                    $('.icon-trash-simple').css('display','none');
                 },
             });
 
