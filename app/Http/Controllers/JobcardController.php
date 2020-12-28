@@ -12,6 +12,7 @@ use App\Cart;
 use App\ServicePriceDetails;
 use App\StatusChange;
 use App\Customer;
+use App\JobcardBills;
 use Illuminate\Support\Facades\Auth;
 use DB;
 use Illuminate\Support\Facades\Validator;
@@ -89,19 +90,22 @@ class JobcardController extends Controller
 
         Session::forget('jobcard_reference');
         Session::forget('customerid');
-
+        //DB::enableQueryLog();
         $status_list = DB::table('vendor_status')
-            ->select('vendor_status.status_id')
+            //->select('vendor_status.status_id')
             ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
             ->where('vendor_status.active', '=', 'Y')
             ->where('vendor_status.ending_status', '=', '1')
-            ->get();
-            //DB::enableQueryLog();
+            ->pluck('vendor_status.status_id')->toArray();;
+            //print_r($status_list);dd();
+         //   dd(DB::getQueryLog());
         $rows1 = Jobcard::leftjoin('products', 'products.id', '=', 'job_card.product_id')
             ->leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
             ->select('customers.name as custname', 'customers.id as custid', 'customers.contact_number as custmobile', 'products.name as pdtname', 'job_card.jobcard_number', 'job_card.created_at', 'job_card.id')
             ->orderBy('job_card.created_at', 'DESC')
-            ->where('job_card.jobcard_number','not like','Temp-%');
+            ->where('job_card.jobcard_number','not like','Temp-%')
+            //->where('job_card.current_status',\DB::raw($status_list),">",\DB::raw("'0'"))
+            ->whereNotIn('job_card.current_status',$status_list);
         $jobcard = array();
         if (Session::get('logged_user_type') == '3') {
             $vendor_id = Session::get('logged_vendor_id');
@@ -111,8 +115,6 @@ class JobcardController extends Controller
         $jobcard = $rows1->paginate(Session::get('paginate'));
         //dd(DB::getQueryLog());
         //     DB::enableQueryLog();
-
-
         return view('jobcard.jobcard', compact('jobcard'));
     }
     public function jobcard_add(Request $request)
@@ -221,7 +223,7 @@ class JobcardController extends Controller
             ->orderBy('status_change.created_at', 'DESC')
             ->get();
         $vendor_status = DB::table('vendor_status')
-            ->select('status.name', 'status.id')
+            ->select('status.name', 'status.id','vendor_status.ending_status')
             ->join('status', 'status.id', '=', 'vendor_status.status_id')
             ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
             ->where('vendor_status.display_order', '>', $vendor_current_status[0]->display_order)
@@ -806,7 +808,7 @@ class JobcardController extends Controller
             <td>Total =</td><td>" . $final   . "</td><td> </td></tr>";
             $links = $servicelist->links()->render();
         }
-        return Response::json(['append' => ($append), 'links' => $links]);
+        return Response::json(['append' => ($append), 'links' => $links,'final'=>$final]);
     }
     public function cart_edit(Request $request)
     {
@@ -957,6 +959,19 @@ class JobcardController extends Controller
         $statuschange->change_by               = Session::get('logged_vendor_id');
         $statuschange->date                     = date('Y-m-d');
         $statuschange->save();
+//jobcardendingstatus
+
+        if($request['jobcardendingstatus']=="1")
+        {//'jobcard_number', 'bill_amount', 'received_amount', 'discount_amount',
+            $statuschange = new JobcardBills();
+            $statuschange->jobcard_number                = $request['jobcardnumber_up'];
+            $statuschange->bill_amount                   = $request['bill_amount'];
+            $statuschange->received_amount               = $request['received_amount'];
+            $statuschange->discount_amount               = $request['discount_amount'];
+            $statuschange->vendor_status=$request['vendor_status'];
+            $statuschange->save();
+        }
+
         return Redirect()->back()->with('status', 'Status Updated successfully!');
     }
 }

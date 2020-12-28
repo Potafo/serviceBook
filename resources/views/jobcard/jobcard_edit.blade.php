@@ -73,40 +73,12 @@
                         </ol>
                     </nav>
                 </div>
-                <div class="col-12" >
-                    <div class="card-body">
-                    <form method="get"  action="../jobcard_updatestatus" autocomplete="off" id="updatestatusform">
-                        @csrf
-                        {{-- @method('put') --}}
-                        <div class="form-row">
-                        <input type="hidden" name="jobcardnumber_up" id="jobcardnumber_up" value="{{ $jobcard_cust[0]->jobcard_reference }}" >
-                        <div class="form-group col-md-4" >
-                            <label for="exampleFormControlInput1">Current Status</label>
-                            <input type="text" class="form-control" id="jobcard_crstatus" name="jobcard_crstatus" style="color: white" readonly placeholder="Name" value="{{ $vendor_current_status[0]->stname }}">
-                        </div>
-                        <div class="form-group col-md-4" >
-                            <label for="exampleFormControlInput1">Change to</label>
-                            <select class="form-control{{ $errors->has('vendor_status') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Status') }}" name="vendor_status" id="vendor_status" value="{{ old('vendor_status') }}">
-                                <option value="">Select Status</option>
-                                    @foreach($vendor_status as $list)
-                                        <option value="{{$list->id}}">{{$list->name}}</option>
-                                    @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group col-md-2" >
-                            <label for="exampleFormControlInput1">Update</label>
-                            <button type="submit" id="updatestatus" class="btn btn-fill btn-primary">{{ __('Update Status') }}</button>
 
-                        </div>
-                        </div>
-                    </form>
-                    </div>
-                </div>
                 <div class="col-12" >
                     <div class="card-header">
                         <h5 class="title">{{ __('Details') }}</h5>
                     </div>
-                <form method="post" action="{{ route('jobcard.insert') }}" autocomplete="off">
+                    <form method="post" action="{{ route('jobcard.insert') }}" autocomplete="off">
                     <div class="card-body">
                     @csrf
                     {{-- @method('put') --}}
@@ -149,7 +121,7 @@
                         </div>
                     </div>
                   @if(Session::get('logged_user_type') =='1')
-                  <div class="form-group">
+                    <div class="form-group">
                     <label>{{ __('Vendors') }}</label>
                     <select class="form-control{{ $errors->has('vendor_name') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Vendors') }}" name="vendor_name" id="vendor_name" value="{{ old('vendor_name') }}">
                         <option value="">Select Vendor</option>
@@ -158,9 +130,9 @@
                             @endforeach
                     </select>
                     @include('alerts.feedback', ['field' => 'vendor_name'])
-                </div>
-                @endif
-                <div class="form-row">
+                    </div>
+                    @endif
+                    <div class="form-row">
                               <div class="form-group col-md-4">
                                 <div class="col-4 text-right">
                                     <button type="button" class="btn btn-primary" data-toggle='modal' data-target='#productsInsert' data-type='update' data-pdtservice='{{ $servicelist[0]->productservice }}' data-genservice='{{ $servicelist[0]->generalservice }}' data-pdtid='{{ $servicelist[0]->pid }}' data-jobcardref ='{{ Session::get('jobcard_reference') }}' data-jobcardnmbr='{{ $servicelist[0]->jobcard_number }}' data-id='{{ $id }}' >
@@ -264,6 +236,55 @@
                   </table>
                 </div>
                 <div class="card-footer py-4 loadpagination">
+                </div>
+
+                <div class="col-12" >
+                    <div class="card-body">
+                    <form method="get"  action="../jobcard_updatestatus" autocomplete="off" id="updatestatusform">
+                        @csrf
+                        {{-- @method('put') --}}
+                        <div class="form-row">
+                            <input type="hidden" name="jobcardnumber_up" id="jobcardnumber_up" value="{{ $jobcard_cust[0]->jobcard_reference }}" >
+                            <input type="hidden" name="jobcardendingstatus" id="jobcardendingstatus"  >
+                            <div class="form-group col-md-4" >
+                                <label for="exampleFormControlInput1">Current Status</label>
+                                <input type="text" class="form-control" id="jobcard_crstatus" name="jobcard_crstatus" style="color: white" readonly placeholder="Name" value="{{ $vendor_current_status[0]->stname }}">
+                            </div>
+                            <div class="form-group col-md-4" >
+                                <label for="exampleFormControlInput1">Change to</label>
+                                <select class="form-control{{ $errors->has('vendor_status') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Status') }}" name="vendor_status" id="vendor_status" value="{{ old('vendor_status') }}">
+                                    <option value="">Select Status</option>
+                                        @foreach($vendor_status as $list)
+                                            <option value="{{$list->id}}" endingstatus="{{  $list->ending_status }}" >{{$list->name}}</option>
+                                        @endforeach
+                                </select>
+                            </div>
+                            <br/>
+
+                        {{-- <span style="display: none" id="finish_jobcard" class="col-md-12"> --}}
+                            <div class="form-group col-md-6 finish_jobcard" style="display: none" >
+                                <label for="exampleFormControlInput1">Bill Amount</label>
+                                <input type="text" class="form-control" id="bill_amount" name="bill_amount" style="color: white" readonly   placeholder="Bill Amount"  >
+                            </div>
+                            <div class="form-group col-md-6 finish_jobcard" style="display: none">
+                                <label for="exampleFormControlInput1">Discount Amount</label>
+                                <input type="text" class="form-control" id="discount_amount" name="discount_amount"   placeholder="Discount Amount"  >
+                            </div>
+                            <div class="form-group col-md-6 finish_jobcard" style="display: none">
+                                <label for="exampleFormControlInput1">Received Amount</label>
+                                <input type="text" class="form-control" id="received_amount" name="received_amount"   placeholder="Received Amount"  >
+                            </div>
+                        {{-- </span> --}}
+                        <br/>
+                        <div class="form-group col-md-4" >
+                            {{-- <label for="exampleFormControlInput1">Update</label> --}}
+                            <button type="submit" id="updatestatus" class="btn btn-fill btn-primary">{{ __('Update Status') }}</button>
+
+                        </div>
+
+                        </div>
+                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -536,6 +557,30 @@
                         //$('select[name="product_list"]').empty();
                         }
             });
+
+
+            $('select[name="vendor_status"]').on('change', function() {
+                var element = $(this).find('option:selected');
+                var endstatus = element.attr("endingstatus");
+                if(endstatus=='1')
+                {
+                    $('.finish_jobcard').css('display','block');
+
+                }
+                    $('#jobcardendingstatus').val(endstatus);
+
+            });
+            $('#received_amount').on('change', function() {
+                var received=parseFloat($(this).val());
+                var bill_amount=parseFloat($('#bill_amount').val());
+                var disc=parseInt(received -  bill_amount) ;
+                if(disc < 0)
+                {
+                    //disc.replace('-', '');
+                    $('#discount_amount').val(Math.abs(disc));
+                }
+
+            });
            // parts_list part_name part_price
 
            $('select[name="parts_list"]').on('change', function() {
@@ -761,6 +806,7 @@ location.reload();
                    // $( '.alert-success' ).css('display','block');
                     $('#service_full_list').append(json_x.append);
                     $('.loadpagination').html(json_x.links);
+                    $('#bill_amount').val(json_x.final);
                 },
             });
 
