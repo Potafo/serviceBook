@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => __('Job Card'), 'pageSlug' => 'jobcard'])
+@extends('layouts.app', ['page' => __('Job Card History'), 'pageSlug' => 'jobcard_history'])
 <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 {{-- <meta name="csrf-token" content="{{ csrf_token() }}" /> --}}
 <style>
