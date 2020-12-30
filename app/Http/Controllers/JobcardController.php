@@ -11,6 +11,7 @@ use App\Service;
 use App\Cart;
 use App\ServicePriceDetails;
 use App\StatusChange;
+use App\StatusChangeHistory;
 use App\Customer;
 use App\JobcardBills;
 use Illuminate\Support\Facades\Auth;
@@ -54,6 +55,10 @@ class JobcardController extends Controller
             $data2['jobcard_number']                  = $jobcrd;
             $cart=StatusChange::firstOrFail()->where('jobcard_number', $value->jobcard_number);
             $saved = $cart->update($data2);
+
+            $data3['jobcard_number']                  = $jobcrd;
+            $cart=StatusChangeHistory::firstOrFail()->where('jobcard_number', $value->jobcard_number);
+            $saved = $cart->update($data3);
         }
 
         if ($saved) {
@@ -68,7 +73,7 @@ class JobcardController extends Controller
         $response_code = '200';
         return response::json(['status' => $status, 'response_code' => $response_code]);
     }
-    public function jobcard_view(Request $request, Jobcard $model)
+    public function jobcard_view(Request $request)
     {
         if(strpos(Session::has('jobcard_reference'),"Temp-") === true){
 
@@ -380,6 +385,15 @@ class JobcardController extends Controller
         $statuschange->change_by               = Session::get('logged_vendor_id');
         $statuschange->date                     = date('Y-m-d');
         $statuschange->save();
+
+        $statuschangehistory = new StatusChangeHistory();
+        $statuschangehistory->jobcard_number               = Session::get('jobcard_reference')."-".Session::get('jobcard_count');
+        $statuschangehistory->from_status               = 0;
+        $statuschangehistory->to_status               = $status;
+        $statuschangehistory->change_by               = Session::get('logged_vendor_id');
+        $statuschangehistory->date                     = date('Y-m-d');
+        $statuschangehistory->save();
+
         $pdtcount=intval(Session::get('jobcard_count'));
         Session::put('jobcard_count', ($pdtcount + 1));
         if ($saved) {
@@ -392,14 +406,15 @@ class JobcardController extends Controller
         }
     }
     public function load_jobcardservice_list(Request $request)
-    {
+    {//DB::enableQueryLog();
         $servicelist = Cart::select('cart.*',  'products.name as pdtname', 'service.id as sid', 'cart.id as cid', 'job_card.id as jid', 'job_card.customer_id as customer_id','job_card.remarks','job_card.service_remarks',\DB::raw("GROUP_CONCAT(service.name) as sname"))
             ->leftjoin("service", "service.id", '=', 'service_id')
             ->join('job_card', 'job_card.jobcard_number', '=', 'cart.jobcard_reference')
             ->join('products', 'products.id', '=', 'job_card.product_id')
             ->where('cart.jobcard_reference', 'LIKE', $request['ref']."%")
             ->paginate(Session::get('paginate'));
-
+           // ->get();
+           // dd(DB::getQueryLog());
         $append = '';
         $links = '';
         if (count($servicelist) > 0) {
@@ -444,9 +459,9 @@ class JobcardController extends Controller
 
                 $i++;
             }
-            $links = $servicelist->links()->render();
+            $links =""; // $servicelist->links()->render();
         }
-        return Response::json(['append' => $append, 'links' => $links]);
+        return Response::json(['append' => $append, 'links' => $links]);//, 'links' => $links
         //return $append;
 
 
@@ -741,23 +756,27 @@ class JobcardController extends Controller
             ->join('job_card', 'job_card.jobcard_number', '=', 'cart.jobcard_reference')
             ->where('cart.jobcard_reference', '=', $request['ref'])
             ->orderBy('created_at', 'DESC')
-            ->paginate(Session::get('paginate'));
+            ->get();
+            //->paginate(Session::get('paginate'));
 
         $append = '';
 
         if (count($servicelist) > 0) {
             $i = 1;
             $final = 0;
+            $tax_total=0;
             foreach ($servicelist as $value) {
                 $price_each = $value->price;
                 $taxval = 0;
                 $total = 0;
                 if (Session::get('tax_enabled') == 'Y') {
                     $taxval = $value->tax_amount;
+                    $tax_total=intval($tax_total) + intval($taxval);
                 }
 
                 $total = intval($taxval)  + intval($price_each);
                 $final = intval($final) + intval($total);
+
                 $append .= "
                 <tr>
                 <td>
@@ -768,9 +787,7 @@ class JobcardController extends Controller
                 <div contentEditable='true' class='edit' id='servicename_" . $value->id . "'> " . $value->service_name . "</div>
 
                 </td>
-                <td>
-                $value->service_remarks
-            </td>
+
                 <td>
                 <div contentEditable='true' class='edit' id='serviceprice_" . $value->id . "'> " . $price_each . "</div>
 
@@ -782,7 +799,11 @@ class JobcardController extends Controller
                     </td>
                     ";
                 }
-                $append .= "<td>
+                $append .= "
+                <td>
+                $value->service_remarks
+            </td>
+                <td>
           $total
             </td>
             <td>";
@@ -803,12 +824,17 @@ class JobcardController extends Controller
                 //           </a>
                 $i++;
             }
+            if (Session::get('tax_enabled') == 'Y') {
+                $append .= "<tr>
+            <td> </td><td> </td><td> </td>
+            <td>Total Tax =</td><td>" . $tax_total   . "</td><td> </td></tr>";
+            }
             $append .= "<tr>
             <td> </td><td> </td><td> </td>
             <td>Total =</td><td>" . $final   . "</td><td> </td></tr>";
-            $links = $servicelist->links()->render();
+            $links ="";// $servicelist->links()->render();
         }
-        return Response::json(['append' => ($append), 'links' => $links,'final'=>$final]);
+        return Response::json(['append' => ($append), 'links' => $links,'final'=>$final,'tax_total'=>$tax_total]);
     }
     public function cart_edit(Request $request)
     {
@@ -959,6 +985,14 @@ class JobcardController extends Controller
         $statuschange->change_by               = Session::get('logged_vendor_id');
         $statuschange->date                     = date('Y-m-d');
         $statuschange->save();
+
+        $statuschangehistory = new StatusChangeHistory();
+        $statuschangehistory->jobcard_number               = $request['jobcardnumber_up'];
+        $statuschangehistory->from_status               = $vendor_current_status[0]->to_status;
+        $statuschangehistory->to_status               = $request['vendor_status'];
+        $statuschangehistory->change_by               = Session::get('logged_vendor_id');
+        $statuschangehistory->date                     = date('Y-m-d');
+        $statuschangehistory->save();
 //jobcardendingstatus
 
         if($request['jobcardendingstatus']=="1")
@@ -968,8 +1002,17 @@ class JobcardController extends Controller
             $statuschange->bill_amount                   = $request['bill_amount'];
             $statuschange->received_amount               = $request['received_amount'];
             $statuschange->discount_amount               = $request['discount_amount'];
+            $statuschange->tax_amount               = $request['tax_amount'];
             $statuschange->vendor_status=$request['vendor_status'];
             $statuschange->save();
+
+            // if ending status then delete from statuschange then changes only in history table
+            $jobcard = StatusChange::firstOrFail()->where('jobcard_number','=',$request['jobcardnumber_up']);
+            $saved = $jobcard->delete($jobcard);
+
+           return Redirect('jobcard')->with('status', 'Jobcard Successfully closed!');
+
+
         }
 
         return Redirect()->back()->with('status', 'Status Updated successfully!');
@@ -994,7 +1037,19 @@ class JobcardController extends Controller
                 // $saved = $jobcard->delete($jobcard);
             }
         }
-
+        $products = array();
+        if (Session::get('logged_user_type') == '3') {
+            $products = $this->product_list_query(Session::get('logged_vendor_id'));
+        } else if (Session::get('logged_user_type') == '1') {
+            $products =array();// $this->product_list_query($jobcard_cust[0]->vendor_id);
+        }
+        $jobcard_status = DB::table('vendor_status')
+        ->select('vendor_status.status_id as id','status.name')
+        ->join('status','status.id','=','vendor_status.status_id')
+        ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
+        ->where('vendor_status.active', '=', 'Y')
+        ->where('vendor_status.ending_status', '=', '1')
+        ->get();
         Session::forget('jobcard_reference');
         Session::forget('customerid');
         //DB::enableQueryLog();
@@ -1003,12 +1058,51 @@ class JobcardController extends Controller
             ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
             ->where('vendor_status.active', '=', 'Y')
             ->where('vendor_status.ending_status', '=', '0')
-            ->pluck('vendor_status.status_id')->toArray();;
+            ->pluck('vendor_status.status_id')->toArray();
             //print_r($status_list);dd();
          //   dd(DB::getQueryLog());
+        // $rows1 = Jobcard::leftjoin('products', 'products.id', '=', 'job_card.product_id')
+        //     ->leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
+        //     ->leftjoin('status', 'status.id', '=', 'job_card.current_status')
+        //     ->leftjoin('jobcard_bills', 'jobcard_bills.jobcard_number', '=', 'job_card.jobcard_number')
+        //     ->select('customers.name as custname', 'customers.id as custid', 'customers.contact_number as custmobile', 'products.name as pdtname', 'job_card.jobcard_number', 'job_card.date as jobcard_date', 'job_card.id','status.name as statusname','jobcard_bills.received_amount')
+        //     ->orderBy('job_card.created_at', 'DESC')
+        //     ->where('job_card.jobcard_number','not like','Temp-%')
+        //     //->where('job_card.current_status',\DB::raw($status_list),">",\DB::raw("'0'"))
+        //     ->whereNotIn('job_card.current_status',$status_list);
+        // $jobcard = array();
+        // if (Session::get('logged_user_type') == '3') {
+        //     $vendor_id = Session::get('logged_vendor_id');
+        //     $jobcard = $rows1->where('job_card.vendor_id', '=', $vendor_id);
+        // } else if (Session::get('logged_user_type') == '1') {
+        // }
+        // $jobcard = $rows1->paginate(Session::get('paginate'));
+        //dd(DB::getQueryLog());
+        $filter_details['filter_fromdate']="";
+        $filter_details['filter_todate']="";
+        $filter_details['filter_status']="";
+        $filter_details['filter_products']="";
+        $filter_details['filter_globalsearch']='';
+        $jobcard = array();
+        $jobcard=$this->load_filter_results($request);
+
+        //     DB::enableQueryLog(); filter_todate filter_status filter_products
+
+        return view('jobcard.jobcard_history', compact('jobcard','jobcard_status','products','filter_details'));
+    }
+    public function load_filter_results(Request $request)
+    {
+        $status_list = DB::table('vendor_status')
+        ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
+        ->where('vendor_status.active', '=', 'Y')
+        ->where('vendor_status.ending_status', '=', '0')
+        ->pluck('vendor_status.status_id')->toArray();
+         // DB::enableQueryLog();
         $rows1 = Jobcard::leftjoin('products', 'products.id', '=', 'job_card.product_id')
             ->leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
-            ->select('customers.name as custname', 'customers.id as custid', 'customers.contact_number as custmobile', 'products.name as pdtname', 'job_card.jobcard_number', 'job_card.created_at', 'job_card.id')
+            ->leftjoin('status', 'status.id', '=', 'job_card.current_status')
+            ->leftjoin('jobcard_bills', 'jobcard_bills.jobcard_number', '=', 'job_card.jobcard_number')
+            ->select('customers.name as custname', 'customers.id as custid', 'customers.contact_number as custmobile', 'products.name as pdtname', 'job_card.jobcard_number', 'job_card.date as jobcard_date', 'job_card.id','status.name as statusname','jobcard_bills.received_amount')
             ->orderBy('job_card.created_at', 'DESC')
             ->where('job_card.jobcard_number','not like','Temp-%')
             //->where('job_card.current_status',\DB::raw($status_list),">",\DB::raw("'0'"))
@@ -1019,10 +1113,86 @@ class JobcardController extends Controller
             $jobcard = $rows1->where('job_card.vendor_id', '=', $vendor_id);
         } else if (Session::get('logged_user_type') == '1') {
         }
+        $filter_details=array();
+        $filter_details['filter_fromdate']="";
+        $filter_details['filter_todate']="";
+        if (!empty($request->input('filter_fromdate')) && !empty($request->input('filter_todate'))) {
+            $dfrom=date("Y-m-d",strtotime($request['filter_fromdate']));
+            $dto=date("Y-m-d",strtotime($request['filter_todate']));
+            $rows1->whereBetween('job_card.date', [$dfrom, $dto]);
+            $filter_details['filter_fromdate']=$request['filter_fromdate'];
+            $filter_details['filter_todate']=$request['filter_todate'];
+        }
+        if (!empty($request->input('filter_fromdate')) && empty($request->input('filter_todate'))) {
+            $dfrom=date("Y-m-d",strtotime($request['filter_fromdate']));
+            $dto=date("Y-m-d");
+            $rows1->whereBetween('job_card.date', [$dfrom, $dto]);
+            $filter_details['filter_fromdate']=$request['filter_fromdate'];
+            $filter_details['filter_todate']="";
+        }
+        if (empty($request->input('filter_fromdate')) && !empty($request->input('filter_todate'))) {
+            $dfrom=date("Y-m-d",strtotime($request['filter_todate']));
+            $dto=date("Y-m-d",strtotime($request['filter_todate']));
+            $rows1->whereBetween('job_card.date', [$dfrom, $dto]);
+            $filter_details['filter_fromdate']="";
+            $filter_details['filter_todate']=$request['filter_todate'];
+        }
+        $filter_details['filter_status']='';
+        if (!empty($request->input('filter_status'))) {
+            $jobcard = $rows1->where('job_card.current_status', $request->input('filter_status'));
+            $filter_details['filter_status']=$request['filter_status'];
+
+        }
+        $filter_details['filter_products']='';
+        if (!empty($request->input('filter_products'))) {
+            $jobcard = $rows1->where('job_card.product_id', $request->input('filter_products'));
+            $filter_details['filter_products']=$request['filter_products'];
+        }
+        $filter_details['filter_globalsearch']='';
+        if (!empty($request->has('filter_globalsearch'))) {
+            $searchQuery =  $request->input('filter_globalsearch');
+            $jobcard =$rows1->where(function ($q) use ($searchQuery) {
+                $q->Where('customers.name', 'LIKE', '%' .$searchQuery. '%')
+                ->orWhere('customers.contact_number', 'LIKE', '%' . $searchQuery. '%')
+                ->orWhere('products.name', 'LIKE',  '%' .$searchQuery. '%')
+                ->orWhere('job_card.jobcard_number', 'LIKE',  '%' .$searchQuery. '%')
+                ->orWhere('job_card.date', 'LIKE', '%' . $searchQuery. '%')
+                ->orWhere('status.name', 'LIKE',  '%' .$searchQuery. '%')
+                ->orWhere('jobcard_bills.received_amount', 'LIKE',  '%' .$searchQuery. '%');
+            });
+
+
+            $filter_details['filter_globalsearch']=$request['filter_globalsearch'];
+        }
+
         $jobcard = $rows1->paginate(Session::get('paginate'));
-        //dd(DB::getQueryLog());
-        //     DB::enableQueryLog();
-        return view('jobcard.jobcard_history', compact('jobcard'));
+
+        return $jobcard;
+    }
+    public function filter_history(Request $request)
+    {
+         $jobcard=$this->load_filter_results($request);
+
+        $filter_details['filter_fromdate']=$request['filter_fromdate'];
+        $filter_details['filter_todate']=$request['filter_todate'];
+        $filter_details['filter_status']=$request['filter_status'];
+        $filter_details['filter_products']=$request['filter_products'];
+        $filter_details['filter_globalsearch']=$request['filter_globalsearch'];
+        $products = array();
+        if (Session::get('logged_user_type') == '3') {
+            $products = $this->product_list_query(Session::get('logged_vendor_id'));
+        } else if (Session::get('logged_user_type') == '1') {
+            $products = array();//$this->product_list_query($jobcard_cust[0]->vendor_id);
+        }
+        $jobcard_status = DB::table('vendor_status')
+        ->select('vendor_status.status_id as id','status.name')
+        ->join('status','status.id','=','vendor_status.status_id')
+        ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
+        ->where('vendor_status.active', '=', 'Y')
+        ->where('vendor_status.ending_status', '=', '1')
+        ->get();
+
+       return view('jobcard.jobcard_history', compact('jobcard','jobcard_status','products','filter_details'));
     }
     public function jobcard_history_pageview(Request $request, $id)
     {
@@ -1055,21 +1225,37 @@ class JobcardController extends Controller
             ->select('service.*')
             ->where('service.type', '=', $Generalservice_id)
             ->get();
+
         $servicelist = $this->service_full_listedit($jobcard_cust[0]->jobcard_reference);
+
         $serviceids = Cart::where('cart.jobcard_reference', '=', $jobcard_cust[0]->jobcard_reference)
             ->pluck('cart.service_id')->toArray();
-        $vendor_current_status = StatusChange::select('vendor_status.display_order', 'status.name as stname', 'status.id as id')
-            ->join('status', 'status_change.to_status', '=', 'status.id')
+
+        $vendor_current_status = StatusChangeHistory::select('vendor_status.display_order', 'status.name as stname', 'status.id as id')
+            ->join('status', 'status_change_history.to_status', '=', 'status.id')
             ->join('vendor_status', 'vendor_status.status_id', '=', 'status.id')
-            ->where('status_change.jobcard_number', '=', $jobcard_cust[0]->jobcard_reference)
-            ->orderBy('status_change.created_at', 'DESC')
+            ->where('status_change_history.jobcard_number', '=', $jobcard_cust[0]->jobcard_reference)
+            ->orderBy('status_change_history.created_at', 'DESC')
             ->get();
+
+
         $vendor_status = DB::table('vendor_status')
             ->select('status.name', 'status.id','vendor_status.ending_status')
             ->join('status', 'status.id', '=', 'vendor_status.status_id')
             ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
             ->where('vendor_status.display_order', '>', $vendor_current_status[0]->display_order)
             ->orderBy('vendor_status.display_order', 'ASC')
+            ->get();
+
+        $jobcard_bills = DB::table('jobcard_bills')
+            ->select('*')
+            ->where('jobcard_number', '=',$jobcard_cust[0]->jobcard_reference)
+            ->get();
+
+        $statuschangehistory = DB::table('status_change_history')
+            ->select('status_change_history.date','status.name as name')
+            ->join('status', 'status.id', '=', 'status_change_history.to_status')
+            ->where('jobcard_number', '=',$jobcard_cust[0]->jobcard_reference)
             ->get();
         $vendor_partslist = array();
         if (Session::get('Parts_status') == 'Y') {
@@ -1080,6 +1266,7 @@ class JobcardController extends Controller
                 ->get();
         }
 
-        return view('jobcard.jobcard_history_view', compact('jobcard_cust', 'id', 'vendor_partslist', 'products', 'serviceids', 'general_service', 'product_service', 'servicelist', 'vendor_status', 'vendor_current_status'));
+        return view('jobcard.jobcard_history_view', compact('jobcard_cust', 'id', 'vendor_partslist', 'products', 'serviceids', 'general_service', 'product_service', 'servicelist', 'vendor_status', 'vendor_current_status','jobcard_bills','statuschangehistory'));
     }
+
 }

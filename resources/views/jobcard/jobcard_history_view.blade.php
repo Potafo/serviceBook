@@ -62,7 +62,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="title">{{ __('Jobcard History View') }}</h5>
+                    {{-- <h5 class="title">{{ __('Jobcard History View') }}</h5> --}}
                 </div>
                 <div class="col-12">
                     <nav aria-label="breadcrumb" role="navigation">
@@ -75,9 +75,9 @@
                 </div>
 
                 <div class="col-12" >
-                    <div class="card-header">
+                    {{-- <div class="card-header">
                         <h5 class="title">{{ __('Details') }}</h5>
-                    </div>
+                    </div> --}}
                     <form method="post" action="{{ route('jobcard.insert') }}" autocomplete="off">
                     <div class="card-body">
                     @csrf
@@ -94,34 +94,62 @@
                     <input type="hidden" name="jobcardrefnumber" id="jobcardrefnumber" value="{{  Session::get('jobcard_reference') }}" >
                     <input type="hidden" name="jobcardnumber" id="jobcardnumber" value="{{ $jobcard_cust[0]->jobcard_number }}" >
                     <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Name</label>
                             <input type="text" class="form-control{{ $errors->has('jobcard_name') ? ' is-invalid' : '' }}" id="jobcard_name" name="jobcard_name" style="color: white" readonly placeholder="Name" value="{{ old('jobcard_name',$jobcard_cust[0]->name) }}">
                             @include('alerts.feedback', ['field' => 'jobcard_name'])
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Mobile</label>
                             <input type="text" class="form-control{{ $errors->has('jobcard_mobile') ? ' is-invalid' : '' }}" id="jobcard_mobile" name="jobcard_mobile" style="color: white" readonly placeholder="Mobile" value="{{ old('jobcard_mobile',$jobcard_cust[0]->mobile) }}">
                             @include('alerts.feedback', ['field' => 'jobcard_mobile'])
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Jobcard Number</label>
                             <input type="text" class="form-control{{ $errors->has('jobcard_number') ? ' is-invalid' : '' }}" id="jobcard_number" name="jobcard_number" style="color: white" readonly placeholder="Jobcard Number" value="{{ $jobcard_cust[0]->jobcard_number }}">
                             @include('alerts.feedback', ['field' => 'jobcard_number'])
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Product</label>
                             <input type="text" class="form-control{{ $errors->has('jobcard_pdt') ? ' is-invalid' : '' }}" id="jobcard_pdt" name="jobcard_pdt" style="color: white" readonly placeholder="Product Name" value="{{ $jobcard_cust[0]->pdtname }}">
                             @include('alerts.feedback', ['field' => 'jobcard_pdt'])
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Remarks</label>
                             <input type="text" class="form-control{{ $errors->has('jobcard_rmrks') ? ' is-invalid' : '' }}" id="jobcard_rmrks" name="jobcard_rmrks" style="color: white" readonly placeholder="Remarks" value="{{ $jobcard_cust[0]->remarks }}">
                             @include('alerts.feedback', ['field' => 'jobcard_rmrks'])
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <label for="exampleFormControlInput1">Sub Total</label>
+                            <input type="text" class="form-control{{ $errors->has('jobcard_total') ? ' is-invalid' : '' }}" id="jobcard_total" name="jobcard_total" style="color: white" readonly placeholder="Sub Total" value="{{ $jobcard_bills[0]->bill_amount }}">
+                            @include('alerts.feedback', ['field' => 'jobcard_total'])
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="exampleFormControlInput1">Received Amount</label>
+                            <input type="text" class="form-control{{ $errors->has('jobcard_receivedamount') ? ' is-invalid' : '' }}" id="jobcard_receivedamount" name="jobcard_receivedamount" style="color: white" readonly placeholder="Received Amount" value="{{ $jobcard_bills[0]->received_amount }}">
+                            @include('alerts.feedback', ['field' => 'jobcard_receivedamount'])
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="exampleFormControlInput1">Discount Amount</label>
+                            <input type="text" class="form-control{{ $errors->has('jobcard_discountamount') ? ' is-invalid' : '' }}" id="jobcard_discountamount" name="jobcard_discountamount" style="color: white" readonly placeholder="Remarks" value="{{ $jobcard_bills[0]->discount_amount }}">
+                            @include('alerts.feedback', ['field' => 'jobcard_discountamount'])
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="exampleFormControlInput1">Tax Amount</label>
+                            <input type="text" class="form-control{{ $errors->has('jobcard_taxamount') ? ' is-invalid' : '' }}" id="jobcard_taxamount" name="jobcard_taxamount" style="color: white" readonly placeholder="Remarks" value="{{ $jobcard_bills[0]->tax_amount }}">
+                            @include('alerts.feedback', ['field' => 'jobcard_taxamount'])
+                        </div>
+                        <div class="form-group col-md-2">
+                            <br/>
+                            <button type="button" class="btn btn-primary" data-toggle='modal' data-target='#statuschangehistory' >
+                               Status History
+                             </button>
+                        </div>
+                    </div>
                   @if(Session::get('logged_user_type') =='1')
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                     <label>{{ __('Vendors') }}</label>
                     <select class="form-control{{ $errors->has('vendor_name') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Vendors') }}" name="vendor_name" id="vendor_name" value="{{ old('vendor_name') }}">
                         <option value="">Select Vendor</option>
@@ -130,7 +158,7 @@
                             @endforeach
                     </select>
                     @include('alerts.feedback', ['field' => 'vendor_name'])
-                    </div>
+                    </div> --}}
                     @endif
                         <div class="form-row">
                               {{-- <div class="form-group col-md-4">
@@ -187,7 +215,7 @@
                           </th>
                           @if(Session::get('tax_enabled')=='Y' )
                           <th>
-                            Tax %
+                            Tax Amount
                           </th>
 
 
@@ -286,6 +314,54 @@
                     </form>
                     </div>
                 </div> --}}
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="statuschangehistory" tabindex="-1" role="dialog" aria-labelledby="smallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel" style="color: purple;margin-left: 20%;"><span>Status change</span></h1>
+                </div>
+                <div class="modal-body">
+
+
+                                <table class="table tablesorter " border="1">
+                                    <thead class="text-primary">
+                                      <tr>
+                                        <th style="color: black" >
+                                          Status
+                                        </th>
+                                        <th style="color: black">
+                                            Date
+                                          </th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                    @if(count($statuschangehistory)>0)
+                                        @foreach($statuschangehistory as $value)
+                                        <tr>
+                                            <th>
+                                                {{ $value->name }}
+                                          </th>
+                                          <th>
+                                            {{ $value->date }}
+                                          </th>
+                                        </tr>
+                                        @endforeach
+                                    @endif
+                                    </tbody>
+                                </table>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                {{-- <button type="submit" class="btn btn-danger">Yes, Delete Service</button> --}}
+                            </div>
+
+
+                </div>
             </div>
         </div>
     </div>

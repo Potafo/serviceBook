@@ -1,17 +1,22 @@
 @extends('layouts.app', ['page' => __('Job Card History'), 'pageSlug' => 'jobcard_history'])
 {{-- <script src="{{ asset('black') }}/js/core/jquery.min.js"></script> --}}
 {{-- <meta name="csrf-token" content="{{ csrf_token() }}" /> --}}
-<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
-
+{{-- <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script> --}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
+<style>
+ select > option {
+        color: black;
+    }
+</style>
 @section('content')
 <div class="row">
   <div class="col-md-12">
     <div class="card ">
       <div class="card-header">
         <div class="row">
-
-
-
 
             <div class="col-8">
                 <h4 class="card-title">Job Card History</h4>
@@ -30,9 +35,56 @@
             </div>
         </div>
         @include('alerts.success')
-
-
       </div>
+        <div class="col-12">
+            <form method="post" action="{{ route('jobcard.history_filter') }}" autocomplete="off" id="historyfilter">
+                @csrf
+                <div class="form-row">
+                    <div class="form-group col-md-2">
+                        <label for="exampleFormControlInput1">From Date</label>
+                        <input type="text" class="form-control date" id="filter_fromdate" name="filter_fromdate"  placeholder="From Date" value="{{ $filter_details['filter_fromdate'] }}">
+
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="exampleFormControlInput1">To Date</label>
+                        <input type="text" class="form-control date" id="filter_todate" name="filter_todate"  placeholder="To Date" value="{{ $filter_details['filter_todate'] }}">
+
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="exampleFormControlInput1">Status</label>
+                        {{-- <input type="text" class="form-control" id="filter_status" name="filter_status"  placeholder="Status" value="{{ old('filter_status') }}"> --}}
+                        <select class="form-control{{ $errors->has('filter_status') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7"   name="filter_status" id="filter_status" >
+                            <option value="">Select Status</option>
+                            @foreach($jobcard_status as $list)
+                                    <option value="{{$list->id}}" @if($filter_details['filter_status']==$list->id) selected @endif>{{$list->name}}</option>
+                                @endforeach
+                        </select>
+
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="exampleFormControlInput1">Products</label>
+                        {{-- <input type="text" class="form-control" id="filter_status" name="filter_status"  placeholder="Status" value="{{ old('filter_status') }}"> --}}
+                        <select class="form-control{{ $errors->has('filter_products') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7"   name="filter_products" id="filter_products" >
+                            <option value="">Select Products</option>
+                            @foreach($products as $list)
+                                    <option value="{{$list->id}}" @if($filter_details['filter_products']==$list->id) selected @endif>{{$list->name}}</option>
+                                @endforeach
+                        </select>
+
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="exampleFormControlInput1">Search</label>
+                        <input type="text" class="form-control" id="filter_globalsearch" name="filter_globalsearch"  placeholder="Search" value="{{ $filter_details['filter_globalsearch'] }}">
+
+                    </div>
+                    <div class="form-group col-md-2">
+
+                        <br/>
+                        <button type="submit" class="btn btn-fill btn-primary searchbutton">{{ __('Search') }}</button>
+                    </div>
+                </div>
+            </form>
+        </div>
       <div class="card-body" style="display: block" id="view_package">
         <div class="table-responsive">
           <table class="table tablesorter " id="">
@@ -50,26 +102,21 @@
                     </th>
                 @endif
                 <th>
-                    Name
+                    Date
                   </th>
                   <th>
-                    Mobile
+                    Customer
                   </th>
                   <th>
                     Product
                   </th>
-                  {{-- <th>
-                    Service
-                  </th> --}}
                   <th>
-                    Days
+                    Amount Received
                   </th>
-                  {{-- <th>
+                  <th>
                     Status
-                  </th> --}}
-                {{-- <th >
-                    Action
-                  </th> --}}
+                  </th>
+
               </tr>
             </thead>
             <tbody>
@@ -90,22 +137,7 @@
                         else {
                            $pdt=$value->pdtname;
                         }
-                    //days
-                        $timezone = 'ASIA/KOLKATA';
-                        $date = new DateTime('now', new DateTimeZone($timezone));
-                        //$package_days_count=$value->days;
-                         $joined_date=date("Y-m-d",strtotime($value->created_at));
-                         $current_date=date("Y-m-d");
-                         $diff=(new DateTime($joined_date))->diff(new DateTime($current_date))->days;
-                         $pending=$diff;//intval($package_days_count) - intval($diff);
-                        if($pending==0)
-                        {
-                            $pending= "Today";
-                        }elseif($pending==1) {
-                            $pending=$pending ." Day";
-                        }elseif($pending>1) {
-                            $pending=$pending ." Days";
-                        }
+
 
                     ?>
                         <tr class="viewjobcards" data-id='{{ $value->id }}' style="cursor: pointer">
@@ -122,37 +154,23 @@
                             </td>
                             @endif
                             <td>
-                                {{ $value->custname }}
+                                {{ $value->jobcard_date }}
                             </td>
                             <td>
-                                {{ $value->custmobile }}
+                                {{ $value->custname }} - {{ $value->custmobile }}
                             </td>
+
                             <td>
                                 {{ $pdt }}
                             </td>
-                            {{-- <td>
-                                {{ $str }}
-                            </td> --}}
                             <td>
-                                {{ $pending }}
+                                {{ $value->received_amount }}
                             </td>
-                            {{-- <td>
+                            <td>
                                 {{ $value->statusname }}
-                            </td> --}}
+                            </td>
 
-                            {{-- <td >
-                                {{-- <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
-                                    <a href="jobcard_edit/{{ $value->jobid }}" ><i class="tim-icons icon-settings"></i></a>
-                                </button> --}}
 
-                                 {{-- <a  href="jobcard_edit/{{ $value->id }}"  >
-                                    <i class='tim-icons icon-pencil'></i>
-                                </a> --}}
-
-                                {{-- <a style="color: #ba54f5; cursor: pointer;" data-toggle='modal' id='deleteButton' data-target='#delete_jobcards' data-custid='{{  $value->custid }}'  data-id='{{  $value->id }}' data-jobcardref='{{  $value->jobcard_number }}' data-jobcardnmbr='{{  $value->jobcard_number }}' title='Delete Service'>
-                                    <i class='tim-icons icon-trash-simple'></i>
-                                </a> --}}
-                            {{-- </td> --}}
                         </tr>
                 @endforeach
 
@@ -202,7 +220,18 @@
 
 @endsection
 <script language="JavaScript" type="text/javascript">
+
     $(document).ready(function() {
+        $('.date').datepicker({
+       format: 'dd-mm-yyyy',
+       todayHighlight: true,
+        autoclose: true,
+     });
+//  setTimeout(function() {
+//                $(".searchbutton").trigger('click');
+//            },10);
+     //load_full_list();
+
         $(document).on('click', '#deleteButton', function(event) {
             event.preventDefault();
             var jobcardid =$(this).attr('data-id');
@@ -240,4 +269,6 @@
         });
 
     });
+
+
 </script>
