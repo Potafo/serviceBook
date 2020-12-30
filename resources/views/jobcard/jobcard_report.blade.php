@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => __('Job Card History'), 'pageSlug' => 'jobcard_history'])
+@extends('layouts.app', ['page' => __('Job Card Report'), 'pageSlug' => 'jobcard_report'])
 {{-- <script src="{{ asset('black') }}/js/core/jquery.min.js"></script> --}}
 {{-- <meta name="csrf-token" content="{{ csrf_token() }}" /> --}}
 {{-- <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script> --}}
@@ -19,7 +19,7 @@
         <div class="row">
 
             <div class="col-8">
-                <h4 class="card-title">Job Card History</h4>
+                <h4 class="card-title">Job Card Report</h4>
             </div>
             <div class="col-4 text-right">
                 {{-- <a class="btn btn-sm btn-primary addpackage" href="jobcard_add">Add Job Card</a> --}}
@@ -28,7 +28,7 @@
                 <nav aria-label="breadcrumb" role="navigation">
                     <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="home">Home</a></li>
-                    <li class="breadcrumb-item "><a href="jobcard_history">JobCard History</a></li>
+                    <li class="breadcrumb-item "><a href="jobcard_report">JobCard Report</a></li>
                     <li class="breadcrumb-item active" aria-current="page" id="bc_current">View</li>
                     </ol>
                 </nav>
@@ -39,7 +39,7 @@
         <div class="col-12">
             <form method="post" action="{{ route('jobcard.history_filter') }}" autocomplete="off" id="historyfilter">
                 @csrf
-                <input type="hidden" id="pageid" name="pageid" value="history" >
+                <input type="hidden" id="pageid" name="pageid" value="report" >
                 <div class="form-row">
                     <div class="form-group col-md-2">
                         <label for="exampleFormControlInput1">From Date</label>
@@ -51,9 +51,9 @@
                         <input type="text" class="form-control date" id="filter_todate" name="filter_todate"  placeholder="To Date" value="{{ $filter_details['filter_todate'] }}">
 
                     </div>
-                    <div class="form-group col-md-2">
+                    {{-- <div class="form-group col-md-2">
                         <label for="exampleFormControlInput1">Status</label>
-                        {{-- <input type="text" class="form-control" id="filter_status" name="filter_status"  placeholder="Status" value="{{ old('filter_status') }}"> --}}
+
                         <select class="form-control{{ $errors->has('filter_status') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7"   name="filter_status" id="filter_status" >
                             <option value="">Select Status</option>
                             @foreach($jobcard_status as $list)
@@ -64,7 +64,7 @@
                     </div>
                     <div class="form-group col-md-2">
                         <label for="exampleFormControlInput1">Products</label>
-                        {{-- <input type="text" class="form-control" id="filter_status" name="filter_status"  placeholder="Status" value="{{ old('filter_status') }}"> --}}
+
                         <select class="form-control{{ $errors->has('filter_products') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7"   name="filter_products" id="filter_products" >
                             <option value="">Select Products</option>
                             @foreach($products as $list)
@@ -72,7 +72,7 @@
                                 @endforeach
                         </select>
 
-                    </div>
+                    </div> --}}
                     <div class="form-group col-md-2">
                         <label for="exampleFormControlInput1">Search</label>
                         <input type="text" class="form-control" id="filter_globalsearch" name="filter_globalsearch"  placeholder="Search" value="{{ $filter_details['filter_globalsearch'] }}">
@@ -95,6 +95,9 @@
                   Slno
                 </th>
                 <th>
+                    Date
+                  </th>
+                <th>
                   JobCard Number
                 </th>
                 @if(Session::get('logged_user_type') =='1')
@@ -102,21 +105,24 @@
                     Vendor
                     </th>
                 @endif
-                <th>
-                    Date
-                  </th>
+
                   <th>
                     Customer
                   </th>
                   <th>
-                    Product
+                    Bill Amount
                   </th>
                   <th>
                     Amount Received
                   </th>
                   <th>
-                    Status
+                    Discount
                   </th>
+                  <th>
+                    Tax Amount
+                  </th>
+
+
 
               </tr>
             </thead>
@@ -141,10 +147,13 @@
 
 
                     ?>
-                        <tr class="viewjobcards" data-id='{{ $value->id }}' style="cursor: pointer">
-
+                        <tr  data-id='{{ $value->id }}' style="cursor: pointer">
+                            {{-- class="viewjobcards" --}}
                             <td>
                                 {{ $jobcard->firstItem() + $key }}
+                            </td>
+                            <td>
+                                {{ $value->jobcard_date }}
                             </td>
                             <td>
                                 {{ $value->jobcard_number }}
@@ -154,24 +163,24 @@
                                 {{ $value->vname }}
                             </td>
                             @endif
-                            <td>
-                                {{ $value->jobcard_date }}
-                            </td>
+
                             <td>
                                 {{ $value->custname }} - {{ $value->custmobile }}
                             </td>
 
                             <td>
-                                {{ $pdt }}
+                                {{ $value->bill_amount }}
                             </td>
                             <td>
                                 {{ $value->received_amount }}
                             </td>
                             <td>
-                                {{ $value->statusname }}
+                                {{ $value->discount_amount }}
                             </td>
 
-
+                            <td>
+                                {{ $value->tax_amount }}
+                            </td>
                         </tr>
                 @endforeach
 
@@ -261,13 +270,13 @@
                 , timeout: 10000
             })
         });
-        $(document).on('click', '.viewjobcards', function(event) {
-            //event.preventDefault();
-            var jobcardid =$(this).attr('data-id');
-            //window.location='jobcard_view/'+jobcardid;
-            window.location='jobcard_history_view/'+jobcardid;
+        // $(document).on('click', '.viewjobcards', function(event) {
+        //     //event.preventDefault();
+        //     var jobcardid =$(this).attr('data-id');
+        //     //window.location='jobcard_view/'+jobcardid;
+        //     window.location='jobcard_history_view/'+jobcardid;
 
-        });
+        // });
 
     });
 
