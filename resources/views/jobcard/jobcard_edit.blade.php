@@ -62,7 +62,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="title">{{ __('Jobcard') }}</h5>
+                    {{-- <h5 class="title">{{ __('Jobcard') }}</h5> --}}
                 </div>
                 <div class="col-12">
                     <nav aria-label="breadcrumb" role="navigation">
@@ -75,9 +75,9 @@
                 </div>
 
                 <div class="col-12" >
-                    <div class="card-header">
+                    {{-- <div class="card-header">
                         <h5 class="title">{{ __('Details') }}</h5>
-                    </div>
+                    </div> --}}
                     <form method="post" action="{{ route('jobcard.insert') }}" autocomplete="off">
                     <div class="card-body">
                     @csrf
@@ -94,34 +94,34 @@
                     <input type="hidden" name="jobcardrefnumber" id="jobcardrefnumber" value="{{  Session::get('jobcard_reference') }}" >
                     <input type="hidden" name="jobcardnumber" id="jobcardnumber" value="{{ $jobcard_cust[0]->jobcard_number }}" >
                     <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-3">
                             <label for="exampleFormControlInput1">Name</label>
                             <input type="text" class="form-control{{ $errors->has('jobcard_name') ? ' is-invalid' : '' }}" id="jobcard_name" name="jobcard_name" style="color: white" readonly placeholder="Name" value="{{ old('jobcard_name',$jobcard_cust[0]->name) }}">
                             @include('alerts.feedback', ['field' => 'jobcard_name'])
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Mobile</label>
                             <input type="text" class="form-control{{ $errors->has('jobcard_mobile') ? ' is-invalid' : '' }}" id="jobcard_mobile" name="jobcard_mobile" style="color: white" readonly placeholder="Mobile" value="{{ old('jobcard_mobile',$jobcard_cust[0]->mobile) }}">
                             @include('alerts.feedback', ['field' => 'jobcard_mobile'])
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Jobcard Number</label>
                             <input type="text" class="form-control{{ $errors->has('jobcard_number') ? ' is-invalid' : '' }}" id="jobcard_number" name="jobcard_number" style="color: white" readonly placeholder="Jobcard Number" value="{{ $jobcard_cust[0]->jobcard_number }}">
                             @include('alerts.feedback', ['field' => 'jobcard_number'])
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Product</label>
                             <input type="text" class="form-control{{ $errors->has('jobcard_pdt') ? ' is-invalid' : '' }}" id="jobcard_pdt" name="jobcard_pdt" style="color: white" readonly placeholder="Product Name" value="{{ $jobcard_cust[0]->pdtname }}">
                             @include('alerts.feedback', ['field' => 'jobcard_pdt'])
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Remarks</label>
                             <input type="text" class="form-control{{ $errors->has('jobcard_rmrks') ? ' is-invalid' : '' }}" id="jobcard_rmrks" name="jobcard_rmrks" style="color: white" readonly placeholder="Remarks" value="{{ $jobcard_cust[0]->remarks }}">
                             @include('alerts.feedback', ['field' => 'jobcard_rmrks'])
                         </div>
                     </div>
                   @if(Session::get('logged_user_type') =='1')
-                    <div class="form-group">
+                    <div class="form-group  col-md-2">
                     <label>{{ __('Vendors') }}</label>
                     <select class="form-control{{ $errors->has('vendor_name') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Vendors') }}" name="vendor_name" id="vendor_name" value="{{ old('vendor_name') }}">
                         <option value="">Select Vendor</option>
@@ -262,6 +262,8 @@
                             <br/>
 
                         {{-- <span style="display: none" id="finish_jobcard" class="col-md-12"> --}}
+
+                            <input type="hidden" class="form-control" id="tax_amount" name="tax_amount" >
                             <div class="form-group col-md-6 finish_jobcard" style="display: none" >
                                 <label for="exampleFormControlInput1">Bill Amount</label>
                                 <input type="text" class="form-control" id="bill_amount" name="bill_amount" style="color: white" readonly   placeholder="Bill Amount"  >
@@ -807,6 +809,7 @@ location.reload();
                     $('#service_full_list').append(json_x.append);
                     $('.loadpagination').html(json_x.links);
                     $('#bill_amount').val(json_x.final);
+                    $('#tax_amount').val(json_x.tax_total);
                 },
             });
 
