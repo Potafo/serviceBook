@@ -71,6 +71,12 @@
                                 <p>{{ __('Job Card History') }}</p>
                             </a>
                         </li>
+                        <li @if ($pageSlug  == 'jobcard_report') class="active " @endif>
+                            <a href="{{ route('jobcard.jobcard_report')  }}">
+                                <i class="tim-icons icon-bullet-list-67"></i>
+                                <p>{{ __('Job Card Report') }}</p>
+                            </a>
+                        </li>
                         <li @if ($pageSlug  == 'products') class="active " @endif>
                             <a href="{{ route('products.products')  }}">
                                 <i class="tim-icons icon-bullet-list-67"></i>

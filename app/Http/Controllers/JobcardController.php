@@ -1084,13 +1084,13 @@ class JobcardController extends Controller
         $filter_details['filter_products']="";
         $filter_details['filter_globalsearch']='';
         $jobcard = array();
-        $jobcard=$this->load_filter_results($request);
+        $jobcard=$this->load_filter_results($request,'history');
 
         //     DB::enableQueryLog(); filter_todate filter_status filter_products
 
         return view('jobcard.jobcard_history', compact('jobcard','jobcard_status','products','filter_details'));
     }
-    public function load_filter_results(Request $request)
+    public function load_filter_results(Request $request,$type)
     {
         $status_list = DB::table('vendor_status')
         ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
@@ -1098,7 +1098,9 @@ class JobcardController extends Controller
         ->where('vendor_status.ending_status', '=', '0')
         ->pluck('vendor_status.status_id')->toArray();
          // DB::enableQueryLog();
-        $rows1 = Jobcard::leftjoin('products', 'products.id', '=', 'job_card.product_id')
+        if($type=="history")
+        {
+            $rows1 = Jobcard::leftjoin('products', 'products.id', '=', 'job_card.product_id')
             ->leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
             ->leftjoin('status', 'status.id', '=', 'job_card.current_status')
             ->leftjoin('jobcard_bills', 'jobcard_bills.jobcard_number', '=', 'job_card.jobcard_number')
@@ -1107,6 +1109,17 @@ class JobcardController extends Controller
             ->where('job_card.jobcard_number','not like','Temp-%')
             //->where('job_card.current_status',\DB::raw($status_list),">",\DB::raw("'0'"))
             ->whereNotIn('job_card.current_status',$status_list);
+        }else  if($type=="report")
+        {
+            $rows1 = Jobcard::leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
+            ->leftjoin('jobcard_bills', 'jobcard_bills.jobcard_number', '=', 'job_card.jobcard_number')
+            ->select('customers.name as custname', 'customers.id as custid', 'customers.contact_number as custmobile',  'job_card.jobcard_number', 'job_card.date as jobcard_date', 'job_card.id','jobcard_bills.received_amount','jobcard_bills.bill_amount','jobcard_bills.discount_amount','jobcard_bills.tax_amount')
+            ->orderBy('job_card.created_at', 'DESC')
+            ->where('job_card.jobcard_number','not like','Temp-%')
+            //->where('job_card.current_status',\DB::raw($status_list),">",\DB::raw("'0'"))
+            ->whereNotIn('job_card.current_status',$status_list);
+        }
+
         $jobcard = array();
         if (Session::get('logged_user_type') == '3') {
             $vendor_id = Session::get('logged_vendor_id');
@@ -1138,30 +1151,48 @@ class JobcardController extends Controller
             $filter_details['filter_todate']=$request['filter_todate'];
         }
         $filter_details['filter_status']='';
-        if (!empty($request->input('filter_status'))) {
-            $jobcard = $rows1->where('job_card.current_status', $request->input('filter_status'));
-            $filter_details['filter_status']=$request['filter_status'];
+        if($type=="history")
+        {
+            if (!empty($request->input('filter_status'))) {
+                $jobcard = $rows1->where('job_card.current_status', $request->input('filter_status'));
+                $filter_details['filter_status']=$request['filter_status'];
 
+            }
         }
+
         $filter_details['filter_products']='';
-        if (!empty($request->input('filter_products'))) {
-            $jobcard = $rows1->where('job_card.product_id', $request->input('filter_products'));
-            $filter_details['filter_products']=$request['filter_products'];
+        if($type=="history")
+        {
+            if (!empty($request->input('filter_products'))) {
+                $jobcard = $rows1->where('job_card.product_id', $request->input('filter_products'));
+                $filter_details['filter_products']=$request['filter_products'];
+            }
         }
+
         $filter_details['filter_globalsearch']='';
         if (!empty($request->has('filter_globalsearch'))) {
             $searchQuery =  $request->input('filter_globalsearch');
-            $jobcard =$rows1->where(function ($q) use ($searchQuery) {
-                $q->Where('customers.name', 'LIKE', '%' .$searchQuery. '%')
-                ->orWhere('customers.contact_number', 'LIKE', '%' . $searchQuery. '%')
-                ->orWhere('products.name', 'LIKE',  '%' .$searchQuery. '%')
-                ->orWhere('job_card.jobcard_number', 'LIKE',  '%' .$searchQuery. '%')
-                ->orWhere('job_card.date', 'LIKE', '%' . $searchQuery. '%')
-                ->orWhere('status.name', 'LIKE',  '%' .$searchQuery. '%')
-                ->orWhere('jobcard_bills.received_amount', 'LIKE',  '%' .$searchQuery. '%');
-            });
-
-
+            if($type=="history")
+            {
+                $jobcard =$rows1->where(function ($q) use ($searchQuery) {
+                    $q->Where('customers.name', 'LIKE', '%' .$searchQuery. '%')
+                    ->orWhere('customers.contact_number', 'LIKE', '%' . $searchQuery. '%')
+                    ->orWhere('products.name', 'LIKE',  '%' .$searchQuery. '%')
+                    ->orWhere('job_card.jobcard_number', 'LIKE',  '%' .$searchQuery. '%')
+                    ->orWhere('job_card.date', 'LIKE', '%' . $searchQuery. '%')
+                    ->orWhere('status.name', 'LIKE',  '%' .$searchQuery. '%')
+                    ->orWhere('jobcard_bills.received_amount', 'LIKE',  '%' .$searchQuery. '%');
+                });
+            }else if($type=="report")
+            {
+                $jobcard =$rows1->where(function ($q) use ($searchQuery) {
+                    $q->Where('customers.name', 'LIKE', '%' .$searchQuery. '%')
+                    ->orWhere('customers.contact_number', 'LIKE', '%' . $searchQuery. '%')
+                    ->orWhere('job_card.jobcard_number', 'LIKE',  '%' .$searchQuery. '%')
+                    ->orWhere('job_card.date', 'LIKE', '%' . $searchQuery. '%')
+                    ->orWhere('jobcard_bills.received_amount', 'LIKE',  '%' .$searchQuery. '%');
+                });
+            }
             $filter_details['filter_globalsearch']=$request['filter_globalsearch'];
         }
 
@@ -1171,7 +1202,8 @@ class JobcardController extends Controller
     }
     public function filter_history(Request $request)
     {
-         $jobcard=$this->load_filter_results($request);
+        $type=$request['pageid'];
+         $jobcard=$this->load_filter_results($request,$type);
 
         $filter_details['filter_fromdate']=$request['filter_fromdate'];
         $filter_details['filter_todate']=$request['filter_todate'];
@@ -1191,8 +1223,13 @@ class JobcardController extends Controller
         ->where('vendor_status.active', '=', 'Y')
         ->where('vendor_status.ending_status', '=', '1')
         ->get();
+        if($type=='history')
+        {
+            return view('jobcard.jobcard_history', compact('jobcard','jobcard_status','products','filter_details'));
+        }else if($type=='report'){
+            return view('jobcard.jobcard_report', compact('jobcard','jobcard_status','products','filter_details'));
+        }
 
-       return view('jobcard.jobcard_history', compact('jobcard','jobcard_status','products','filter_details'));
     }
     public function jobcard_history_pageview(Request $request, $id)
     {
@@ -1269,4 +1306,74 @@ class JobcardController extends Controller
         return view('jobcard.jobcard_history_view', compact('jobcard_cust', 'id', 'vendor_partslist', 'products', 'serviceids', 'general_service', 'product_service', 'servicelist', 'vendor_status', 'vendor_current_status','jobcard_bills','statuschangehistory'));
     }
 
+    public function jobcard_report_view(Request $request)
+    {
+        if(strpos(Session::has('jobcard_reference'),"Temp-") === true){
+
+
+            if (Session::has('jobcard_reference')) {
+                $jobcard = Jobcard::firstOrFail()->where('jobcard_number','like', Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
+
+                $jobcard = Cart::firstOrFail()->where('jobcard_reference','like',  Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
+
+                $jobcard = StatusChange::firstOrFail()->where('jobcard_number','like', Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
+
+                // $jobcard = Customer::firstOrFail()->where('id', $request['customerid']);
+                // $saved = $jobcard->delete($jobcard);
+            }
+        }
+        $products = array();
+        if (Session::get('logged_user_type') == '3') {
+            $products = $this->product_list_query(Session::get('logged_vendor_id'));
+        } else if (Session::get('logged_user_type') == '1') {
+            $products =array();// $this->product_list_query($jobcard_cust[0]->vendor_id);
+        }
+        $jobcard_status = DB::table('vendor_status')
+        ->select('vendor_status.status_id as id','status.name')
+        ->join('status','status.id','=','vendor_status.status_id')
+        ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
+        ->where('vendor_status.active', '=', 'Y')
+        ->where('vendor_status.ending_status', '=', '1')
+        ->get();
+        Session::forget('jobcard_reference');
+        Session::forget('customerid');
+        //DB::enableQueryLog();
+        $status_list = DB::table('vendor_status')
+            //->select('vendor_status.status_id')
+            ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
+            ->where('vendor_status.active', '=', 'Y')
+            ->where('vendor_status.ending_status', '=', '0')
+            ->pluck('vendor_status.status_id')->toArray();
+            //print_r($status_list);dd();
+         //   dd(DB::getQueryLog());
+        // $rows1 = Jobcard::leftjoin('products', 'products.id', '=', 'job_card.product_id')
+        //     ->leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
+        //     ->leftjoin('status', 'status.id', '=', 'job_card.current_status')
+        //     ->leftjoin('jobcard_bills', 'jobcard_bills.jobcard_number', '=', 'job_card.jobcard_number')
+        //     ->select('customers.name as custname', 'customers.id as custid', 'customers.contact_number as custmobile', 'products.name as pdtname', 'job_card.jobcard_number', 'job_card.date as jobcard_date', 'job_card.id','status.name as statusname','jobcard_bills.received_amount')
+        //     ->orderBy('job_card.created_at', 'DESC')
+        //     ->where('job_card.jobcard_number','not like','Temp-%')
+        //     //->where('job_card.current_status',\DB::raw($status_list),">",\DB::raw("'0'"))
+        //     ->whereNotIn('job_card.current_status',$status_list);
+        // $jobcard = array();
+        // if (Session::get('logged_user_type') == '3') {
+        //     $vendor_id = Session::get('logged_vendor_id');
+        //     $jobcard = $rows1->where('job_card.vendor_id', '=', $vendor_id);
+        // } else if (Session::get('logged_user_type') == '1') {
+        // }
+        // $jobcard = $rows1->paginate(Session::get('paginate'));
+        //dd(DB::getQueryLog());
+        $filter_details['filter_fromdate']="";
+        $filter_details['filter_todate']="";
+        $filter_details['filter_status']="";
+        $filter_details['filter_products']="";
+        $filter_details['filter_globalsearch']='';
+        $jobcard = array();
+        $jobcard=$this->load_filter_results($request,'report');
+
+        return view('jobcard.jobcard_report', compact('jobcard','jobcard_status','products','filter_details'));
+    }
 }
