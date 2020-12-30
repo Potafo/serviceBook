@@ -12,7 +12,7 @@ class ClearController extends Controller
     {
 
         //$vendor=DB::delete("TRUNCATE TABLE $tables ");
-        $sql=DB::tables('job_card')->get();
+        $sql=DB::table('job_card')->get();
         foreach($sql as $val)
         {
             $jobcard = Jobcard::firstOrFail()->where('jobcard_number','=',$val->jobcard_number);
