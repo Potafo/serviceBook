@@ -19,11 +19,11 @@ class ClearController extends Controller
         //     $jobcard = Jobcard::firstOrFail()->where('jobcard_number','=',$val->jobcard_number);
         //     $saved = $jobcard->delete($jobcard);
         // }
-        $sql=DB::table('cart')->get();
-        foreach($sql as $val)
-        {
-            $jobcard = Cart::firstOrFail()->where('	jobcard_reference ','=',$val->jobcard_reference);
-            $saved = $jobcard->delete($jobcard);
-        }
+        // $sql=DB::table('cart')->get();
+        // foreach($sql as $val)
+        // {
+        //     $jobcard = Cart::firstOrFail()->where('	jobcard_reference ','=',$val->jobcard_reference);
+        //     $saved = $jobcard->delete($jobcard);
+        // }
     }
 }
