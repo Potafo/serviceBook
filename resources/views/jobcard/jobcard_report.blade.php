@@ -110,23 +110,29 @@
                     Customer
                   </th>
                   <th>
-                    Bill Amount
+                   Sub Total
                   </th>
                   <th>
-                    Amount Received
+                    Tax Amount
                   </th>
                   <th>
                     Discount
                   </th>
                   <th>
-                    Tax Amount
+                    Amount Received
                   </th>
+
+
 
 
 
               </tr>
             </thead>
             <tbody>
+                <?php $billamount=0;
+                      $taxamount=0;
+                      $discount=0;
+                      $amountrecieved=0; ?>
                 @if(count($jobcard)>0)
                     @foreach($jobcard as $key=>$value)
                     <?php
@@ -144,6 +150,10 @@
                         else {
                            $pdt=$value->pdtname;
                         }
+                        $billamount= intval($billamount)  + intval($value->bill_amount);
+                      $taxamount=intval($taxamount)  + intval($value->tax_amount);
+                      $discount=intval($discount)  + intval($value->discount_amount);
+                      $amountrecieved=intval($amountrecieved)  + intval($value->received_amount);
 
 
                     ?>
@@ -172,19 +182,33 @@
                                 {{ $value->bill_amount }}
                             </td>
                             <td>
-                                {{ $value->received_amount }}
+                                {{ $value->tax_amount }}
                             </td>
                             <td>
                                 {{ $value->discount_amount }}
                             </td>
-
                             <td>
-                                {{ $value->tax_amount }}
+                                {{ $value->received_amount }}
                             </td>
+
+
+
                         </tr>
                 @endforeach
 
              @endif
+             <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+
+
+                <td>{{ $billamount }}</td>
+                <td>{{ $taxamount }}</td>
+                <td>{{ $discount }}</td>
+                <td>{{ $amountrecieved }}</td>
+             </tr>
             </tbody>
           </table>
 

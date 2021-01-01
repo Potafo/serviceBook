@@ -47,6 +47,18 @@ select > option {
                     @include('alerts.success')
                     <input type="hidden" id="hidden_mode" name="hidden_mode" value="{{ $mode }}" >
                     @if($mode=="status")
+                        {{-- <div class="form-row">
+                            <div class="form-group  col-md-6">
+                                <label>{{ __('Vendors') }}</label>
+                                <select class="form-control{{ $errors->has('vendor_name') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Vendors') }}"  name="vendor_name_status" id="vendor_name_status" value="{{ old('vendor_name') }}">
+                                    <option value="">Select Vendor</option>
+                                    @foreach($vendor_list as $list)
+                                            <option value="{{$list->id}}">{{$list->name}}</option>
+                                        @endforeach
+                                </select>
+                                @include('alerts.feedback', ['field' => 'vendor_name'])
+                                </div>
+                        </div> --}}
                         <div class="form-row">
                             <div class="form-group col-md-6">
                                 <label for="exampleFormControlInput1">{{ $title }} Name</label>

@@ -14,7 +14,7 @@ use App\MainConfiguration;
 
 class ConfigurationController extends Controller
 {
-    public function vendorconfig_view(Request $request)
+    public function vendorconfig_view(Request $request,$id)
     {
         $services='';
        // $users = User::all();
@@ -24,8 +24,17 @@ class ConfigurationController extends Controller
        ->where('configuration.status','=','Y')
        ->where('configuration.page_view','=','Y')
        ->get();
+       $data=array();
+       foreach($configurations as $key=>$value)
+       {
+           $fieldname = strtolower(str_replace(" ", "_", $value->config_name));
+           $configuration=VendorConfiguration::select('vendor_configuration.*')
+           ->where('vendor_id','=',$id)
+           ->get();
+           $data[$fieldname]=$configuration[0]->$fieldname;
+       }
 
-        return view('configuration.vendor_configuration', compact('configurations'));
+        return view('configuration.vendor_configuration', compact('configurations','id','data'));
     }
     public function config_add(Request $request)
     {
@@ -107,8 +116,16 @@ class ConfigurationController extends Controller
     {
         $field=$request['field'];
         $data[$field]       =$request['status'];
-        $jobcard = VendorConfiguration::firstOrFail()->where('vendor_id', Session::get('logged_vendor_id'));
-        $saved=$jobcard->update($data);
+        if(!empty(Session::get('logged_vendor_id')))
+            {
+                $jobcard = VendorConfiguration::firstOrFail()->where('vendor_id', Session::get('logged_vendor_id'));
+                $saved=$jobcard->update($data);
+            }else{
+                $jobcard = VendorConfiguration::firstOrFail()->where('vendor_id', $request['vendor']);
+                $saved=$jobcard->update($data);
+            }
+
+
         Session::put($field, $request['status']);
         return response()->json(['message' => 'Configuration updated successfully.']);
     }
@@ -144,6 +161,51 @@ class ConfigurationController extends Controller
         $fieldname = strtolower(str_replace(" ", "_", $field));
         Session::put($fieldname, $request['textvalue']);
         return response()->json(['message' => 'Configuration updated successfully.']);
+    }
+    public function vendor_config_list(Request $request)
+    {
+
+        $vendor=$request['vendor_id'];
+       // DB::enableQueryLog();
+       $data=array();
+       $configurations=DB::table('configuration')
+       ->select('configuration.*')
+       ->where('configuration.type','=','3')
+       ->where('configuration.status','=','Y')
+       ->where('configuration.page_view','=','Y')
+       ->get();
+        foreach($configurations as $key=>$value)
+            {
+                $fieldname = strtolower(str_replace(" ", "_", $value->config_name));
+                $configuration=VendorConfiguration::select('vendor_configuration.*')
+                ->where('vendor_id','=',$vendor)
+                ->get();
+                $data[$fieldname]=$configuration[0]->$fieldname;
+            }
+
+                //dd(DB::getQueryLog());
+
+       //$fieldvalue=$configuration[0]->$request['field'];
+
+        return view('configuration/load_configuration')->with(['data' => $data, 'configurations' => $configurations]);
+        // foreach($configurations as $key=>$value)
+        // {
+        //     $append.='<div class="form-row">
+        //                 <div class="form-group  col-md-6">
+        //                     <h4>'.ucwords($value->config_name).'</h4>
+        //                 ';
+        //             if($value->input_type == "checkbox")
+        //             {
+        //                 $fieldname = strtolower(str_replace(" ", "_", $value->config_name));
+        //                 if($data[$fieldname]=='Y') $val='checked'; else $val='';
+        //                 $append.='<input type="checkbox" data-id="'.$value->id.'" data-field="'.$fieldname.'" name="status" class="js-switch"  '.$val.'>';
+        //             }else if($value->input_type == "textbox"){
+
+        //             }
+        //     $append.='</div>
+        //                 </div><br/>';
+        // }
+        // return $append;
     }
 
 }
