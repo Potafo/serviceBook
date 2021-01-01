@@ -100,11 +100,11 @@
                 <th>
                   JobCard Number
                 </th>
-                @if(Session::get('logged_user_type') =='1')
+                {{-- @if(Session::get('logged_user_type') =='1')
                     <th>
                     Vendor
                     </th>
-                @endif
+                @endif --}}
 
                   <th>
                     Customer
@@ -168,11 +168,11 @@
                             <td>
                                 {{ $value->jobcard_number }}
                             </td>
-                            @if(Session::get('logged_user_type') =='1')
+                            {{-- @if(Session::get('logged_user_type') =='1')
                             <td>
                                 {{ $value->vname }}
                             </td>
-                            @endif
+                            @endif --}}
 
                             <td>
                                 {{ $value->custname }} - {{ $value->custmobile }}

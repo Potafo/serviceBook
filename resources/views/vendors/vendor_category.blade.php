@@ -97,7 +97,7 @@
                     Name
                 </th>
                 @if($mode=="status")
-                @if(empty(Session::get('logged_vendor_id')))
+                @if(empty(Session::get('status_vendor')))
                     <th class="text-center">
                         Vendor
                     </th>
@@ -138,7 +138,7 @@
                                 {{ $value->name }}
                             </td>
                                 @if($mode=="status")
-                                    @if(empty(Session::get('logged_vendor_id')))
+                                @if(empty(Session::get('status_vendor')))
                                     <td class="text-center">
                                         {{ $value->vname }}
                                     </td>
