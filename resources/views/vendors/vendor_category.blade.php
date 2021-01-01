@@ -97,6 +97,11 @@
                     Name
                 </th>
                 @if($mode=="status")
+                @if(empty(Session::get('logged_vendor_id')))
+                    <th class="text-center">
+                        Vendor
+                    </th>
+                    @endif
                     <th class="text-center">
                         Send Sms
                     </th>
@@ -133,6 +138,12 @@
                                 {{ $value->name }}
                             </td>
                                 @if($mode=="status")
+                                    @if(empty(Session::get('logged_vendor_id')))
+                                    <td class="text-center">
+                                        {{ $value->vname }}
+                                    </td>
+                                    @endif
+
                                     <td class="text-center">
                                         {{ $value->send_sms }}
                                     </td>

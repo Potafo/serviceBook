@@ -182,6 +182,9 @@
                           <th>
                             Service
                           </th>
+                          <th>
+                            Service Remarks
+                          </th>
                         <th >
                             Price
                           </th>
@@ -192,9 +195,7 @@
 
 
                           @endif
-                          <th>
-                            Service Remarks
-                          </th>
+
                           <th >
                             Total
                           </th>
@@ -717,7 +718,7 @@ location.reload();
         //     , timeout: 10000
         // })
     });
-    $(document).on('click', '#submitForm', function(){alert("sdfsdf");
+    $(document).on('click', '#submitForm', function(){
         var registerForm = $("#jobcardcreate");
         var formData = registerForm.serialize();
         var ref=$('#jobcardnumber_ref').val();

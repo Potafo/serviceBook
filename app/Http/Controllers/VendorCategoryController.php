@@ -39,14 +39,27 @@ class VendorCategoryController extends Controller
             // ->orderBy('service_type.name', 'ASC')
             // ->paginate(Session::get('paginate'));
         }else if($mode=="status"){
-            //DB::enableQueryLog();
+           // DB::enableQueryLog();
+           if(!empty(Session::get('logged_vendor_id')))
+           {
             $category=DB::table('vendor_status')
             ->join('status','status.id','=','vendor_status.status_id')
+            //->join('vendor','vendor.id','=','vendor_status.vendor_id')
             ->select('vendor_status.*','status.name')
             ->where('vendor_status.vendor_id','=',Session::get('logged_vendor_id'))
             ->orderBy('vendor_status.display_order', 'ASC')
             ->paginate(Session::get('paginate'));
-           // dd(DB::getQueryLog());
+           }else{
+            $category=DB::table('vendor_status')
+            ->join('status','status.id','=','vendor_status.status_id')
+            ->join('vendor','vendor.id','=','vendor_status.vendor_id')
+            ->select('vendor_status.*','status.name','vendor.name as vname')
+            ->where('vendor_status.vendor_id','=',Session::get('status_vendor'))
+            ->orderBy('vendor_status.display_order', 'ASC')
+            ->paginate(Session::get('paginate'));
+           }
+
+            //dd(DB::getQueryLog());
         }
 
         return view('vendors.vendor_category',compact('mode','category'));
@@ -80,11 +93,20 @@ class VendorCategoryController extends Controller
         // }
         $servicecategory='';
         if($mode=="status"){
-           //DB::enableQueryLog();
+           //DB::enableQueryLog(); dd(DB::getQueryLog());
+           if(!empty(Session::get('logged_vendor_id')))
+           {
             $category=DB::table('status')
             ->whereNotIn('id', DB::table('vendor_status')->where('vendor_id', Session::get('logged_vendor_id'))->pluck('status_id')->toArray())
             ->select('status.*')
             ->get();
+           }else{
+            $category=DB::table('status')
+            ->whereNotIn('id', DB::table('vendor_status')->where('vendor_id', Session::get('status_vendor'))->pluck('status_id')->toArray())
+            ->select('status.*')
+            ->get();
+           }
+
            // dd(DB::getQueryLog());
         }else if($mode=="service_type"){
                 $category=DB::table('service_type')
@@ -316,7 +338,13 @@ class VendorCategoryController extends Controller
             $vcat->send_email                =$request['send_email'];
             $vcat->ending_status                =$request['ending_status'];
             $vcat->display_order               =$request['displayorder'];
+            if(!empty(Session::get('logged_vendor_id')))
+           {
             $vcat->vendor_id               =Session::get('logged_vendor_id');
+           }else{
+            $vcat->vendor_id               =Session::get('status_vendor');
+           }
+
             $saved=$vcat->save();
             if ($saved) {
                 $savestatus++;
@@ -356,17 +384,36 @@ class VendorCategoryController extends Controller
             ->select('service_category.*')
             ->get();
         }elseif($mode=="status"){
-            $vendor=DB::table('vendor_status')
-            ->join('status','status.id','=','vendor_status.status_id')
-            ->select('vendor_status.*','status.name')
-            ->where('vendor_status.vendor_id','=',Session::get('logged_vendor_id'))
-            ->where('vendor_status.id','=',$id)
-            ->orderBy('vendor_status.display_order', 'ASC')
-            ->paginate(Session::get('paginate'));
-            $category=DB::table('status')
-            ->whereNotIn('id', DB::table('vendor_status')->where('vendor_id', Session::get('logged_vendor_id'))->pluck('status_id')->toArray())
-            ->select('status.*')
-            ->get();
+
+
+
+            if(!empty(Session::get('logged_vendor_id')))
+            {
+                $vendor=DB::table('vendor_status')
+                ->join('status','status.id','=','vendor_status.status_id')
+                ->select('vendor_status.*','status.name')
+                ->where('vendor_status.vendor_id','=',Session::get('logged_vendor_id'))
+                ->where('vendor_status.id','=',$id)
+                ->orderBy('vendor_status.display_order', 'ASC')
+                ->paginate(Session::get('paginate'));
+                $category=DB::table('status')
+                ->whereNotIn('id', DB::table('vendor_status')->where('vendor_id', Session::get('logged_vendor_id'))->pluck('status_id')->toArray())
+                ->select('status.*')
+                ->get();
+            }else{
+                $vendor=DB::table('vendor_status')
+                ->join('status','status.id','=','vendor_status.status_id')
+                ->select('vendor_status.*','status.name')
+                ->where('vendor_status.vendor_id','=',Session::get('status_vendor'))
+                ->where('vendor_status.id','=',$id)
+                ->orderBy('vendor_status.display_order', 'ASC')
+                ->paginate(Session::get('paginate'));
+                $category=DB::table('status')
+           ->whereNotIn('id', DB::table('vendor_status')->where('vendor_id', Session::get('status_vendor'))->pluck('status_id')->toArray())
+                ->select('status.*')
+                ->get();
+            }
+
         }
 
 
@@ -501,4 +548,10 @@ class VendorCategoryController extends Controller
          return Response::json(['append' => $append,'links'=>$links]);
 
     }
+    public function set_vendorid(Request $request)
+    {
+        Session::put('status_vendor',$request['vendorid']);
+        return 0;
+    }
+
 }

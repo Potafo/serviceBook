@@ -787,7 +787,9 @@ class JobcardController extends Controller
                 <div contentEditable='true' class='edit' id='servicename_" . $value->id . "'> " . $value->service_name . "</div>
 
                 </td>
-
+                <td>
+                $value->service_remarks
+            </td>
                 <td>
                 <div contentEditable='true' class='edit' id='serviceprice_" . $value->id . "'> " . $price_each . "</div>
 
@@ -800,9 +802,7 @@ class JobcardController extends Controller
                     ";
                 }
                 $append .= "
-                <td>
-                $value->service_remarks
-            </td>
+
                 <td>
           $total
             </td>

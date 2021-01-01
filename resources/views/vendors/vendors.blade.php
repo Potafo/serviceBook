@@ -99,30 +99,30 @@
                         }
 
                         ?>
-                        <tr class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
-                            <td>
+                        <tr >
+                            <td class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
                                 {{ $vendor->firstItem() + $key }}
                             </td>
-                            <td>
+                            <td class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
                                 {{ $value->vname }}
-                            </td>
+                            </td class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
 
-                            <td>
+                            <td class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
                                 {{ $value->contact_number }}
                             </td>
-                            <td >
+                            <td class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
                                 {{ $value->vcategory }}
                             </td>
-                            <td >
+                            <td class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
                                 {{ $value->vtype }}
                             </td>
-                            <td >
+                            <td class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
                                 {{ $value->pname }}
                             </td>
-                            <td >
+                            <td class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
                                 {{ $pending }}
                                                         </td>
-                            <td >
+                            <td class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
                                 {{-- <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon"> --}}
                                     <a href="vendor_view/{{ $value->vid }}" ><i class="tim-icons icon-zoom-split"></i></a>
                                 {{-- </button> --}}
@@ -132,10 +132,16 @@
                             <td >
                                 {{-- <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-icon"> --}}
                                     <a href="vendor_edit/{{ $value->vid }}" ><i class='tim-icons icon-pencil'></i></a>
+                                    <a href="vendor_configuration/{{ $value->vid }}" ><i class='tim-icons icon-settings'></i></a>
+
+                                    {{-- href="vendor_category/status" --}}
                                 {{-- </button> --}}
                                 {{-- <button type="button" rel="tooltip" class="btn btn-danger btn-sm btn-icon">
                                     <i class="tim-icons icon-simple-remove"></i>
                                 </button> --}}
+                               </td>
+                               <td>
+                                <a  class="loadvendor_status" vendor_id='{{ $value->vid }}' ><i class='tim-icons icon-shape-star'></i></a>
                                </td>
                         </tr>
                 @endforeach
@@ -171,8 +177,31 @@
   </div>
 
 </div>
-<script src="{{ asset('black') }}/js/jquery.min.js"></script>
+<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
+    <script language="JavaScript" type="text/javascript">
 
+        $(document).ready(function() {
+
+           $.ajaxSetup({
+                       headers: {
+                           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                       }
+                   });
+                   $(document).on('click', '.loadvendor_status', function(event) {
+
+                        var vendorid =$(this).attr('vendor_id');
+                        $.ajax({
+                                type: "post",
+                                dataType: "text",
+                                url: 'set_vendorid',
+                                data: {'vendorid': vendorid},
+                                success: function (data) {
+                                    window.location='vendor_category/status';
+                                }
+                            });
+                        });
+                });
+            </script>
     <script language="JavaScript" type="text/javascript">
  $(document).on('click', '.viewvendors', function(event) {
             //event.preventDefault();
@@ -181,6 +210,8 @@
             window.location='vendor_view/'+vendorid;
 
         });
+
+
     </script>
 
 @endsection
