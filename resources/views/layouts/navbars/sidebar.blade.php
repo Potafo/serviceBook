@@ -87,6 +87,12 @@
                                 <p>{{ __('Job Card Report') }}</p>
                             </a>
                         </li>
+                        <li @if ($pageSlug  == 'jobcard_reviews') class="active " @endif>
+                            <a href="{{ route('jobcard.jobcard_reviews')  }}">
+                                <i class="tim-icons icon-shape-star"></i>
+                                <p>{{ __('Reviews') }}</p>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </li>

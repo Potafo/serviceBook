@@ -133,12 +133,12 @@
                         </div>
                         <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Discount Amount</label>
-                            <input type="text" class="form-control{{ $errors->has('jobcard_discountamount') ? ' is-invalid' : '' }}" id="jobcard_discountamount" name="jobcard_discountamount" style="color: white" readonly placeholder="Remarks" value="{{ $jobcard_bills[0]->discount_amount }}">
+                            <input type="text" class="form-control{{ $errors->has('jobcard_discountamount') ? ' is-invalid' : '' }}" id="jobcard_discountamount" name="jobcard_discountamount" style="color: white" readonly placeholder="Discount amount" value="{{ $jobcard_bills[0]->discount_amount }}">
                             @include('alerts.feedback', ['field' => 'jobcard_discountamount'])
                         </div>
                         <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Tax Amount</label>
-                            <input type="text" class="form-control{{ $errors->has('jobcard_taxamount') ? ' is-invalid' : '' }}" id="jobcard_taxamount" name="jobcard_taxamount" style="color: white" readonly placeholder="Remarks" value="{{ $jobcard_bills[0]->tax_amount }}">
+                            <input type="text" class="form-control{{ $errors->has('jobcard_taxamount') ? ' is-invalid' : '' }}" id="jobcard_taxamount" name="jobcard_taxamount" style="color: white" readonly placeholder="Tax Amount" value="{{ $jobcard_bills[0]->tax_amount }}">
                             @include('alerts.feedback', ['field' => 'jobcard_taxamount'])
                         </div>
                         <div class="form-group col-md-2">

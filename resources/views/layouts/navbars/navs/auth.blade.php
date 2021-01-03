@@ -16,8 +16,13 @@
             <span class="navbar-toggler-bar navbar-kebab"></span>
         </button>
         <div class="collapse navbar-collapse" id="navigation">
+            <?php  $name = Auth::user()->name; ?>
             <ul class="navbar-nav ml-auto">
-                <li class="search-bar input-group">
+                <li style="margin-top: 10%;">
+                    {{ $name }}
+                </li>
+
+                {{-- <li class="search-bar input-group">
                     <button class="btn btn-link" id="search-button" data-toggle="modal" data-target="#searchModal"><i class="tim-icons icon-zoom-split"></i>
                         <span class="d-lg-none d-md-block">{{ __('Search') }}</span>
                     </button>
@@ -45,7 +50,7 @@
                             <a href="#" class="nav-item dropdown-item">{{ __('Another one') }}</a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
                 <li class="dropdown nav-item">
                     <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
                         <div class="photo">
