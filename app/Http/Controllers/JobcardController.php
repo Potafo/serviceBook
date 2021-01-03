@@ -14,6 +14,7 @@ use App\StatusChange;
 use App\StatusChangeHistory;
 use App\Customer;
 use App\JobcardBills;
+use App\Reviews;
 use Illuminate\Support\Facades\Auth;
 use DB;
 use Illuminate\Support\Facades\Validator;
@@ -1340,32 +1341,12 @@ class JobcardController extends Controller
         ->get();
         Session::forget('jobcard_reference');
         Session::forget('customerid');
-        //DB::enableQueryLog();
         $status_list = DB::table('vendor_status')
             //->select('vendor_status.status_id')
             ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
             ->where('vendor_status.active', '=', 'Y')
             ->where('vendor_status.ending_status', '=', '0')
             ->pluck('vendor_status.status_id')->toArray();
-            //print_r($status_list);dd();
-         //   dd(DB::getQueryLog());
-        // $rows1 = Jobcard::leftjoin('products', 'products.id', '=', 'job_card.product_id')
-        //     ->leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
-        //     ->leftjoin('status', 'status.id', '=', 'job_card.current_status')
-        //     ->leftjoin('jobcard_bills', 'jobcard_bills.jobcard_number', '=', 'job_card.jobcard_number')
-        //     ->select('customers.name as custname', 'customers.id as custid', 'customers.contact_number as custmobile', 'products.name as pdtname', 'job_card.jobcard_number', 'job_card.date as jobcard_date', 'job_card.id','status.name as statusname','jobcard_bills.received_amount')
-        //     ->orderBy('job_card.created_at', 'DESC')
-        //     ->where('job_card.jobcard_number','not like','Temp-%')
-        //     //->where('job_card.current_status',\DB::raw($status_list),">",\DB::raw("'0'"))
-        //     ->whereNotIn('job_card.current_status',$status_list);
-        // $jobcard = array();
-        // if (Session::get('logged_user_type') == '3') {
-        //     $vendor_id = Session::get('logged_vendor_id');
-        //     $jobcard = $rows1->where('job_card.vendor_id', '=', $vendor_id);
-        // } else if (Session::get('logged_user_type') == '1') {
-        // }
-        // $jobcard = $rows1->paginate(Session::get('paginate'));
-        //dd(DB::getQueryLog());
         $filter_details['filter_fromdate']="";
         $filter_details['filter_todate']="";
         $filter_details['filter_status']="";
@@ -1375,5 +1356,108 @@ class JobcardController extends Controller
         $jobcard=$this->load_filter_results($request,'report');
 
         return view('jobcard.jobcard_report', compact('jobcard','jobcard_status','products','filter_details'));
+    }
+    public function jobcard_reviews_view(Request $request)
+    {
+        if(strpos(Session::has('jobcard_reference'),"Temp-") === true){
+
+
+            if (Session::has('jobcard_reference')) {
+                $jobcard = Jobcard::firstOrFail()->where('jobcard_number','like', Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
+
+                $jobcard = Cart::firstOrFail()->where('jobcard_reference','like',  Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
+
+                $jobcard = StatusChange::firstOrFail()->where('jobcard_number','like', Session::get('jobcard_reference').'%');
+                $saved = $jobcard->delete($jobcard);
+
+            }
+        }
+        Session::forget('jobcard_reference');
+        Session::forget('customerid');
+        //  $jobcard = array();
+        // $rows1 = Reviews::leftjoin('job_card', 'job_card.jobcard_number', '=', 'reviews.jobcard_number')
+        //     ->leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
+        //     ->leftjoin('cart', 'cart.jobcard_reference', '=', 'job_card.jobcard_number')
+        //     ->select('job_card.id as rid','reviews.date as rdate', \DB::raw("GROUP_CONCAT(cart.service_name) as service_name"), 'reviews.jobcard_number as jobcard_number', 'customers.name as custname',  'customers.contact_number as custmobile','reviews.star_rating','reviews.review');
+        // $jobcard = $rows1->paginate(Session::get('paginate'));
+
+        $filter_details['filter_fromdate']="";
+        $filter_details['filter_todate']="";
+       // $filter_details['filter_status']="";
+       // $filter_details['filter_products']="";
+        $filter_details['filter_globalsearch']='';
+        $jobcard = array();
+        $jobcard=$this->load_filter_reviews($request);
+
+        //     DB::enableQueryLog(); filter_todate filter_status filter_products
+
+        return view('jobcard.jobcard_reviews', compact('jobcard','filter_details'));
+    }
+    public function load_filter_reviews(Request $request)
+    {
+        $jobcard = array();
+        $rows1 = Reviews::leftjoin('job_card', 'job_card.jobcard_number', '=', 'reviews.jobcard_number')
+            ->leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
+            ->leftjoin('cart', 'cart.jobcard_reference', '=', 'job_card.jobcard_number')
+            ->select('job_card.id as rid','reviews.date as rdate', \DB::raw("GROUP_CONCAT(cart.service_name) as service_name"), 'reviews.jobcard_number as jobcard_number', 'customers.name as custname',  'customers.contact_number as custmobile','reviews.star_rating','reviews.review');
+            $filter_details=array();
+            $filter_details['filter_fromdate']="";
+            $filter_details['filter_todate']="";
+            if (!empty($request->input('filter_fromdate')) && !empty($request->input('filter_todate'))) {
+                $dfrom=date("Y-m-d",strtotime($request['filter_fromdate']));
+                $dto=date("Y-m-d",strtotime($request['filter_todate']));
+                $rows1->whereBetween('reviews.date', [$dfrom, $dto]);
+                $filter_details['filter_fromdate']=$request['filter_fromdate'];
+                $filter_details['filter_todate']=$request['filter_todate'];
+            }
+            if (!empty($request->input('filter_fromdate')) && empty($request->input('filter_todate'))) {
+                $dfrom=date("Y-m-d",strtotime($request['filter_fromdate']));
+                $dto=date("Y-m-d");
+                $rows1->whereBetween('reviews.date', [$dfrom, $dto]);
+                $filter_details['filter_fromdate']=$request['filter_fromdate'];
+                $filter_details['filter_todate']="";
+            }
+            if (empty($request->input('filter_fromdate')) && !empty($request->input('filter_todate'))) {
+                $dfrom=date("Y-m-d",strtotime($request['filter_todate']));
+                $dto=date("Y-m-d",strtotime($request['filter_todate']));
+                $rows1->whereBetween('reviews.date', [$dfrom, $dto]);
+                $filter_details['filter_fromdate']="";
+                $filter_details['filter_todate']=$request['filter_todate'];
+            }
+            $filter_details['filter_globalsearch']='';
+            if (!empty($request->has('filter_globalsearch'))) {
+                $searchQuery =  $request->input('filter_globalsearch');
+                    $jobcard =$rows1->where(function ($q) use ($searchQuery) {
+                        $q->Where('customers.name', 'LIKE', '%' .$searchQuery. '%')
+                        ->orWhere('customers.contact_number', 'LIKE', '%' . $searchQuery. '%')
+                        ->orWhere('job_card.jobcard_number', 'LIKE',  '%' .$searchQuery. '%')
+                        ->orWhere('job_card.date', 'LIKE', '%' . $searchQuery. '%');
+                    });
+
+
+
+                $filter_details['filter_globalsearch']=$request['filter_globalsearch'];
+            }
+
+            $jobcard = $rows1->paginate(Session::get('paginate'));
+        return $jobcard;
+    }
+    public function filter_review(Request $request)
+    {
+
+         $jobcard=$this->load_filter_reviews($request);
+
+        $filter_details['filter_fromdate']=$request['filter_fromdate'];
+        $filter_details['filter_todate']=$request['filter_todate'];
+       // $filter_details['filter_status']=$request['filter_status'];
+        //$filter_details['filter_products']=$request['filter_products'];
+        $filter_details['filter_globalsearch']=$request['filter_globalsearch'];
+
+
+            return view('jobcard.jobcard_reviews', compact('jobcard','filter_details'));
+
+
     }
 }

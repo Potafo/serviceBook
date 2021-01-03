@@ -1,5 +1,4 @@
-@extends('layouts.app', ['page' => __('Job Card History'), 'pageSlug' => 'jobcard_history'])
-
+@extends('layouts.app', ['page' => __('Job Card Reviews'), 'pageSlug' => 'jobcard_reviews'])
 <script src="{{ asset('black') }}/js/core/jquery-1.9.1.js"></script>
 <link href="{{ asset('black') }}/css/bootstrap.min.css" rel="stylesheet">
 <link href="{{ asset('black') }}/css/bootstrap-datepicker.css" rel="stylesheet">
@@ -17,7 +16,7 @@
         <div class="row">
 
             <div class="col-8">
-                <h4 class="card-title">Job Card History</h4>
+                <h4 class="card-title">Job Card Reviews</h4>
             </div>
             <div class="col-4 text-right">
                 {{-- <a class="btn btn-sm btn-primary addpackage" href="jobcard_add">Add Job Card</a> --}}
@@ -26,7 +25,7 @@
                 <nav aria-label="breadcrumb" role="navigation">
                     <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="home">Home</a></li>
-                    <li class="breadcrumb-item "><a href="jobcard_history">JobCard History</a></li>
+                    <li class="breadcrumb-item "><a href="jobcard_reviews">JobCard Reviews</a></li>
                     <li class="breadcrumb-item active" aria-current="page" id="bc_current">View</li>
                     </ol>
                 </nav>
@@ -35,7 +34,7 @@
         @include('alerts.success')
       </div>
         <div class="col-12">
-            <form method="post" action="{{ route('jobcard.history_filter') }}" autocomplete="off" id="historyfilter">
+            <form method="post" action="{{ route('jobcard.review_filter') }}" autocomplete="off" id="historyfilter">
                 @csrf
                 <input type="hidden" id="pageid" name="pageid" value="history" >
                 <div class="form-row">
@@ -49,28 +48,28 @@
                         <input type="text" class="form-control date" id="filter_todate" name="filter_todate"  placeholder="To Date" value="{{ $filter_details['filter_todate'] }}">
 
                     </div>
-                    <div class="form-group col-md-2">
+                    {{-- <div class="form-group col-md-2">
                         <label for="exampleFormControlInput1">Status</label>
                         {{-- <input type="text" class="form-control" id="filter_status" name="filter_status"  placeholder="Status" value="{{ old('filter_status') }}"> --}}
-                        <select class="form-control{{ $errors->has('filter_status') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7"   name="filter_status" id="filter_status" >
+                       {{-- <select class="form-control{{ $errors->has('filter_status') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7"   name="filter_status" id="filter_status" >
                             <option value="">Select Status</option>
                             @foreach($jobcard_status as $list)
                                     <option value="{{$list->id}}" @if($filter_details['filter_status']==$list->id) selected @endif>{{$list->name}}</option>
                                 @endforeach
                         </select>
 
-                    </div>
-                    <div class="form-group col-md-2">
+                    </div> --}}
+                    {{-- <div class="form-group col-md-2">
                         <label for="exampleFormControlInput1">Products</label>
                         {{-- <input type="text" class="form-control" id="filter_status" name="filter_status"  placeholder="Status" value="{{ old('filter_status') }}"> --}}
-                        <select class="form-control{{ $errors->has('filter_products') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7"   name="filter_products" id="filter_products" >
+                       {{--  <select class="form-control{{ $errors->has('filter_products') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7"   name="filter_products" id="filter_products" >
                             <option value="">Select Products</option>
                             @foreach($products as $list)
                                     <option value="{{$list->id}}" @if($filter_details['filter_products']==$list->id) selected @endif>{{$list->name}}</option>
                                 @endforeach
                         </select>
 
-                    </div>
+                    </div> --}}
                     <div class="form-group col-md-2">
                         <label for="exampleFormControlInput1">Search</label>
                         <input type="text" class="form-control" id="filter_globalsearch" name="filter_globalsearch"  placeholder="Search" value="{{ $filter_details['filter_globalsearch'] }}">
@@ -93,25 +92,26 @@
                   Slno
                 </th>
                 <th>
-                  JobCard Number
-                </th>
-                @if(Session::get('logged_user_type') =='1')
-                    <th>
-                    Vendor
-                    </th>
-                @endif
-                <th>
                     Date
                   </th>
-                  <th>
-                    Customer
+                <th>
+                  JobCard Number
+                </th>
+
+                    <th>
+                    Service name
+                    </th>
+
+                <th>
+                    Cust. details
                   </th>
                   <th>
-                    Product
+                    Star Rating
                   </th>
                   <th>
-                    Amount Received
+                    Content
                   </th>
+
                   <th>
                     Status
                   </th>
@@ -121,61 +121,41 @@
             <tbody>
                 @if(count($jobcard)>0)
                     @foreach($jobcard as $key=>$value)
-                    <?php
-                    //service length checking
-                        // if (strlen($value->serv_name) > 20){
-                        //     $str = substr($value->sname, 0, 17) . '...';
-                        // }
-                        // else {
-                        //    $str=$value->sname;
-                        // }
-                        //product length checking
-                        if (strlen($value->pdtname) > 20){
-                            $pdt = substr($value->pdtname, 0, 12) . '...';
-                        }
-                        else {
-                           $pdt=$value->pdtname;
-                        }
 
-
-                    ?>
-                        <tr class="viewjobcards" data-id='{{ $value->id }}' style="cursor: pointer">
+                        <tr class="viewjobcards" data-id='{{ $value->rid }}' style="cursor: pointer">
 
                             <td>
                                 {{ $jobcard->firstItem() + $key }}
                             </td>
                             <td>
+                                {{ $value->rdate }}
+                            </td>
+
+                            <td>
                                 {{ $value->jobcard_number }}
                             </td>
-                            @if(Session::get('logged_user_type') =='1')
+
                             <td>
-                                {{ $value->vname }}
-                            </td>
-                            @endif
-                            <td>
-                                {{ $value->jobcard_date }}
+                                {{ $value->service_name }}
                             </td>
                             <td>
                                 {{ $value->custname }} - {{ $value->custmobile }}
                             </td>
 
-                            <td>
-                                {{ $pdt }}
-                            </td>
-                            <td>
-                                {{ $value->received_amount }}
-                            </td>
-                            <td>
-                                {{ $value->statusname }}
-                            </td>
 
+                            <td>
+                                {{ $value->star_rating }}
+                            </td>
+                            <td>
+                                {{ $value->review }}
+                            </td>
+                            <td>
+                                {{ $value->review }}
+                            </td>
 
                         </tr>
                 @endforeach
-@else
-<tr>
-<td>No records found </td>
-</tr>
+
              @endif
             </tbody>
           </table>
