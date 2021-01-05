@@ -24,8 +24,8 @@ use DB;
 use Illuminate\Support\Facades\Validator;
 use Session;
 use App\Traits\ListQueryById;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Page;
+//use Maatwebsite\Excel\Facades\Excel;
+//use App\Page;
 
 class JobcardController extends Controller
 {
@@ -1469,7 +1469,7 @@ class JobcardController extends Controller
     }
     public function export(Request $request)
     {
-       return Excel::download(new JobcardReportExport($request), 'jobcard-report.xls');
+      //return Excel::download(new JobcardReportExport($request), 'jobcard-report.xls');
 
     }
 }
