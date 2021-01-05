@@ -82,7 +82,7 @@
                     </div>
                 </div>
             </form>
-            <form method='post' action='export'>
+            {{-- <form method='post' action='export'>
                 {{ csrf_field() }}
                 <input type="hidden"  id="filter_fromdate_export" name="filter_fromdate" value="{{ $filter_details['filter_fromdate'] }}" >
                 <input type="hidden"  id="filter_todate_export" name="filter_todate" value="{{ $filter_details['filter_todate'] }}">
@@ -96,14 +96,14 @@
 
 
                     </div>
-                    {{-- <div class="form-group col-md-2">
+                    <div class="form-group col-md-2">
                         <br/> <br/>
                         <a style="color: #ff1111; cursor: pointer;">
                             <i class='tim-icons icon-single-copy-04'> PDF Download</i>
                         </a>
-                    </div> --}}
+                    </div>
                 </div>
-            </form>
+            </form> --}}
         </div>
     <div class="card-body" style="display: block" id="view_package">
         <div class="table-responsive">
