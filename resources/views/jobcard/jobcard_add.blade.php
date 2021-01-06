@@ -62,14 +62,11 @@
                             <input type="text" class="typeahead form-control{{ $errors->has('jobcard_mobile') ? ' is-invalid' : '' }}" id="jobcard_mobile" name="jobcard_mobile" placeholder="Mobile" value="{{ old('jobcard_mobile',$customermobile) }}">
                             @include('alerts.feedback', ['field' => 'jobcard_mobile'])
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-2">
                             <label for="exampleFormControlInput1">Email</label>
                             <input type="text" class="typeahead form-control{{ $errors->has('jobcard_email') ? ' is-invalid' : '' }}" id="jobcard_email" name="jobcard_email" placeholder="Email" value="{{ old('jobcard_email',$customeremail) }}">
                             @include('alerts.feedback', ['field' => 'jobcard_email'])
                         </div>
-                    </div>
-
-                    <div class="form-row">
                         @if(Session::get('logged_user_type') =='1')
                         <div class="form-group col-md-2">
                             <label>{{ __('Vendors') }}</label>
@@ -82,16 +79,21 @@
                             @include('alerts.feedback', ['field' => 'vendor_name'])
                         </div>
                         @endif
-                    </div>
-                    <div class="form-row">
-                        {{-- <label>{{ __('Products') }}</label> --}}
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-2" style=" margin-top: 1%;">
                             <button type="button" class="btn btn-primary" data-type='add' data-toggle="modal" data-target="#productsInsert" data-jobcardref ="{{   Session::get('jobcard_reference') }}" >
                                 <i class="tim-icons icon-simple-add"></i>  Add Products
                             </button>
                         </div>
+                    </div>
+
+                    <div class="form-row">
+
+                    </div>
+                    <div class="form-row">
+                        {{-- <label>{{ __('Products') }}</label> --}}
+
                         {{-- text-right --}}
-                            <div class="form-group col-md-2">
+                            <div class="form-group col-md-2" style="position: fixed;bottom: 0px;right: 0px;">
                                 <button type="submit" class="btn btn-fill btn-primary">{{ __('Submit Job Card') }}</button>
                             </div>
                     </div>
