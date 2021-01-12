@@ -18,6 +18,7 @@ use App\Http\Requests\UserRequest;
 use Session;
 use App\VendorConfiguration;
 use App\Traits\AuthSessions;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -80,6 +81,7 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'user_type' => $data['usertype'],
+            'remember_token' => Str::random(20),
         ]);
         $this->getsessionsAfterAuth($user);
         return $user;
