@@ -35,11 +35,11 @@ Route::post('service_list', 'JobcardController@getServiceList');
 
 Route::post('login','ApiController@login');
 Route::post('addProduct','ApiController@add_products');
-Route::post('getProductList','ApiController@getProductList');
+Route::get('getProductList','ApiController@getProductList');
 Route::post('editProduct','ApiController@editProduct');
 Route::post('deleteProduct','ApiController@deleteProduct');
-Route::post('getServiceList','ApiController@getServiceList');
+Route::get('getServiceList','ApiController@getServiceList');
 Route::post('addService','ApiController@add_service');
 Route::post('editService','ApiController@editService');
-Route::post('getCustomerList','ApiController@getCustomerList');
-Route::post('getVendorStatusList','ApiController@getVendorStatusList');
+Route::get('getCustomerList','ApiController@getCustomerList');
+Route::get('getVendorStatusList','ApiController@getVendorStatusList');
