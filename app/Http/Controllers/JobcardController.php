@@ -478,10 +478,20 @@ class JobcardController extends Controller
             ->where('service.type', '=', $productservice_id)
             ->where('service.product_id', '=', $product_id)
             ->get();
-        $general_service = DB::table('service')
-            ->select('service.*')
-            ->where('service.type', '=', $Generalservice_id)
-            ->get();
+            if (Session::get('logged_user_type') == '3') {
+                $general_service = DB::table('service')
+                ->select('service.*')
+                ->where('service.type', '=', $Generalservice_id)
+                ->where('service.vendor_id', '=', Session::get('logged_vendor_id'))
+                ->get();
+            }else
+            {
+                $general_service = DB::table('service')
+                ->select('service.*')
+                ->where('service.type', '=', $Generalservice_id)
+                ->get();
+            }
+
         $productservice = array();
         $generalservice = array();
         $append = '';

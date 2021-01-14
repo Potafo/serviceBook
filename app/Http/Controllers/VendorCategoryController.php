@@ -49,12 +49,21 @@ class VendorCategoryController extends Controller
             ->where('vendor_status.vendor_id','=',Session::get('logged_vendor_id'))
             ->orderBy('vendor_status.display_order', 'ASC')
             ->paginate(Session::get('paginate'));
-           }else{
+           }elseif(!empty(Session::get('status_vendor')))
+           {
             $category=DB::table('vendor_status')
             ->join('status','status.id','=','vendor_status.status_id')
             ->join('vendor','vendor.id','=','vendor_status.vendor_id')
             ->select('vendor_status.*','status.name','vendor.name as vname')
             ->where('vendor_status.vendor_id','=',Session::get('status_vendor'))
+            ->orderBy('vendor_status.display_order', 'ASC')
+            ->paginate(Session::get('paginate'));
+           }else{
+            $category=DB::table('vendor_status')
+            ->join('status','status.id','=','vendor_status.status_id')
+            ->join('vendor','vendor.id','=','vendor_status.vendor_id')
+            ->select('vendor_status.*','status.name','vendor.name as vname')
+            //->where('vendor_status.vendor_id','=',Session::get('status_vendor'))
             ->orderBy('vendor_status.display_order', 'ASC')
             ->paginate(Session::get('paginate'));
            }
@@ -400,11 +409,23 @@ class VendorCategoryController extends Controller
                 ->whereNotIn('id', DB::table('vendor_status')->where('vendor_id', Session::get('logged_vendor_id'))->pluck('status_id')->toArray())
                 ->select('status.*')
                 ->get();
-            }else{
+            }elseif(!empty(Session::get('status_vendor'))){
                 $vendor=DB::table('vendor_status')
                 ->join('status','status.id','=','vendor_status.status_id')
                 ->select('vendor_status.*','status.name')
                 ->where('vendor_status.vendor_id','=',Session::get('status_vendor'))
+                ->where('vendor_status.id','=',$id)
+                ->orderBy('vendor_status.display_order', 'ASC')
+                ->paginate(Session::get('paginate'));
+                $category=DB::table('status')
+           ->whereNotIn('id', DB::table('vendor_status')->where('vendor_id', Session::get('status_vendor'))->pluck('status_id')->toArray())
+                ->select('status.*')
+                ->get();
+            }else{
+                $vendor=DB::table('vendor_status')
+                ->join('status','status.id','=','vendor_status.status_id')
+                ->select('vendor_status.*','status.name')
+               // ->where('vendor_status.vendor_id','=',Session::get('status_vendor'))
                 ->where('vendor_status.id','=',$id)
                 ->orderBy('vendor_status.display_order', 'ASC')
                 ->paginate(Session::get('paginate'));
