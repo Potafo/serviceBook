@@ -1,7 +1,46 @@
 @extends('layouts.app', ['pageSlug' => 'dashboard'])
 <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 @section('content')
-    <div class="row">
+<div class="card-body">
+    <div class="form-row">
+
+        @if(Session::get('logged_user_type') == "3")
+            {{-- <div class="form-group col-md-4">
+                {{-- <a href="{{ route('jobcard.jobcard')  }}">
+                    <p>{{ __('Job Card') }}</p>
+                </a>
+            </div> --}}
+                <div class="form-group col-md-4" >
+                    <a href="{{ route('jobcard.jobcard')  }}" class="btn btn-fill btn-primary " style="float: left; ">
+                        <span data-notify="icon" class="tim-icons icon-double-right"></span>
+                        JobCard Page</a>
+                </div>
+
+
+                @if($alerttype=="red")
+                    <div class="form-group col-md-4">
+                        <div class="alert alert-danger alert-with-icon" style=" background-color: #b10b0b !important;">
+                            <span data-notify="icon" class="tim-icons icon-bell-55"></span>
+                            <span data-notify="message">{{ $pending }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <a href="vendor_view/{{ Session::get('logged_vendor_id') }}#renewview"  class="btn btn-fill btn-primary" style="float: right; ">Renew</a>
+                    </div>
+                @elseif($alerttype=="green")
+                    <div class="form-group col-md-4">
+                        <div class="alert alert-info alert-with-icon"   style=" background-color: #0bb11c !important;">
+                            <span data-notify="icon" class="tim-icons icon-bell-55"></span>
+                            <span data-notify="message">{{ $pending }}</span>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        @endif
+    </div>
+
+<h5 class="title">{{ $title }}</h5>
+    <div class="row"  >
         @foreach($dashboard_list as $key=>$value)
             <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
                 <div class="font-icon-detail">
@@ -11,8 +50,6 @@
                 </div>
             </div>
         @endforeach
-
-
     </div>
 
     <div class="row">
@@ -22,7 +59,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="panel panel-default">
-                                <div class="panel-heading my-2" style="color: blanchedalmond">Chart Demo</div>
+                                <div class="panel-heading my-2" style="color: blanchedalmond">{{ $title }}</div>
                                 <div class="col-lg-8">
                                         <canvas id="userChart" class="rounded shadow"></canvas>
                                 </div>
@@ -40,7 +77,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="panel panel-default">
-                                <div class="panel-heading my-2" style="color: blanchedalmond">Chart Demo</div>
+                                <div class="panel-heading my-2" style="color: blanchedalmond">{{ $title }}</div>
                                 <div class="col-lg-8">
                                         <canvas id="userChart1" class="rounded shadow"></canvas>
                                 </div>
@@ -92,24 +129,13 @@
             </div>
         </div>
     </div> --}}
-
+</div>
 @endsection
-
-{{-- <link rel="stylesheet" type="text/css" href="{{ asset('black') }}/css/material-dashboard.css"> --}}
 @push('js')
-    {{-- <script src="{{ asset('black') }}/js/plugins/chartjs.min.js"></script>
-    <script>
-        $(document).ready(function() {
-          demo.initDashboardPageCharts();
-        });
-    </script> --}}
 
-{{-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> --}}
-{{-- <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script> --}}
+
 <script src="{{ asset('black') }}/js/plugins/chart.js"></script>
-{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script> --}}
-{{-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script> --}}
-{{-- <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> --}}
+
 <!-- CHARTS -->
 
 
@@ -122,7 +148,7 @@
         labels: {!!json_encode($chart->labels)!!},
         datasets: [
               {
-                  label: 'Status',
+                  label: {!! json_encode($chart->label)!!},
                   backgroundColor: {!! json_encode($chart->colours)!!} ,
                   data:  {!! json_encode($chart->dataset)!!} ,
               },
@@ -137,20 +163,13 @@
         labels: {!!json_encode($chart->labels)!!},
         datasets: [
               {
-                  label: 'Status',
+                  label: {!! json_encode($chart->label)!!},
                   backgroundColor: {!! json_encode($chart->colours)!!} ,
                   data:  {!! json_encode($chart->dataset)!!} ,
               },
           ]
     };
 
-    // function start(){
-    //     var ctx = document.getElementById("graficoBarra").getContext("2d");
-    //     var BarChart = new Chart(ctx).Bar(dataBar, optionsBar);
-
-    //     var ctx2 = document.getElementById("graficoLinha").getContext("2d");
-    //     var LineChart = new Chart(ctx2).Line(dataLine, optionsLine);
-    // }
     function start(){
     var ctx = document.getElementById("userChart").getContext("2d");
     var BarChart = new Chart(ctx, {
@@ -231,58 +250,5 @@
 
 
 
-{{-- <script>
 
-
-
-
-  var ctx = document.getElementById('userChart1').getContext('2d');
-  var chart = new Chart(ctx, {
-      // The type of chart we want to create bar,pie,line
-      type: 'bar',
-// The data for our dataset
-      data: {
-          labels:  {!!json_encode($chart->labels)!!} ,
-          datasets: [
-              {
-                  label: 'Status',
-                  backgroundColor: {!! json_encode($chart->colours)!!} ,
-                  data:  {!! json_encode($chart->dataset)!!} ,
-              },
-          ]
-      },
-// Configuration options go here
-      options: {
-          scales: {
-              yAxes: [{
-                  ticks: {
-                      beginAtZero: true,
-                      callback: function(value) {if (value % 1 === 0) {return value;}}
-                  },
-                  scaleLabel: {
-                      display: false
-                  }
-              }]
-          },
-          legend: {
-              labels: {
-                  // This more specific font property overrides the global property
-                  fontColor: '#fff',
-                  fontFamily: "'Muli', sans-serif",
-                  padding: 25,
-                  boxWidth: 25,
-                  fontSize: 14,
-              }
-          },
-          layout: {
-              padding: {
-                  left: 10,
-                  right: 10,
-                  top: 0,
-                  bottom: 10
-              }
-          }
-      }
-  });
-</script> --}}
 @endpush
