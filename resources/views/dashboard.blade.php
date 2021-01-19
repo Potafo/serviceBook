@@ -10,12 +10,13 @@
                     <p>{{ __('Job Card') }}</p>
                 </a>
             </div> --}}
+            @if($alerttype=="green")
                 <div class="form-group col-md-4" >
                     <a href="{{ route('jobcard.jobcard')  }}" class="btn btn-fill btn-primary " style="float: left; ">
                         <span data-notify="icon" class="tim-icons icon-double-right"></span>
                         JobCard Page</a>
                 </div>
-
+            @endif
 
                 @if($alerttype=="red")
                     <div class="form-group col-md-4">
