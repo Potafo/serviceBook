@@ -126,7 +126,12 @@ class HomeController extends Controller
             {
                 $pending= "Expired";
                 $alerttype="red";
-            }else {
+            }elseif($pending==1)
+            {
+                $pending=$pending ." Day more";
+                $alerttype="green";
+            }
+            else {
                 $pending=$pending ." Days more";
                 $alerttype="green";
             }
