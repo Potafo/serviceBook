@@ -143,34 +143,66 @@ class HomeController extends Controller
             ->select(DB::raw('count(id) as `data`'))
             ->whereDay('created_at','=',$day)
             ->get();
-            $dashboard_list[0]['name']="Today";
-            $dashboard_list[0]['label']="Today";
-            $dashboard_list[0]['count']=$today[0]->data;
+            if(count($today)>0)
+            {
+                $dashboard_list[0]['name']="Today";
+                $dashboard_list[0]['label']="Today";
+                $dashboard_list[0]['count']=$today[0]->data;
+            }else{
+                $dashboard_list[0]['name']="Today";
+                $dashboard_list[0]['label']="Today";
+                $dashboard_list[0]['count']=0;
+            }
+
 
             $last_30days = DB::table('vendor')
             ->select(DB::raw('count(id) as `data`'))
             ->where('created_at','>=',Carbon::now()->subdays(30))->get(['name','created_at']);
-            $dashboard_list[1]['name']="Last 30 days";
-            $dashboard_list[1]['label']="Last 30 days";
-            $dashboard_list[1]['count']=$last_30days[0]->data;
+            if(count($last_30days)>0)
+            {
+                $dashboard_list[1]['name']="Last 30 days";
+                $dashboard_list[1]['label']="Last 30 days";
+                $dashboard_list[1]['count']=$last_30days[0]->data;
+            }else{
+                $dashboard_list[1]['name']="Last 30 days";
+                $dashboard_list[1]['label']="Last 30 days";
+                $dashboard_list[1]['count']=0;
+            }
+
 
             $this_month = DB::table('vendor')
             ->select(DB::raw('count(id) as `data`') ,  DB::raw('YEAR(created_at) year, MONTH(created_at) month'))
             ->whereMonth('created_at', '=', $month)
             ->groupby('month')
             ->get();
-            $dashboard_list[2]['name']="This Month";
-            $dashboard_list[2]['label']="This Month";
-            $dashboard_list[2]['count']=$this_month[0]->data;
+            if(count($this_month)>0)
+            {
+                $dashboard_list[2]['name']="This Month";
+                $dashboard_list[2]['label']="This Month";
+                $dashboard_list[2]['count']=$this_month[0]->data;
+            }else{
+                $dashboard_list[2]['name']="This Month";
+                $dashboard_list[2]['label']="This Month";
+                $dashboard_list[2]['count']=0;
+            }
+
 
             $this_year = DB::table('vendor')
             ->select(DB::raw('count(id) as `data`'), DB::raw("DATE_FORMAT(created_at, '%m-%Y') new_date"),  DB::raw('YEAR(created_at) year, MONTH(created_at) month'))
             ->whereYear('created_at', '=', $year)
             ->groupby('year')
             ->get();
-            $dashboard_list[3]['name']="This Year";
-            $dashboard_list[3]['label']="This Year";
-            $dashboard_list[3]['count']=$this_year[0]->data;
+            if(count($this_year)>0)
+            {
+                $dashboard_list[3]['name']="This Year";
+                $dashboard_list[3]['label']="This Year";
+                $dashboard_list[3]['count']=$this_year[0]->data;
+            }else{
+                $dashboard_list[3]['name']="This Year";
+                $dashboard_list[3]['label']="This Year";
+                $dashboard_list[3]['count']=0;
+            }
+
 
 
             $last_year = DB::table('vendor')
@@ -178,9 +210,17 @@ class HomeController extends Controller
             ->whereYear('created_at', '=', $year-1)
             ->groupby('year')
             ->get();
-            $dashboard_list[4]['name']="Last Year";
-            $dashboard_list[4]['label']="Last Year";
-            $dashboard_list[4]['count']=$last_year[0]->data;
+            if(count($last_year)>0)
+            {
+                $dashboard_list[4]['name']="Last Year";
+                $dashboard_list[4]['label']="Last Year";
+                $dashboard_list[4]['count']=$last_year[0]->data;
+            }else{
+                $dashboard_list[4]['name']="Last Year";
+                $dashboard_list[4]['label']="Last Year";
+                $dashboard_list[4]['count']=0;
+            }
+
 
             //DB::enableQueryLog();
             $lastDay = date('t',strtotime(date('d/m/Y')));
@@ -192,13 +232,21 @@ class HomeController extends Controller
             ->orderby('day','ASC')
             ->get();
             $j=0;
-            foreach($this_month_chart as $key=>$value){
-                $thismonth_list[$j]['count']=$value->data;
-                $thismonth_list[$j]['name']=$value->day;
-                $thismonth_list[$j]['label']=$value->day;
-                $j++;
-                //$chart_test[$value['name']]=$value['count'];
+            if(count($this_month_chart)>0)
+            {
+                foreach($this_month_chart as $key=>$value){
+                    $thismonth_list[$j]['count']=$value->data;
+                    $thismonth_list[$j]['name']=$value->day;
+                    $thismonth_list[$j]['label']=$value->day;
+                    $j++;
+                    //$chart_test[$value['name']]=$value['count'];
+                }
+            }else{
+                     $thismonth_list[$j]['count']="";
+                    $thismonth_list[$j]['name']="";
+                    $thismonth_list[$j]['label']="";
             }
+
             $chart=array();
             $chart_test=array();
             //for($i=0;$i++;$i<=$lastDay)
