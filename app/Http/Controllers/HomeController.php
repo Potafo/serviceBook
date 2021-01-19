@@ -27,11 +27,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $status_list = DB::table('vendor')
-            ->select('*')->get();
-            foreach ($status_list as $value) {
-                DB::select('UPDATE vendor set joined_on="'.$value->created_at.'" where id="'.$value->id.'"');
-            }
+        // $status_list = DB::table('vendor')
+        //     ->select('*')->get();
+        //     foreach ($status_list as $value) {
+        //         DB::select('UPDATE vendor set joined_on="'.$value->created_at.'" where id="'.$value->id.'"');
+        //     }
 
         $pending=0;$alerttype="";
         if (Session::get('logged_user_type') == '3') {
