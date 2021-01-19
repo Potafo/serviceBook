@@ -126,14 +126,17 @@ class HomeController extends Controller
             {
                 $pending= "Expired";
                 $alerttype="red";
+                Session::put("vendor_expired", "Y");
             }elseif($pending==1)
             {
                 $pending=$pending ." Day more";
                 $alerttype="green";
+                Session::put("vendor_expired", "N");
             }
             else {
                 $pending=$pending ." Days more";
                 $alerttype="green";
+                Session::put("vendor_expired", "N");
             }
 
 
