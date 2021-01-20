@@ -12,6 +12,7 @@ use Response;
 use DB;
 use DateTime;
 use DateTimeZone;
+use App\VendorCategory;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use App\Rules\PhoneNumber;
@@ -29,35 +30,109 @@ class VendorController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function vendor_list_query()
+    public function vendor_list_query(Request $request)
     {
-        $logged_user_id = Auth::id();
+        $logged_user_id = Auth::id();//DB::enableQueryLog();
         $rows1=DB::table('vendor')
         ->join('package', 'package.id', '=', 'vendor.current_package')
         ->join('vendor_category', 'vendor_category.id', '=', 'vendor.category')
         ->join('vendor_type', 'vendor_type.id', '=', 'vendor.type')
         ->select('vendor.id as vid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
         ->orderBy('vendor.name', 'ASC');
+
+
+        $filter_details=array();
+        // $filter_details['filter_fromdate']="";
+        // $filter_details['filter_todate']="";
+        if (!empty($request->input('filter_fromdate')) && !empty($request->input('filter_todate'))) {
+            $dfrom=date("Y-m-d",strtotime($request['filter_fromdate'])) ." 00:00:00";
+            $dto=date("Y-m-d",strtotime($request['filter_todate']))." 23:59:59";
+            $rows1->whereBetween('vendor.joined_on', [$dfrom, $dto]);
+            // $filter_details['filter_fromdate']=$request['filter_fromdate'];
+            // $filter_details['filter_todate']=$request['filter_todate'];
+        }
+        if (!empty($request->input('filter_fromdate')) && empty($request->input('filter_todate'))) {
+            $dfrom=date("Y-m-d",strtotime($request['filter_fromdate']))." 00:00:00";
+            $dto=date("Y-m-d")." 23:59:59";
+            $rows1->whereBetween('vendor.joined_on', [$dfrom, $dto]);
+            // $filter_details['filter_fromdate']=$request['filter_fromdate'];
+            // $filter_details['filter_todate']="";
+        }
+        if (empty($request->input('filter_fromdate')) && !empty($request->input('filter_todate'))) {
+            $dfrom=date("Y-m-d",strtotime($request['filter_todate']))." 00:00:00";
+            $dto=date("Y-m-d",strtotime($request['filter_todate']))." 23:59:59";
+            $rows1->whereBetween('vendor.joined_on', [$dfrom, $dto]);
+            // $filter_details['filter_fromdate']="";
+            // $filter_details['filter_todate']=$request['filter_todate'];
+        }
+
+            if (!empty($request->input('filter_category'))) {
+                $jobcard = $rows1->where('vendor.category', $request->input('filter_category'));
+                //$filter_details['filter_category']=$request['filter_category'];
+
+            }
+
+            if (!empty($request->input('filter_type'))) {
+                $jobcard = $rows1->where('vendor.type', $request->input('filter_type'));
+                //$filter_details['filter_type']=$request['filter_type'];
+            }
+
+
+
+        if (!empty($request->has('filter_globalsearch'))) {
+            $searchQuery =  $request->input('filter_globalsearch');
+
+                $jobcard =$rows1->where(function ($q) use ($searchQuery) {
+                    $q->Where('vendor_category.name', 'LIKE', '%' .$searchQuery. '%')
+                    ->orWhere('vendor_type.name', 'LIKE', '%' . $searchQuery. '%')
+                    ->orWhere('vendor.name', 'LIKE',  '%' .$searchQuery. '%')
+                    ->orWhere('package.type', 'LIKE',  '%' .$searchQuery. '%');
+                    // ->orWhere('job_card.date', 'LIKE', '%' . $searchQuery. '%')
+                    // ->orWhere('status.name', 'LIKE',  '%' .$searchQuery. '%')
+                    // ->orWhere('jobcard_bills.received_amount', 'LIKE',  '%' .$searchQuery. '%');
+                });
+
+        }
+
+
+
+
+
         if($logged_user_id=="1")
         {
             $vendor=$rows1->paginate(Session::get('paginate'));
         }else{
            $vendor= $rows1->where('vendor.user_id','=',$logged_user_id)
             ->paginate(Session::get('paginate'));
-        }
+        }//dd(DB::getQueryLog());
         return $vendor;
     }
-    public function vendors_view()
+    public function vendors_view(Request $request)
     {
-        //$vendor=Vendor::all();
-       // DB::enableQueryLog();
-       // dd(DB::getQueryLog());
-        $vendor=$this->vendor_list_query();
-      // $vendor=Vendor::table("SELECT *,vendor.id as vid, package.type as pname,vendor_category.name as vcategory,vendor_type.name as vtype FROM `vendor`  join package   ON vendor.current_package=package.id join vendor_type on vendor.type=vendor_type.id JOIN vendor_category on vendor_category.id=vendor.category")->get()->paginate(2);
-        return view('vendors.vendors',compact('vendor'));
-       // return view('vendors.vendors', ['vendor' => $model->paginate(2)]);
+        $filter_details['filter_fromdate']="";
+        $filter_details['filter_todate']="";
+        $filter_details['filter_category']="";
+        $filter_details['filter_type']="";
+        $filter_details['filter_mode']="";
+        $filter_details['filter_globalsearch']='';
+
+        if(isset($request['filter_fromdate']))
+        {
+            $filter_details['filter_fromdate']=$request['filter_fromdate'];
+            $filter_details['filter_todate']=$request['filter_todate'];
+            $filter_details['filter_category']=$request['filter_category'];
+            $filter_details['filter_type']=$request['filter_type'];
+            $filter_details['filter_mode']=$request['filter_mode'];
+            $filter_details['filter_globalsearch']=$request['filter_globalsearch'];
+        }
 
 
+        $jobcard = array();
+        //$jobcard=$this->load_filter_results($request,'history');
+        $vendor_cat=VendorCategory::all();
+        $vendor_type=VendorType::all();
+        $vendor=$this->vendor_list_query($request);
+        return view('vendors.vendors',compact('vendor','filter_details','vendor_cat','vendor_type'));
     }
     public function shorcode_generator($name,$digits)
     {
@@ -221,7 +296,7 @@ class VendorController extends Controller
         ->join('package', 'package.id', '=', 'vendor.current_package')
         ->where('vendor.id','=',$id)
         ->get();
-        //DB::enableQueryLog();
+        //DB::enableQueryLog();dd(DB::getQueryLog());
         $renewal=RenewalList::select("renewal_list.*","package.*")
         ->join('package', 'package.id', '=', 'renewal_list.package')
         ->where("renewal_list.vendor_id","=",$id)
@@ -396,6 +471,24 @@ class VendorController extends Controller
         }else{
             return back()->with('status', 'Sorry!');
         }
+
+    }
+    public function filter_vendor(Request $request)
+    {
+
+        // $filter_details['filter_fromdate']=$request['filter_fromdate'];
+        // $filter_details['filter_todate']=$request['filter_todate'];
+        // $filter_details['filter_category']=$request['filter_category'];
+        // $filter_details['filter_type']=$request['filter_type'];
+        // $filter_details['filter_mode']=$request['filter_mode'];
+        // $filter_details['filter_globalsearch']=$request['filter_globalsearch'];
+
+        // //$jobcard=$this->load_filter_results($request,'history');
+        // $vendor_cat=VendorCategory::all();
+        // $vendor_type=VendorType::all();
+        // $vendor=$this->vendor_list_query($request);dd(print_r($filter_details));
+        // return view('vendors.vendors',compact('vendor','filter_details','vendor_cat','vendor_type'));
+
 
     }
 }
