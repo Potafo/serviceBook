@@ -167,11 +167,14 @@
                          $current_date=date("Y-m-d");
                          $diff=(new DateTime($joined_date))->diff(new DateTime($current_date))->days;
                          $pending=intval($package_days_count) - intval($diff);
+                         $toblock='';
                         if($pending<=0)
                         {
                             $pending= "Expired";
+                            $toblock='Y';
                         }else {
                             $pending=$pending ." Days more";
+
                         }
 
                         ?>
@@ -217,8 +220,15 @@
                                 </button> --}}
                                </td>
                                <td>
-                                <a  class="loadvendor_status" vendor_id='{{ $value->vid }}' title="Vendor Status"><i class='tim-icons icon-shape-star'></i></a>
-                               </td>
+                                <a  class="loadvendor_status" vendor_id='{{ $value->vid }}' title="Vendor Status"><i class='tim-icons icon-shape-star' style="color: #ba54f5;"></i></a>
+                               @if($toblock=='Y')
+                                @if($value->active=='Y')
+                                    <a  data-toggle='modal'   data-target='#block_login' id="block_login_button"  data-user_id='{{ $value->userid }}' title="Block Vendor"><i class='tim-icons icon-lock-circle' style="color: red; font-size: 26px !important;"></i></a>
+                                @else
+                                    <a  href="vendor_view/{{ $value->vid }}#renewview"    title="Blocked"><i class='tim-icons icon-alert-circle-exc' style="color: red;font-size: 26px !important;"></i></a>
+                                @endif
+                                    @endif
+                            </td>
                         </tr>
                 @endforeach
 
@@ -253,10 +263,62 @@
   </div>
 
 </div>
+<div class="modal fade" id="block_login" tabindex="-1" role="dialog" aria-labelledby="smallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body" id="smallBody">
+                <div>
+                    <form action="{{ route('block_vendor_login') }}" method="post">
+
+                        <input type="hidden" id="user_id" name="user_id" >
+
+                        <div class="modal-body">
+                            @csrf
+
+                            <div class="text-center">Are you sure you want to Block this Vendor ?</div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Sorry</button>
+                            <button type="submit" class="btn btn-danger">Yes, Block Please</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {{-- <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script> --}}
     <script language="JavaScript" type="text/javascript">
 
         $(document).ready(function() {
+
+
+            $(document).on('click', '#block_login_button', function(event) {
+            event.preventDefault();
+            var vendor =$(this).attr('data-user_id');
+
+            $('#user_id').val(vendor);
+
+            $.ajax({
+                url: route('block_vendor_login')
+                , beforeSend: function() {
+                },
+                // return the result
+                success: function(result) {
+                    $('#block_login').modal("show");
+                }
+                , complete: function() {
+                }
+                , error: function(jqXHR, testStatus, error) {
+                    console.log(error);
+                    alert("Page " + href + " cannot open. Error:" + error);
+                    $('#loader').hide();
+                }
+                , timeout: 10000
+            })
+        });
+
+
             $('.date').datepicker({
        format: 'dd-mm-yyyy',
        todayHighlight: true,

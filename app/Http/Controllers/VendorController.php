@@ -8,6 +8,7 @@ use App\Package;
 use App\RenewalList;
 use App\VendorType;
 use App\UserLogin;
+use App\User;
 use Response;
 use DB;
 use DateTime;
@@ -37,7 +38,8 @@ class VendorController extends Controller
         ->join('package', 'package.id', '=', 'vendor.current_package')
         ->join('vendor_category', 'vendor_category.id', '=', 'vendor.category')
         ->join('vendor_type', 'vendor_type.id', '=', 'vendor.type')
-        ->select('vendor.id as vid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
+        ->join('users','users.id','=','vendor.user_id')
+        ->select('vendor.id as vid','users.active','vendor.user_id as userid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
         ->orderBy('vendor.name', 'ASC');
 
 
@@ -131,7 +133,9 @@ class VendorController extends Controller
         //$jobcard=$this->load_filter_results($request,'history');
         $vendor_cat=VendorCategory::all();
         $vendor_type=VendorType::all();
+
         $vendor=$this->vendor_list_query($request);
+
         return view('vendors.vendors',compact('vendor','filter_details','vendor_cat','vendor_type'));
     }
     public function shorcode_generator($name,$digits)
@@ -473,22 +477,12 @@ class VendorController extends Controller
         }
 
     }
-    public function filter_vendor(Request $request)
+    public function block_vendor_login(Request $request)
     {
+        $data['active']     ='N';
+        $jobcard = User::firstOrFail()->where('id', $request['user_id']);
+        $saved = $jobcard->update($data);
 
-        // $filter_details['filter_fromdate']=$request['filter_fromdate'];
-        // $filter_details['filter_todate']=$request['filter_todate'];
-        // $filter_details['filter_category']=$request['filter_category'];
-        // $filter_details['filter_type']=$request['filter_type'];
-        // $filter_details['filter_mode']=$request['filter_mode'];
-        // $filter_details['filter_globalsearch']=$request['filter_globalsearch'];
-
-        // //$jobcard=$this->load_filter_results($request,'history');
-        // $vendor_cat=VendorCategory::all();
-        // $vendor_type=VendorType::all();
-        // $vendor=$this->vendor_list_query($request);dd(print_r($filter_details));
-        // return view('vendors.vendors',compact('vendor','filter_details','vendor_cat','vendor_type'));
-
-
+        return Redirect('vendors')->with('status', 'Vendor Login Blocked successfully!');
     }
 }
