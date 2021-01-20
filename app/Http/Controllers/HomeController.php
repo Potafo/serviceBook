@@ -146,7 +146,7 @@ class HomeController extends Controller
             $month = $now->format('m');
             $year = $now->format('Y');
             $day = $now->format('d');
-
+            Session::put("vendor_expired", "N");
             $today = DB::table('vendor')
             ->select(DB::raw('count(id) as `data`'))
             ->whereDay('created_at','=',$day)
