@@ -86,8 +86,8 @@ class VendorController extends Controller
                     $q->Where('vendor_category.name', 'LIKE', '%' .$searchQuery. '%')
                     ->orWhere('vendor_type.name', 'LIKE', '%' . $searchQuery. '%')
                     ->orWhere('vendor.name', 'LIKE',  '%' .$searchQuery. '%')
-                    ->orWhere('package.type', 'LIKE',  '%' .$searchQuery. '%');
-                    // ->orWhere('job_card.date', 'LIKE', '%' . $searchQuery. '%')
+                    ->orWhere('package.type', 'LIKE',  '%' .$searchQuery. '%')
+                     ->orWhere('vendor.contact_number', 'LIKE', '%' . $searchQuery. '%');
                     // ->orWhere('status.name', 'LIKE',  '%' .$searchQuery. '%')
                     // ->orWhere('jobcard_bills.received_amount', 'LIKE',  '%' .$searchQuery. '%');
                 });
