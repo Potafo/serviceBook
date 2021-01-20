@@ -122,7 +122,7 @@ class HomeController extends Controller
              $current_date=date("Y-m-d");
              $diff=(new DateTime($joined_date))->diff(new DateTime($current_date))->days;
              $pending=intval($package_days_count) - intval($diff);
-            if($pending<0)
+            if($pending<=0)
             {
                 $pending= "Expired";
                 $alerttype="red";
