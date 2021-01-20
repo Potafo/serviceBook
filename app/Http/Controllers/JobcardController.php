@@ -15,11 +15,17 @@ use App\StatusChangeHistory;
 use App\Customer;
 use App\JobcardBills;
 use App\Reviews;
+use App\User;
+use App\Exports\UsersExport;
+use App\Exports\JobcardReport;
+use App\Exports\JobcardReportExport;
 use Illuminate\Support\Facades\Auth;
 use DB;
 use Illuminate\Support\Facades\Validator;
 use Session;
 use App\Traits\ListQueryById;
+//use Maatwebsite\Excel\Facades\Excel;
+//use App\Page;
 
 class JobcardController extends Controller
 {
@@ -1238,7 +1244,8 @@ class JobcardController extends Controller
         {
             return view('jobcard.jobcard_history', compact('jobcard','jobcard_status','products','filter_details'));
         }else if($type=='report'){
-            return view('jobcard.jobcard_report', compact('jobcard','jobcard_status','products','filter_details'));
+            //return Redirect('jobcard_report')->with('jobcard', $jobcard);
+            return view('jobcard.jobcard_report', compact('jobcard', 'filter_details'));
         }
 
     }
@@ -1468,6 +1475,11 @@ class JobcardController extends Controller
 
             return view('jobcard.jobcard_reviews', compact('jobcard','filter_details'));
 
+
+    }
+    public function export(Request $request)
+    {
+      //return Excel::download(new JobcardReportExport($request), 'jobcard-report.xls');
 
     }
 }

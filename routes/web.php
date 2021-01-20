@@ -95,6 +95,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('jobcard_report', ['as' => 'jobcard.jobcard_report', 'uses' => 'JobcardController@jobcard_report_view']);
     Route::get('jobcard_reviews', ['as' => 'jobcard.jobcard_reviews', 'uses' => 'JobcardController@jobcard_reviews_view']);
     Route::post('jobcard_review_filter', ['as' => 'jobcard.review_filter', 'uses' => 'JobcardController@filter_review']);
+    Route::post('export', 'JobcardController@export');
+
     //products
     Route::get('products', ['as' => 'products.products', 'uses' => 'ProductController@products_view']);
     Route::get('products_add', function() {

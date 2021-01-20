@@ -1,12 +1,8 @@
 @extends('layouts.app', ['page' => __('Job Card Report'), 'pageSlug' => 'jobcard_report'])
-{{-- <script src="{{ asset('black') }}/js/core/jquery.min.js"></script> --}}
-{{-- <meta name="csrf-token" content="{{ csrf_token() }}" /> --}}
-{{-- <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script> --}}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css"/>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet">
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
-<style>
+<script src="{{ asset('black') }}/js/core/jquery-1.9.1.js"></script>
+<link href="{{ asset('black') }}/css/bootstrap.min.css" rel="stylesheet">
+<link href="{{ asset('black') }}/css/bootstrap-datepicker.css" rel="stylesheet">
+<script src="{{ asset('black') }}/js/core/bootstrap-datepicker.js"></script><style>
  select > option {
         color: black;
     }
@@ -37,8 +33,9 @@
         @include('alerts.success')
       </div>
         <div class="col-12">
-            <form method="post" action="{{ route('jobcard.history_filter') }}" autocomplete="off" id="historyfilter">
-                @csrf
+            <form method="post"  action="{{ url('jobcard_history_filter') }}" autocomplete="off" id="historyfilter">
+                {{ csrf_field() }}
+
                 <input type="hidden" id="pageid" name="pageid" value="report" >
                 <div class="form-row">
                     <div class="form-group col-md-2">
@@ -85,8 +82,30 @@
                     </div>
                 </div>
             </form>
+            {{-- <form method='post' action='export'>
+                {{ csrf_field() }}
+                <input type="hidden"  id="filter_fromdate_export" name="filter_fromdate" value="{{ $filter_details['filter_fromdate'] }}" >
+                <input type="hidden"  id="filter_todate_export" name="filter_todate" value="{{ $filter_details['filter_todate'] }}">
+                <input type="hidden"  id="filter_globalsearch_export" name="filter_globalsearch" value="{{ $filter_details['filter_globalsearch'] }}">
+
+                <div class="form-row">
+                    <div class="form-group col-md-2">
+
+
+                            <button type="submit" class="btn btn-fill btn-primary searchbutton" style="color: #87f554; cursor: pointer;"><i class='tim-icons icon-attach-87' style="color: #87f554; cursor: pointer;"></i>{{ __('Excel') }}</button>
+
+
+                    </div>
+                    <div class="form-group col-md-2">
+                        <br/> <br/>
+                        <a style="color: #ff1111; cursor: pointer;">
+                            <i class='tim-icons icon-single-copy-04'> PDF Download</i>
+                        </a>
+                    </div>
+                </div>
+            </form> --}}
         </div>
-      <div class="card-body" style="display: block" id="view_package">
+    <div class="card-body" style="display: block" id="view_package">
         <div class="table-responsive">
           <table class="table tablesorter " id="">
             <thead class=" text-primary" >
@@ -100,12 +119,6 @@
                 <th>
                   JobCard Number
                 </th>
-                {{-- @if(Session::get('logged_user_type') =='1')
-                    <th>
-                    Vendor
-                    </th>
-                @endif --}}
-
                   <th>
                     Customer
                   </th>
@@ -121,11 +134,6 @@
                   <th>
                     Amount Received
                   </th>
-
-
-
-
-
               </tr>
             </thead>
             <tbody>
@@ -136,14 +144,6 @@
                 @if(count($jobcard)>0)
                     @foreach($jobcard as $key=>$value)
                     <?php
-                    //service length checking
-                        // if (strlen($value->serv_name) > 20){
-                        //     $str = substr($value->sname, 0, 17) . '...';
-                        // }
-                        // else {
-                        //    $str=$value->sname;
-                        // }
-                        //product length checking
                         if (strlen($value->pdtname) > 20){
                             $pdt = substr($value->pdtname, 0, 12) . '...';
                         }
@@ -168,11 +168,6 @@
                             <td>
                                 {{ $value->jobcard_number }}
                             </td>
-                            {{-- @if(Session::get('logged_user_type') =='1')
-                            <td>
-                                {{ $value->vname }}
-                            </td>
-                            @endif --}}
 
                             <td>
                                 {{ $value->custname }} - {{ $value->custmobile }}
@@ -261,11 +256,39 @@
        todayHighlight: true,
         autoclose: true,
      });
+
+$(document).on('change', '#filter_fromdate', function(event) {
+    $('#filter_fromdate_export').val($(this).val());
+});
+$(document).on('change', '#filter_todate', function(event) {
+    $('#filter_todate_export').val($(this).val());
+});
+$(document).on('change', '#filter_globalsearch', function(event) {
+    $('#filter_globalsearch_export').val($(this).val());
+});
+    // filter_globalsearch_export filter_globalsearch filter_fromdate_export filter_fromdate filter_todate_export filter_todate
+
 //  setTimeout(function() {
 //                $(".searchbutton").trigger('click');
 //            },10);
      //load_full_list();
 
+    //  $(document).on('click', '.searchbutton', function(event) {
+    //     var registerForm = $("#historyfilter");
+    //     var formData = registerForm.serialize();
+    //     $.ajax({
+    //         url: 'jobcard_history_filter' ,
+    //         method:'post',
+    //         data:formData,
+    //         headers: {
+    //       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //   },
+
+
+    //         },
+    //     });
+
+    // });
         $(document).on('click', '#deleteButton', function(event) {
             event.preventDefault();
             var jobcardid =$(this).attr('data-id');

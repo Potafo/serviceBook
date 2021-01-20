@@ -1,51 +1,95 @@
 @extends('layouts.app', ['pageSlug' => 'dashboard'])
 <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 @section('content')
+<div class="card-body">
+    <div class="form-row">
+
+        @if(Session::get('logged_user_type') == "3")
+            {{-- <div class="form-group col-md-4">
+                {{-- <a href="{{ route('jobcard.jobcard')  }}">
+                    <p>{{ __('Job Card') }}</p>
+                </a>
+            </div> --}}
+            @if($alerttype=="green")
+                <div class="form-group col-md-4" >
+                    <a href="{{ route('jobcard.jobcard')  }}" class="btn btn-fill btn-primary " style="float: left; ">
+                        <span data-notify="icon" class="tim-icons icon-double-right"></span>
+                        JobCard Page</a>
+                </div>
+            @endif
+
+                @if($alerttype=="red")
+                    <div class="form-group col-md-4">
+                        <div class="alert alert-danger alert-with-icon" style=" background-color: #b10b0b !important;">
+                            <span data-notify="icon" class="tim-icons icon-bell-55"></span>
+                            <span data-notify="message">{{ $pending }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <a href="vendor_view/{{ Session::get('logged_vendor_id') }}#renewview"  class="btn btn-fill btn-primary" style="float: right; ">Renew</a>
+                    </div>
+                @elseif($alerttype=="green")
+                    <div class="form-group col-md-4">
+                        <div class="alert alert-info alert-with-icon"   style=" background-color: #0bb11c !important;">
+                            <span data-notify="icon" class="tim-icons icon-bell-55"></span>
+                            <span data-notify="message">{{ $pending }}</span>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        @endif
+    </div>
+
+<h5 class="title">{{ $title }}</h5>
+    <div class="row"  >
+        @foreach($dashboard_list as $key=>$value)
+            <div class="font-icon-list col-lg-2 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                <div class="font-icon-detail">
+                <i class="tim-icons icon-sound-wave"></i>
+                <h1>{{  $value['count'] }}</h1>
+                <p style="font-size: 17px;">{{  $value['name'] }}</p>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card card-chart">
-                <div class="card-header ">
+                <div class="container">
                     <div class="row">
-                        <div class="col-sm-6 text-left">
-                            <h5 class="card-category">Total Shipments</h5>
-                            <h2 class="card-title">Performance</h2>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
-                            <label class="btn btn-sm btn-primary btn-simple active" id="0">
-                                <input type="radio" name="options" checked>
-                                <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Accounts</span>
-                                <span class="d-block d-sm-none">
-                                    <i class="tim-icons icon-single-02"></i>
-                                </span>
-                            </label>
-                            <label class="btn btn-sm btn-primary btn-simple" id="1">
-                                <input type="radio" class="d-none d-sm-none" name="options">
-                                <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Purchases</span>
-                                <span class="d-block d-sm-none">
-                                    <i class="tim-icons icon-gift-2"></i>
-                                </span>
-                            </label>
-                            <label class="btn btn-sm btn-primary btn-simple" id="2">
-                                <input type="radio" class="d-none" name="options">
-                                <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Sessions</span>
-                                <span class="d-block d-sm-none">
-                                    <i class="tim-icons icon-tap-02"></i>
-                                </span>
-                            </label>
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading my-2" style="color: blanchedalmond">{{ $title }}</div>
+                                <div class="col-lg-8">
+                                        <canvas id="userChart" class="rounded shadow"></canvas>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="chart-area">
-                        <canvas id="chartBig1"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="row">
+        <div class="col-12">
+            <div class="card card-chart">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading my-2" style="color: blanchedalmond">{{ $title }}</div>
+                                <div class="col-lg-8">
+                                        <canvas id="userChart1" class="rounded shadow"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- <div class="row">
         <div class="col-lg-4">
             <div class="card card-chart">
                 <div class="card-header">
@@ -85,297 +129,127 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-6 col-md-12">
-            <div class="card card-tasks">
-                <div class="card-header ">
-                    <h6 class="title d-inline">Tasks(5)</h6>
-                    <p class="card-category d-inline">today</p>
-                    <div class="dropdown">
-                        <button type="button" class="btn btn-link dropdown-toggle btn-icon" data-toggle="dropdown">
-                            <i class="tim-icons icon-settings-gear-63"></i>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-                            <a class="dropdown-item" href="#pablo">Action</a>
-                            <a class="dropdown-item" href="#pablo">Another action</a>
-                            <a class="dropdown-item" href="#pablo">Something else</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body ">
-                    <div class="table-full-width table-responsive">
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="">
-                                                <span class="form-check-sign">
-                                                    <span class="check"></span>
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <p class="title">Update the Documentation</p>
-                                        <p class="text-muted">Dwuamish Head, Seattle, WA 8:47 AM</p>
-                                    </td>
-                                    <td class="td-actions text-right">
-                                        <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                                            <i class="tim-icons icon-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="" checked="">
-                                                <span class="form-check-sign">
-                                                    <span class="check"></span>
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <p class="title">GDPR Compliance</p>
-                                        <p class="text-muted">The GDPR is a regulation that requires businesses to protect the personal data and privacy of Europe citizens for transactions that occur within EU member states.</p>
-                                    </td>
-                                    <td class="td-actions text-right">
-                                        <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                                            <i class="tim-icons icon-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="">
-                                                    <span class="form-check-sign">
-                                                        <span class="check"></span>
-                                                    </span>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <p class="title">Solve the issues</p>
-                                        <p class="text-muted">Fifty percent of all respondents said they would be more likely to shop at a company </p>
-                                    </td>
-                                    <td class="td-actions text-right">
-                                        <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                                            <i class="tim-icons icon-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="">
-                                                <span class="form-check-sign">
-                                                    <span class="check"></span>
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <p class="title">Release v2.0.0</p>
-                                        <p class="text-muted">Ra Ave SW, Seattle, WA 98116, SUA 11:19 AM</p>
-                                    </td>
-                                    <td class="td-actions text-right">
-                                        <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                                            <i class="tim-icons icon-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="">
-                                                <span class="form-check-sign">
-                                                    <span class="check"></span>
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <p class="title">Export the processed files</p>
-                                        <p class="text-muted">The report also shows that consumers will not easily forgive a company once a breach exposing their personal data occurs. </p>
-                                    </td>
-                                    <td class="td-actions text-right">
-                                        <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                                            <i class="tim-icons icon-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input class="form-check-input" type="checkbox" value="">
-                                                <span class="form-check-sign">
-                                                    <span class="check"></span>
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <p class="title">Arival at export process</p>
-                                        <p class="text-muted">Capitol Hill, Seattle, WA 12:34 AM</p>
-                                    </td>
-                                    <td class="td-actions text-right">
-                                        <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                                            <i class="tim-icons icon-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6 col-md-12">
-            <div class="card ">
-                <div class="card-header">
-                    <h4 class="card-title">Simple Table</h4>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table tablesorter" id="">
-                            <thead class=" text-primary">
-                                <tr>
-                                    <th>
-                                        Name
-                                    </th>
-                                    <th>
-                                        Country
-                                    </th>
-                                    <th>
-                                        City
-                                    </th>
-                                    <th class="text-center">
-                                        Salary
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                      Dakota Rice
-                                    </td>
-                                    <td>
-                                      Niger
-                                    </td>
-                                    <td>
-                                      Oud-Turnhout
-                                    </td>
-                                    <td class="text-center">
-                                      $36,738
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Minerva Hooper
-                                    </td>
-                                    <td>
-                                        Curaçao
-                                    </td>
-                                    <td>
-                                        Sinaai-Waas
-                                    </td>
-                                    <td class="text-center">
-                                        $23,789
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Sage Rodriguez
-                                    </td>
-                                    <td>
-                                        Netherlands
-                                    </td>
-                                    <td>
-                                        Baileux
-                                    </td>
-                                    <td class="text-center">
-                                        $56,142
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Philip Chaney
-                                    </td>
-                                    <td>
-                                        Korea, South
-                                    </td>
-                                    <td>
-                                        Overland Park
-                                    </td>
-                                    <td class="text-center">
-                                        $38,735
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Doris Greene
-                                    </td>
-                                    <td>
-                                        Malawi
-                                    </td>
-                                    <td>
-                                        Feldkirchen in Kärnten
-                                    </td>
-                                    <td class="text-center">
-                                        $63,542
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Mason Porter
-                                    </td>
-                                    <td>
-                                        Chile
-                                    </td>
-                                    <td>
-                                        Gloucester
-                                    </td>
-                                    <td class="text-center">
-                                        $78,615
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Jon Porter
-                                    </td>
-                                    <td>
-                                        Portugal
-                                    </td>
-                                    <td>
-                                        Gloucester
-                                    </td>
-                                    <td class="text-center">
-                                        $98,615
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    </div> --}}
+</div>
 @endsection
-
 @push('js')
-    <script src="{{ asset('black') }}/js/plugins/chartjs.min.js"></script>
-    <script>
-        $(document).ready(function() {
-          demo.initDashboardPageCharts();
-        });
-    </script>
+
+
+<script src="{{ asset('black') }}/js/plugins/chart.js"></script>
+
+<!-- CHARTS -->
+
+
+<script>
+    var optionsBar = {
+        responsive: true
+    };
+
+    var dataBar = {
+        labels: {!!json_encode($chart->labels)!!},
+        datasets: [
+              {
+                  label: {!! json_encode($chart->label)!!},
+                  backgroundColor: {!! json_encode($chart->colours)!!} ,
+                  data:  {!! json_encode($chart->dataset)!!} ,
+              },
+          ]
+    };
+
+    var optionsLine = {
+        responsive: true
+    };
+
+    var dataLine = {
+        labels: {!!json_encode($chart->labels)!!},
+        datasets: [
+              {
+                  label: {!! json_encode($chart->label)!!},
+                  backgroundColor: {!! json_encode($chart->colours)!!} ,
+                  data:  {!! json_encode($chart->dataset)!!} ,
+              },
+          ]
+    };
+
+    function start(){
+    var ctx = document.getElementById("userChart").getContext("2d");
+    var BarChart = new Chart(ctx, {
+          type: 'bar',
+          data: dataBar,
+          options: {
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true,
+                      callback: function(value) {if (value % 1 === 0) {return value;}}
+                  },
+                  scaleLabel: {
+                      display: false
+                  }
+              }]
+          },
+          legend: {
+              labels: {
+                  // This more specific font property overrides the global property
+                  fontColor: '#fff',
+                  fontFamily: "'Muli', sans-serif",
+                  padding: 25,
+                  boxWidth: 25,
+                  fontSize: 14,
+              }
+          },
+          layout: {
+              padding: {
+                  left: 10,
+                  right: 10,
+                  top: 0,
+                  bottom: 10
+              }
+          }
+      }
+    });
+
+    var ctx2 = document.getElementById("userChart1").getContext("2d");
+    var LineChart = new Chart(ctx2, {
+          type: 'line',
+          data: dataLine,
+          options: {
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true,
+                      callback: function(value) {if (value % 1 === 0) {return value;}}
+                  },
+                  scaleLabel: {
+                      display: false
+                  }
+              }]
+          },
+          legend: {
+              labels: {
+                  // This more specific font property overrides the global property
+                  fontColor: '#fff',
+                  fontFamily: "'Muli', sans-serif",
+                  padding: 25,
+                  boxWidth: 25,
+                  fontSize: 14,
+              }
+          },
+          layout: {
+              padding: {
+                  left: 10,
+                  right: 10,
+                  top: 0,
+                  bottom: 10
+              }
+          }
+      }
+    });
+}
+    window.onload = start;
+</script>
+
+
+
+
 @endpush

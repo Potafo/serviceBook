@@ -60,7 +60,7 @@
                     <p>{{ __('User Profile') }}</p>
                 </a>
             </li>
-            <li>
+            <li >
                 <a data-toggle="collapse" href="#jobcard_tab" aria-expanded="true">
                     <i class="fab fa-laravel" ></i>
                     <span class="nav-link-text" >{{ __('JobCard') }}</span>
@@ -68,15 +68,15 @@
                 </a>
 
                 <div class="collapse show" id="jobcard_tab">
-                    <ul class="nav pl-4">
-                        <li @if ($pageSlug  == 'jobcard') class="active " @endif>
-                            <a href="{{ route('jobcard.jobcard')  }}">
+                    <ul class="nav pl-4" >
+                        <li @if ($pageSlug  == 'jobcard') class="active " @endif >
+                            <a href="{{ route('jobcard.jobcard')  }}" @if(Session::get('vendor_expired') == "Y") style="pointer-events: none;" @endif>
                                 <i class="tim-icons icon-badge"></i>
                                 <p>{{ __('Job Card') }}</p>
                             </a>
                         </li>
                         <li @if ($pageSlug  == 'jobcard_history') class="active " @endif>
-                            <a href="{{ route('jobcard.jobcard_history')  }}">
+                            <a href="{{ route('jobcard.jobcard_history')  }}" >
                                 <i class="tim-icons icon-single-copy-04"></i>
                                 <p>{{ __('Job Card History') }}</p>
                             </a>
@@ -185,4 +185,5 @@
         </ul>
     </div>
 </div>
+
 
