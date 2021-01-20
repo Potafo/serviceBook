@@ -1,5 +1,13 @@
 @extends('layouts.app', ['page' => __('Vendors'), 'pageSlug' => 'vendors'])
-
+<script src="{{ asset('black') }}/js/core/jquery-1.9.1.js"></script>
+<link href="{{ asset('black') }}/css/bootstrap.min.css" rel="stylesheet">
+<link href="{{ asset('black') }}/css/bootstrap-datepicker.css" rel="stylesheet">
+<script src="{{ asset('black') }}/js/core/bootstrap-datepicker.js"></script>
+<style>
+    select > option {
+           color: black;
+       }
+   </style>
 @section('content')
 <div class="row">
   <div class="col-md-12">
@@ -44,6 +52,74 @@
         </div>
 
       </div>
+      <div class="col-12">
+        <form method="get" action="{{ route('vendors.vendors') }}" autocomplete="off" id="vendorfilter">
+            @csrf
+            {{-- @method('put') --}}
+            {{-- <input type="hidden" id="pageid" name="pageid" value="history" > --}}
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label for="exampleFormControlInput1">From Date</label>
+                    <input type="text" class="form-control date" id="filter_fromdate" name="filter_fromdate"  placeholder="From Date" value="{{ $filter_details['filter_fromdate'] }}">
+
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="exampleFormControlInput1">To Date</label>
+                    <input type="text" class="form-control date" id="filter_todate" name="filter_todate"  placeholder="To Date" value="{{ $filter_details['filter_todate'] }}">
+
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="exampleFormControlInput1">Category</label>
+                    {{-- <input type="text" class="form-control" id="filter_status" name="filter_status"  placeholder="Status" value="{{ old('filter_status') }}"> --}}
+                    <select class="form-control{{ $errors->has('filter_category') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7"   name="filter_category" id="filter_category" >
+                        <option value="">Select Category</option>
+                        @foreach($vendor_cat as $list)
+                                <option value="{{$list->id}}" @if($filter_details['filter_category']==$list->id) selected @endif>{{$list->name}}</option>
+                            @endforeach
+                    </select>
+
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="exampleFormControlInput1">Type</label>
+                    {{-- <input type="text" class="form-control" id="filter_status" name="filter_status"  placeholder="Status" value="{{ old('filter_status') }}"> --}}
+                    <select class="form-control{{ $errors->has('filter_type') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7"   name="filter_type" id="filter_type" >
+                        <option value="">Select Type</option>
+                        @foreach($vendor_type as $list)
+                                <option value="{{$list->id}}" @if($filter_details['filter_type']==$list->id) selected @endif>{{$list->name}}</option>
+                            @endforeach
+                    </select>
+
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="exampleFormControlInput1">Search</label>
+                    <input type="text" class="form-control" id="filter_globalsearch" name="filter_globalsearch"  placeholder="Search" value="{{ $filter_details['filter_globalsearch'] }}">
+
+                </div>
+
+                <div class="form-group col-md-2">
+
+                    <br/>
+                    <button type="submit" class="btn btn-fill btn-primary searchbutton">{{ __('Search') }}</button>
+                </div>
+
+            </div>
+            <div class="form-row">
+                {{-- <div class="form-group col-md-2">
+                    <label for="exampleFormControlInput1">Mode</label>
+
+                    <select class="form-control{{ $errors->has('filter_mode') ? ' is-invalid' : '' }} selectpicker " data-style="select-with-transition" title="Single Select" data-size="7"   name="filter_mode" id="filter_mode" >
+                        <option value="">Select Mode</option>
+
+                        <option value="1" @if($filter_details['filter_mode']==1) selected @endif>Expired</option>
+
+                    </select>
+
+                </div> --}}
+
+            </div>
+        </form>
+    </div>
+
       <div class="card-body" style="display: block" id="view_package">
         <div class="table-responsive">
           <table class="table tablesorter " id="">
@@ -74,7 +150,7 @@
                     View
                   </th>
                   <th>
-                    Edit
+                    Actions
                   </th>
               </tr>
             </thead>
@@ -91,7 +167,7 @@
                          $current_date=date("Y-m-d");
                          $diff=(new DateTime($joined_date))->diff(new DateTime($current_date))->days;
                          $pending=intval($package_days_count) - intval($diff);
-                        if($pending<0)
+                        if($pending<=0)
                         {
                             $pending= "Expired";
                         }else {
@@ -124,15 +200,15 @@
                                                         </td>
                             <td class="viewvendors" data-id='{{ $value->vid }}' style="cursor: pointer;">
                                 {{-- <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon"> --}}
-                                    <a href="vendor_view/{{ $value->vid }}" ><i class="tim-icons icon-zoom-split"></i></a>
+                                    <a href="vendor_view/{{ $value->vid }}" title="View,Renew,Package list"><i class="tim-icons icon-zoom-split"></i></a>
                                 {{-- </button> --}}
 
 
                             </td>
                             <td >
                                 {{-- <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-icon"> --}}
-                                    <a href="vendor_edit/{{ $value->vid }}" ><i class='tim-icons icon-pencil'></i></a>
-                                    <a href="vendor_configuration/{{ $value->vid }}" ><i class='tim-icons icon-settings'></i></a>
+                                    <a href="vendor_edit/{{ $value->vid }}" title="Edit Vendor"><i class='tim-icons icon-pencil'></i></a>
+                                    <a href="vendor_configuration/{{ $value->vid }}" title="Vendor Configuration"><i class='tim-icons icon-settings'></i></a>
 
                                     {{-- href="vendor_category/status" --}}
                                 {{-- </button> --}}
@@ -141,7 +217,7 @@
                                 </button> --}}
                                </td>
                                <td>
-                                <a  class="loadvendor_status" vendor_id='{{ $value->vid }}' ><i class='tim-icons icon-shape-star'></i></a>
+                                <a  class="loadvendor_status" vendor_id='{{ $value->vid }}' title="Vendor Status"><i class='tim-icons icon-shape-star'></i></a>
                                </td>
                         </tr>
                 @endforeach
@@ -177,11 +253,15 @@
   </div>
 
 </div>
-<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
+{{-- <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script> --}}
     <script language="JavaScript" type="text/javascript">
 
         $(document).ready(function() {
-
+            $('.date').datepicker({
+       format: 'dd-mm-yyyy',
+       todayHighlight: true,
+        autoclose: true,
+     });
            $.ajaxSetup({
                        headers: {
                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
