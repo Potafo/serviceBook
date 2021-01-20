@@ -39,7 +39,7 @@ class VendorController extends Controller
         ->join('vendor_category', 'vendor_category.id', '=', 'vendor.category')
         ->join('vendor_type', 'vendor_type.id', '=', 'vendor.type')
         ->join('users','users.id','=','vendor.user_id')
-        ->select('vendor.id as vid','users.active','vendor.user_id as userid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
+        ->select('vendor.id as vid','users.active','vendor.last_renewal_date','vendor.user_id as userid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
         ->orderBy('vendor.name', 'ASC');
 
 
@@ -464,6 +464,13 @@ class VendorController extends Controller
         $vendor = Vendor::findOrFail($request['vendor_id']);
         $saved=$vendor->update($data);
 
+        $active_set=Vendor::where('id','=',$request['vendor_id'])->select('vendor.user_id')->get();
+        $user_id=$active_set[0]->user_id;
+
+        $data1['active']     ='Y';
+        $user = User::firstOrFail()->where('id',$user_id);
+        $saved = $user->update($data1);
+
         return $savestatus;
 
     }
@@ -471,6 +478,7 @@ class VendorController extends Controller
     {
       $updated = $this->renewallist($request);
         if($updated == '2'){
+
             return back()->with('status', 'Renewed successfully');
         }else{
             return back()->with('status', 'Sorry!');

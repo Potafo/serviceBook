@@ -163,7 +163,11 @@
                          //$datetime = $date->format('Y-m-d H:i:s');
 
                         $package_days_count=$value->days;
+                        if($value->last_renewal_date == null)
                          $joined_date=date("Y-m-d",strtotime($value->joined_on));
+                         else {
+                            $joined_date=date("Y-m-d",strtotime($value->last_renewal_date));
+                         }
                          $current_date=date("Y-m-d");
                          $diff=(new DateTime($joined_date))->diff(new DateTime($current_date))->days;
                          $pending=intval($package_days_count) - intval($diff);
