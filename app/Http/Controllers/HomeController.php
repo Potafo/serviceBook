@@ -112,13 +112,19 @@ class HomeController extends Controller
              ->join('package', 'package.id', '=', 'vendor.current_package')
              ->join('vendor_category', 'vendor_category.id', '=', 'vendor.category')
              ->join('vendor_type', 'vendor_type.id', '=', 'vendor.type')
-             ->select('vendor.*','vendor.id as vid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
+             ->join('users','users.id','=','vendor.user_id')
+             ->select('vendor.*','vendor.id as vid','vendor.last_renewal_date','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
              ->orderBy('vendor.name', 'ASC')
              ->where('vendor.id','=',Session::get('logged_vendor_id'))
              ->get();
 
             $package_days_count=$vendor[0]->days;
-             $joined_date=date("Y-m-d",strtotime($vendor[0]->joined_on));
+            if($vendor[0]->last_renewal_date == null)
+                $joined_date=date("Y-m-d",strtotime($vendor[0]->joined_on));
+            else {
+                $joined_date=date("Y-m-d",strtotime($vendor[0]->last_renewal_date));
+                }
+            // $joined_date=date("Y-m-d",strtotime($vendor[0]->joined_on));
              $current_date=date("Y-m-d");
              $diff=(new DateTime($joined_date))->diff(new DateTime($current_date))->days;
              $pending=intval($package_days_count) - intval($diff);
