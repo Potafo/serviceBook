@@ -9,16 +9,24 @@ use Illuminate\Support\Facades\Config;
 
 class EmailController extends Controller
 {
+    protected $to_name;
+    protected $to_email;
+    public function __construct()
+    {
+        $this->to_name = "Potafo";
+        $this->to_email = "jeshi.p88@gmail.com";
+
+    }
     public function mail()
     {
-    $to_name = "Riddhi";
-    $to_email = 'jeshi.p88@gmail.com';
+    $to_name = $this->to_name;//"Riddhi";
+    $to_email =$this->to_email;// 'jeshi.p88@gmail.com';
     $data = array('name'=>"Cloudways (sender_name)", 'body' => "A test mail");
 
     Mail::send('email.email', $data, function($message) use ($to_name, $to_email) {
-    $message->to($to_email, $to_name)
-    ->subject("Laravel Test Mail");
-    $message->from('webdev.potafo@gmail.com','Test Mail');
+        $message->to($to_email, $to_name)
+                ->subject("Laravel Test Mail");
+        $message->from('webdev.potafo@gmail.com','Test Mail');
     });
 
        return 'Email sent Successfully';
