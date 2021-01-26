@@ -1,5 +1,6 @@
 @extends('layouts.app', ['page' => __('User Profile'), 'pageSlug' => 'vendors'])
-<script src="{{ asset('black') }}/js/core/jquery.min.js"></script>
+{{-- <script src="{{ asset('black') }}/js/core/jquery.min.js"></script> --}}
+<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 <style>
 select > option {
     color: black;
@@ -22,7 +23,7 @@ select > option {
                             <div class="form-row">
                                 <div class="form-group{{ $errors->has('name') ? ' has-danger' : '' }} col-md-6">
                                     <label>{{ __('Name') }}</label>
-                                    <input type="text" name="name" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" placeholder="{{ __('Name') }}" value="{{ old('name',$vendor[0]->vname) }}">
+                                    <input type="text" name="name" id="name" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" placeholder="{{ __('Name') }}" value="{{ old('name',$vendor[0]->vname) }}">
                                     @include('alerts.feedback', ['field' => 'name'])
                                 </div>
                                 <div class="form-group{{ $errors->has('mobile') ? ' has-danger' : '' }} col-md-6">
@@ -32,11 +33,15 @@ select > option {
                                 </div>
                             </div>
                             <div class="form-row">
+                                <?php
+                                $shotkey= ($vendor[0]->shortkey ==null) ? (mt_rand(100000,999999)) : ($vendor[0]->shortkey);
+                                ?>
                                 <div class="form-group{{ $errors->has('shortkey') ? ' has-danger' : '' }} col-md-6">
                                     <label>{{ __('Short Key') }}<span style="color: red"> *</span></label>
-                                    <input type="text" name="shortkey" class="form-control{{ $errors->has('shortkey') ? ' is-invalid' : '' }}" placeholder="{{ __('Short key') }}" value="{{ old('shortkey',$vendor[0]->shortkey) }}">
+                                    <input type="text" name="shortkey" id="shortkey" class="form-control{{ $errors->has('shortkey') ? ' is-invalid' : '' }}" placeholder="{{ __('Short key') }}" value="{{ old('shortkey',$shotkey) }}">
                                     @include('alerts.feedback', ['field' => 'shortkey'])
                                 </div>
+
                                 <div class="form-group{{ $errors->has('shortcode') ? ' has-danger' : '' }} col-md-6">
                                     <label>{{ __('Short Code') }}<span style="color: red"> *</span></label>
                                     <input type="text" name="shortcode" id="shortcode" class="form-control{{ $errors->has('shortcode') ? ' is-invalid' : '' }}" placeholder="{{ __('Short Code - Max 3') }}" maxlength="3" value="{{ old('shortcode',$vendor[0]->short_code) }}">
@@ -176,3 +181,67 @@ select > option {
 
     </div>
 @endsection
+<script language="JavaScript" type="text/javascript">
+    function loadsuggestion(webname)
+           {
+
+               $('#webname').val(webname);
+           }
+       $(document).ready(function() {
+         // $('#product_list').multiselect();
+           $('#name').on('change', function() {
+               var name = $(this).val();
+               if(name) {
+                   var data={"name":name};
+                   $.ajax({
+                          method: "post",
+                          url : "../api/shorcode_generate",
+                          data : data,
+                          cache : false,
+                          crossDomain : true,
+                          async : false,
+                          dataType :'text',
+                          success : function(result)
+                          {
+                               var json_x= JSON.parse(result);
+                               $('#shortcode').val(json_x.shortcode);
+                               $('#webname').val(json_x.webname);
+                          }
+                          });
+               }
+           });
+
+
+           $('#webname').on('change', function() { // act upon keyup events every 250 milliseconds when user is typing
+           $('#suggestions').html('');
+
+           var input = $(this).val();
+           if(input) {
+                   var data={"name":input};
+                   $.ajax({
+                          method: "post",
+                          url : "../api/webname_generate",
+                          data : data,
+                          cache : false,
+                          crossDomain : true,
+                          async : false,
+                          dataType :'text',
+                          success : function(result)
+                          {
+                           document.getElementById('suggestions').innerHTML = result;
+                           document.getElementById('suggestions').style.overflow='auto';
+
+                          }
+                          });
+               }
+            });
+
+           //  $('.webnamesuggestions').on('click', function() {
+           //      alert($(this).attr('myval'));
+           //     $('#webname').val();
+           // });
+
+
+       });
+
+      </script>
