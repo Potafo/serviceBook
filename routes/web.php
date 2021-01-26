@@ -126,5 +126,7 @@ Route::group(['middleware' => 'auth'], function () {
      Route::post('vendorservice_insert', ['as' => 'vendor_service.insert', 'uses' => 'VendorServiceController@insert']);
 
      Route::post('block_vendor_login', ['as' => 'block_vendor_login', 'uses' => 'VendorController@block_vendor_login']);
+
+     Route::get('/send/email', 'EmailController@mail');
 });
 
