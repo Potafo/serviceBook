@@ -164,12 +164,12 @@
                             </a>
                         </li>
 
-                        <li @if ($pageSlug == 'vendor_category/status')  class="active " @endif>
+                        {{-- <li @if ($pageSlug == 'vendor_category/status')  class="active " @endif>
                             <a href="{{ url('vendor_category/status')  }}">
                                 <i class="tim-icons icon-bullet-list-67"></i>
                                 <p>{{ __('Vendor Status') }}</p>
                             </a>
-                        </li>
+                        </li> --}}
                         @endif
 
                     </ul>
