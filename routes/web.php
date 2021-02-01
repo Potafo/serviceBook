@@ -130,3 +130,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 });
 Route::get('/view_jobcard_details_fromemail/{id}/{vendor_id}/{taxenabled}', 'JobcardController@view_jobcard_fromemail');
+Route::get('/customer_rating_email/{id}', 'JobcardController@view_rating_fromemail');
+Route::post('submit_rating', ['as' => 'submit_rating', 'uses' => 'JobcardController@submit_rating']);
+Route::get('thanku', function() {
+    return view('default.thanku');
+});

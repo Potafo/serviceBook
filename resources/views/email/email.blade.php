@@ -201,8 +201,8 @@
 
                     <table cellpadding="0" cellspacing="0" width="100%">
                       <tr>
-                        <td style="text-align:center; font-size:30px; padding-bottom:40px; " bgcolor="#009933">
-                          Your order has been Confirmed!
+                        <td style="text-align:center; font-size:30px;  " bgcolor="#dcdf1d">
+                            Your status --> {{ $status }}.
                         </td>
                       </tr>
                       <tr>
@@ -212,7 +212,7 @@
                           Thank u for Choosing {{ $vendor_details[0]->name }}.<br>
                           <br>
                           <br>
-                          Your booking at {{ $vendor_details[0]->name }} is CONFIRMED. Here are the details.<br>
+                         Here are the details.<br>
                           <br>
                          <b>Order Number:</b> {{ $jobcard }}<br>
                          Date: {{ date('d-m-Y') }}<br>
@@ -370,7 +370,15 @@
             </td>
           </tr>
         </table>
-
+        @if($endstatus=='Y')
+        <table>
+        <tr>
+            <td>
+                <a href="{{ url('customer_rating_email/'.$jobcard.'')  }}"> Please Click here </a>
+            </td>
+        </tr>
+        </table>
+        @endif
         <table class="w320" bgcolor="#E5E5E5" cellpadding="0" cellspacing="0" border="0" width="100%">
           <tr>
             <td style="border-top:1px solid #B3B3B3;" align="center">

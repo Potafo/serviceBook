@@ -19,6 +19,7 @@ use App\User;
 use App\Exports\UsersExport;
 use App\Exports\JobcardReport;
 use App\Exports\JobcardReportExport;
+use App\Status;
 use Illuminate\Support\Facades\Auth;
 use DB;
 use Illuminate\Support\Facades\Validator;
@@ -100,7 +101,7 @@ class JobcardController extends Controller
         return $status_data;
        // return response::json(['status' => $status, 'response_code' => $response_code,'email_status'=>$email_status]);
     }
-    public function jobcard_email($jobcard,$status,$vendor_id,$mode,$taxenabled)
+    public function jobcard_email($jobcard,$status,$vendor_id,$mode,$taxenabled,$endstatus='N')
     {
 
         $products = $this->sendemail_sms($vendor_id,$status);
@@ -113,6 +114,8 @@ class JobcardController extends Controller
                 ->join('products', 'products.id', '=', 'job_card.product_id')
                 ->where('job_card.jobcard_number', '=', $jobcard)
                 ->get();
+                $status_list=Status::select('*')->where('id','=',$status)->get();
+                $status_name=$status_list[0]->name;
             $data_email = array('cust_name'=>$jobcard_cust[0]->custname,
             'body' => "Thank u for ur Order",
             'cust_email' =>$jobcard_cust[0]->email,
@@ -121,7 +124,9 @@ class JobcardController extends Controller
             'cust_mobile' =>$jobcard_cust[0]->custmobile,
             'servicelist'=>$servicelist,
             'product_det'=>$jobcard_cust,
-            'taxenabled'=>$taxenabled
+            'taxenabled'=>$taxenabled,
+            'endstatus'=>$endstatus,
+            'status'=>$status_name
             );
             if($mode=='email_sent')
             {
@@ -1109,7 +1114,13 @@ class JobcardController extends Controller
         $statuschangehistory->date                     = date('Y-m-d');
         $statuschangehistory->save();
 //jobcardendingstatus
-
+        if($request['jobcardendingstatus']=="1")
+        {
+            $this->jobcard_email($request['jobcardnumber_up'],$request['vendor_status'],Session::get('logged_vendor_id'),'email_sent',Session::get('tax_enabled'),'Y');
+        }else
+        {
+            $this->jobcard_email($request['jobcardnumber_up'],$request['vendor_status'],Session::get('logged_vendor_id'),'email_sent',Session::get('tax_enabled'));
+        }
         if($request['jobcardendingstatus']=="1")
         {//'jobcard_number', 'bill_amount', 'received_amount', 'discount_amount',
             $statuschange = new JobcardBills();
@@ -1590,5 +1601,32 @@ class JobcardController extends Controller
         $status = $statuslist[0]->id;
         $data_email=$this->jobcard_email($jobcard,$status,$vendor_id,'email_view',$taxenabled);
         return view('default.jobcard_details_email_view',compact('data_email'));
+    }
+    public function view_rating_fromemail($jobcard)
+    {
+        $check_rating=Jobcard::select('*')->where('review','=',null)
+        ->Where('star_rating', '=',null)
+        ->where('jobcard_number','=',$jobcard)
+        ->get();
+        if(count($check_rating)>0)
+        {
+            return view('default.customer_rating_email',compact('jobcard'));
+        }else
+        {
+            $message="Already Submited.............";
+            return view('default.thanku',compact('message'));
+        }
+
+    }
+    public function submit_rating(Request $request)
+    {
+        // jobcard
+        $data['star_rating']                   = $request['starrating_input'];
+        $data['review']         = $request['remark'];
+
+        $jobcard = Jobcard::firstOrFail()->where('jobcard_number', $request['jobcard']);
+        $saved = $jobcard->update($data);
+        $message="Thank U for Your Response.............";
+        return view('default.thanku',compact('message'));
     }
 }
