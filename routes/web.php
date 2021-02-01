@@ -127,6 +127,6 @@ Route::group(['middleware' => 'auth'], function () {
 
      Route::post('block_vendor_login', ['as' => 'block_vendor_login', 'uses' => 'VendorController@block_vendor_login']);
 
-     Route::get('/send/email', 'EmailController@mail');
-});
 
+});
+Route::get('/view_jobcard_details_fromemail/{id}/{vendor_id}/{taxenabled}', 'JobcardController@view_jobcard_fromemail');

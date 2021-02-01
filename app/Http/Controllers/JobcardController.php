@@ -24,6 +24,7 @@ use DB;
 use Illuminate\Support\Facades\Validator;
 use Session;
 use App\Traits\ListQueryById;
+use Illuminate\Support\Facades\Mail;
 //use Maatwebsite\Excel\Facades\Excel;
 //use App\Page;
 
@@ -33,6 +34,8 @@ class JobcardController extends Controller
     public function insert_jobcard(Request $request)
     {
         //$table->engine = "InnoDB";
+        $status_data=array();
+
         $savestatus = 0;
         $vendorid = '';
         if (Session::get('logged_user_type') == '3') {
@@ -66,19 +69,89 @@ class JobcardController extends Controller
             $data3['jobcard_number']                  = $jobcrd;
             $cart=StatusChangeHistory::firstOrFail()->where('jobcard_number', $value->jobcard_number);
             $saved = $cart->update($data3);
+
+
+        /***************Email Sending Starts **************************************/
+
+        $statuslist = DB::table('vendor_status')
+        ->select('vendor_status.status_id as id')
+        ->where('vendor_status.vendor_id', '=', Session::get('logged_vendor_id'))
+        ->where('vendor_status.display_order', '=', '1')
+        ->get();
+        $status = $statuslist[0]->id;
+        $this->jobcard_email($jobcrd,$status,Session::get('logged_vendor_id'),'email_sent',Session::get('tax_enabled'));
+
+        /***************Email Sending ends ****************************************/
+
+
         }
+
 
         if ($saved) {
             $savestatus++;
         }
         if ($savestatus > 0) {
-            $status = 'success';
+            $status_data['status']  = 'success';
         } else {
-            $status = 'fail';
+            $status_data['status']  = 'fail';
         }
 
-        $response_code = '200';
-        return response::json(['status' => $status, 'response_code' => $response_code]);
+
+        return $status_data;
+       // return response::json(['status' => $status, 'response_code' => $response_code,'email_status'=>$email_status]);
+    }
+    public function jobcard_email($jobcard,$status,$vendor_id,$mode,$taxenabled)
+    {
+
+        $products = $this->sendemail_sms($vendor_id,$status);
+        if($products[0]->send_email == "Y")
+        {
+            $vendor=Vendor::select('*')->where('id','=',$vendor_id)->get();
+            $servicelist =$this->servicelist_query_foredit_page($jobcard);
+             $jobcard_cust = Jobcard::select('products.name as pdtname',  'job_card.remarks as remarks','customers.name as custname', 'customers.contact_number as custmobile','customers.email as email') //DB::table('job_card')
+                ->leftjoin('customers', 'customers.id', '=', 'job_card.customer_id')
+                ->join('products', 'products.id', '=', 'job_card.product_id')
+                ->where('job_card.jobcard_number', '=', $jobcard)
+                ->get();
+            $data_email = array('cust_name'=>$jobcard_cust[0]->custname,
+            'body' => "Thank u for ur Order",
+            'cust_email' =>$jobcard_cust[0]->email,
+            'jobcard' =>$jobcard,
+            'vendor_details' =>$vendor,
+            'cust_mobile' =>$jobcard_cust[0]->custmobile,
+            'servicelist'=>$servicelist,
+            'product_det'=>$jobcard_cust,
+            'taxenabled'=>$taxenabled
+            );
+            if($mode=='email_sent')
+            {
+                Mail::send('email.email', $data_email, function ($message) use ($data_email) {
+                    $message->from('webdev.potafo@gmail.com', 'Service Book');//$vendor[0]->mail_id; $vendor[0]->name;
+                    $message->sender('webdev.potafo@gmail.com', 'Service Book');//$vendor[0]->mail_id; $vendor[0]->name;
+                    $message->to($data_email['cust_email'], $data_email['cust_name']);
+                    //$message->cc('john@johndoe.com', 'John Doe');
+                    //$message->bcc('john@johndoe.com', 'John Doe');
+                   // $message->replyTo('webdev.potafo@gmail.com', 'Service Book');
+                    $message->subject('Received Your Order');
+                   // $message->priority(3);
+                   // $message->attach('pathToFile');
+                });
+
+                if( count(Mail::failures()) > 0 ) {
+
+                    $status_data['email_status']="Email Sending failed";
+
+                 } else {
+                    $status_data['email_status']="Email Sent successfully";
+                 }
+                 return $status_data['email_status'];
+            }elseif($mode=='email_view')
+            {
+                return $data_email;
+            }
+
+        }
+
     }
     public function jobcard_view(Request $request)
     {
@@ -188,12 +261,14 @@ class JobcardController extends Controller
             $errors = $validator->errors();
             return Redirect()->back()->with('errors', $errors)->withInput($request->all());
         } else {
-            $this->insert_jobcard($request);
+            $resmsg=$this->insert_jobcard($request);
+            //email_status status
             Session::forget('jobcard_reference');
             Session::forget('customerid');
             return Redirect('jobcard')->with('status', 'Jobcard Successfully Added!');
         }
     }
+
     public function jobcard_edit(Request $request, $id)
     {
         $jobcard_cust = array();
@@ -204,6 +279,7 @@ class JobcardController extends Controller
             ->join('products', 'products.id', '=', 'job_card.product_id')
             ->where('job_card.id', '=', $id)
             ->get();
+
         // dd(DB::getQueryLog());
         Session::put('jobcard_reference', $jobcard_cust[0]->jobcard_reference);
         $products = array();
@@ -765,17 +841,27 @@ class JobcardController extends Controller
             ->get();
         return $pricelist;
     }
+    public function servicelist_query_foredit_page($jobcard)
+    {
+        $servicelist = Cart::select('cart.*','job_card.remarks','job_card.service_remarks')
+        ->leftjoin("service", 'service.id', '=', 'cart.service_id')
+        ->join('job_card', 'job_card.jobcard_number', '=', 'cart.jobcard_reference')
+        ->where('cart.jobcard_reference', '=', $jobcard)
+        ->orderBy('created_at', 'DESC')
+        ->get();
+        return $servicelist;
+    }
     public function load_jobcardservice_list_edit(Request $request)
     {
 
-        $servicelist = Cart::select('cart.*','job_card.remarks','job_card.service_remarks')
-            ->leftjoin("service", 'service.id', '=', 'cart.service_id')
-            ->join('job_card', 'job_card.jobcard_number', '=', 'cart.jobcard_reference')
-            ->where('cart.jobcard_reference', '=', $request['ref'])
-            ->orderBy('created_at', 'DESC')
-            ->get();
+        // $servicelist = Cart::select('cart.*','job_card.remarks','job_card.service_remarks')
+        //     ->leftjoin("service", 'service.id', '=', 'cart.service_id')
+        //     ->join('job_card', 'job_card.jobcard_number', '=', 'cart.jobcard_reference')
+        //     ->where('cart.jobcard_reference', '=', $request['ref'])
+        //     ->orderBy('created_at', 'DESC')
+        //     ->get();
             //->paginate(Session::get('paginate'));
-
+            $servicelist =$this->servicelist_query_foredit_page($request['ref']);
         $append = '';
 
         if (count($servicelist) > 0) {
@@ -955,21 +1041,33 @@ class JobcardController extends Controller
         $search = $request['search'];
         $request_field = $request['request'];
         if ($search == '') {
-            $customers = Customer::orderby('name', 'asc')->select('id', 'name', 'contact_number', 'email')->get(); //->limit(5)
+            $customers = Customer::orderby('name', 'asc')->select('id', 'name', 'contact_number', 'email')
+                    ->groupBy('name')
+                    ->groupBy('contact_number')
+                    ->groupBy('email')->get(); //->limit(5)
         } else {
             $customers = '';
             if ($request_field == "jobcard_name") {
                 $customers = Customer::orderby('name', 'asc')
                     ->select('id', 'name', 'contact_number', 'email')
-                    ->where('name', 'like', '%' . $search . '%')->get(); //->limit(5)
+                    ->where('name', 'like', '%' . $search . '%')
+                    ->groupBy('name')
+                    ->groupBy('contact_number')
+                    ->groupBy('email')->get(); //->limit(5)
             } else if ($request_field == "jobcard_mobile") {
                 $customers = Customer::orderby('name', 'asc')
                     ->select('id', 'name', 'contact_number', 'email')
-                    ->where('contact_number', 'like', '%' . $search . '%')->get(); //->limit(5)
+                    ->where('contact_number', 'like', '%' . $search . '%')
+                    ->groupBy('name')
+                    ->groupBy('contact_number')
+                    ->groupBy('email')->get(); //->limit(5)
             } else if ($request_field == "jobcard_email") {
                 $customers = Customer::orderby('name', 'asc')
                     ->select('id', 'name', 'contact_number', 'email')
-                    ->where('email', 'like', '%' . $search . '%')->get(); //->limit(5)
+                    ->where('email', 'like', '%' . $search . '%')
+                    ->groupBy('name')
+                    ->groupBy('contact_number')
+                    ->groupBy('email')->get(); //->limit(5)
             }
         }
         $response = array();
@@ -1481,5 +1579,16 @@ class JobcardController extends Controller
     {
       //return Excel::download(new JobcardReportExport($request), 'jobcard-report.xls');
 
+    }
+    public function view_jobcard_fromemail($jobcard,$vendor_id,$taxenabled)
+    {
+        $statuslist = DB::table('vendor_status')
+        ->select('vendor_status.status_id as id')
+        ->where('vendor_status.vendor_id', '=', $vendor_id)
+        ->where('vendor_status.display_order', '=', '1')
+        ->get();
+        $status = $statuslist[0]->id;
+        $data_email=$this->jobcard_email($jobcard,$status,$vendor_id,'email_view',$taxenabled);
+        return view('default.jobcard_details_email_view',compact('data_email'));
     }
 }
