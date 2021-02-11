@@ -11,6 +11,7 @@ use Session;
 use Response;
 use App\VendorConfiguration;
 use App\MainConfiguration;
+use App\AppConfiguration;
 
 class ConfigurationController extends Controller
 {
@@ -98,6 +99,16 @@ class ConfigurationController extends Controller
             $mainconfig->config_id    =$config->id;
             $saved=$mainconfig->save();
         }
+        if($request['config_type']=="4"){
+            $fieldname = strtolower(str_replace(" ", "_", $request['config_name']));
+            //`type`, `name`, `value`, `config_id`
+            $appconfig= new AppConfiguration();
+            $appconfig->type           =$request['config_type'];
+            $appconfig->name    =$fieldname;
+            $appconfig->value    =null;
+            $appconfig->config_id    =$config->id;
+            $saved=$appconfig->save();
+        }
 
         if ($saved) {
             $savestatus++;
@@ -149,17 +160,48 @@ class ConfigurationController extends Controller
       // DB::enableQueryLog();
        $configurations= MainConfiguration::select('main_configuration.*','cf.input_type')
        ->join('configuration as cf','cf.id','=','main_configuration.config_id')->get();
+
+       $appconfigurations= AppConfiguration::select('app_configuration.*','cf.input_type')
+       ->join('configuration as cf','cf.id','=','app_configuration.config_id')->get();
        //dd(DB::getQueryLog());
-        return view('configuration.main_configuration', compact('configurations'));
+        return view('configuration.main_configuration', compact('configurations','appconfigurations'));
     }
     public function config_main_update(Request $request)
     {
+        $from=$request['from'];
         $field=$request['field'];
-        $data['value']       =$request['textvalue'];
-        $config = MainConfiguration::findOrFail($request['id']);
-        $saved=$config->update($data);
-        $fieldname = strtolower(str_replace(" ", "_", $field));
-        Session::put($fieldname, $request['textvalue']);
+        $mode=$request['mode'];
+        if($from=="textbox")
+        {
+
+            $data['value']       =$request['textvalue'];
+            if($mode=="common_config")
+            {
+                $config = MainConfiguration::findOrFail($request['id']);
+            }elseif($mode=="app_config")
+            {
+                $config = AppConfiguration::findOrFail($request['id']);
+            }
+            $saved=$config->update($data);
+            $fieldname = strtolower(str_replace(" ", "_", $field));
+            Session::put($fieldname, $request['textvalue']);
+
+        }else if($from=="checkbox")
+        {
+            //$fieldname = strtolower(str_replace(" ", "_", $field));
+            $data['value']       =$request['status'];
+            if($mode=="common_config")
+            {
+                $config = MainConfiguration::findOrFail($request['id']);
+            }elseif($mode=="app_config")
+            {
+                $config = AppConfiguration::findOrFail($request['id']);
+            }
+            $saved=$config->update($data);
+            Session::put($field, $request['status']);
+        }
+
+
         return response()->json(['message' => 'Configuration updated successfully.']);
     }
     public function vendor_config_list(Request $request)

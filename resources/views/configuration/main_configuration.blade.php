@@ -5,9 +5,7 @@
     <div class="row container">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header">
-                    <h5 class="title">{{ __('Main Configurations') }}</h5>
-                </div>
+
                 {{-- <div class="col-8">
                     <nav aria-label="breadcrumb" role="navigation">
                         <ol class="breadcrumb">
@@ -21,10 +19,12 @@
                     <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
                         <i class="tim-icons icon-simple-remove"></i>
                     </button>
-                    <span id="alertmessage"> Main Configuration successfully updated</span>
+                    <span id="alertmessage">  Configuration successfully updated</span>
                 </div>
                 <div class="card-body">
-
+                    <div class="card-header">
+                        <h5 class="title" style="color: darkorchid;font-size: 155%">{{ __('Common/Admin Configurations') }}</h5>
+                    </div>
                     <table class="table table-hover table-striped">
                         <thead>
 
@@ -35,12 +35,38 @@
                                     <td>{{ $value->name }}</td>
                                     <td>
                                         @if($value->input_type == "checkbox")
-                                            <?php $fieldname = strtolower(str_replace(" ", "_", $value->config_name)); ?>
-                                            <input type="checkbox" data-id="{{ $value->id }}" data-field="{{ $fieldname }}" name="status" class="js-switch" {{ Session::get($fieldname) == 'Y' ? 'checked' : '' }}>
+                                            <?php $fieldname = strtolower(str_replace(" ", "_", $value->name)); ?>
+                                            <input type="checkbox" data-id="{{ $value->id }}" data-field="{{ $fieldname }}" data-mode="common_config" name="status" class="js-switch" {{ Session::get($fieldname) == 'Y' ? 'checked' : '' }}>
 
                                         @elseif($value->input_type == "textbox")
                                             <?php $fieldname = strtolower(str_replace(" ", "_", $value->name)); ?>
-                                            <input type="textbox" data-id="{{ $value->id }}" data-field="{{ $fieldname }}" name="status" class="textbox" value="{{ Session::get($fieldname) }}">
+                                            <input type="textbox" data-id="{{ $value->id }}" data-field="{{ $fieldname }}" data-mode="common_config" name="status" class="textbox" value="{{ Session::get($fieldname) }}">
+                                        @endif
+                                    </td>
+                                    {{-- <td>{{ $user->created_at->diffForHumans() }}</td> --}}
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    <div class="card-header">
+                        <h5 class="title" style="color: darkorchid;font-size: 155%">{{ __('App Configurations') }}</h5>
+                    </div>
+                    <table class="table table-hover table-striped">
+                        <thead>
+
+                        </thead>
+                        <tbody>
+                            @foreach($appconfigurations as $key=>$value)
+                                <tr>
+                                    <td>{{ $value->name }}</td>
+                                    <td>
+                                        @if($value->input_type == "checkbox")
+                                            <?php $fieldname = strtolower(str_replace(" ", "_", $value->name)); ?>
+                                            <input type="checkbox" data-id="{{ $value->id }}" data-field="{{ $fieldname }}" data-mode="app_config" name="status" class="js-switch" {{ Session::get($fieldname) == 'Y' ? 'checked' : '' }}>
+
+                                        @elseif($value->input_type == "textbox")
+                                            <?php $fieldname = strtolower(str_replace(" ", "_", $value->name)); ?>
+                                            <input type="textbox" data-id="{{ $value->id }}" data-field="{{ $fieldname }}" data-mode="app_config" name="status" class="textbox" value="{{ Session::get($fieldname) }}">
                                         @endif
                                     </td>
                                     {{-- <td>{{ $user->created_at->diffForHumans() }}</td> --}}
@@ -88,11 +114,13 @@
         $('.js-switch').change(function () {
             let status = $(this).prop('checked') === true ? 'Y' : 'N';
             let field = $(this).data('field');
+            let mode = $(this).data('mode');
+            let id = $(this).data('id');
             $.ajax({
                 type: "GET",
                 dataType: "json",
-                url: '{{ route('configuration.config_update') }}',
-                data: {'status': status, 'field': field},
+                url: '{{ route('configuration.config_main_update') }}',
+                data: {'status': status, 'field': field,'mode': mode,'from':'checkbox', 'id': id},
                 success: function (data) {
                     $('#alertmessage').html(data.message);
                     $('.alert-success').css('display','block');
@@ -109,11 +137,12 @@
             var textvalue = $(this).val();
             let field = $(this).data('field');
             let id = $(this).data('id');
+            let mode = $(this).data('mode');
             $.ajax({
                 type: "GET",
                 dataType: "json",
                 url: '{{ route('configuration.config_main_update') }}',
-                data: {'textvalue': textvalue, 'field': field, 'id': id},
+                data: {'textvalue': textvalue, 'field': field, 'id': id, 'mode': mode,'from':'textbox'},
                 success: function (data) {
                     $('#alertmessage').html(data.message);
                     $('.alert-success').css('display','block');

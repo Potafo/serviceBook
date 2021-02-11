@@ -15,6 +15,7 @@ use App\VendorConfiguration;
 use App\ServiceCategory;
 use App\ServiceType;
 use DB;
+use App\AppConfiguration;
 
 trait AuthSessions
 {
@@ -105,6 +106,13 @@ trait AuthSessions
         }else if($type=="1"  || $type=="2")
         {
             $configuration=MainConfiguration::select('main_configuration.*')
+            ->where('name','=',$field)
+            ->get();
+
+            return $configuration[0]->value;
+        }else if($type=="4")
+        {
+            $configuration=AppConfiguration::select('app_configuration.*')
             ->where('name','=',$field)
             ->get();
 
