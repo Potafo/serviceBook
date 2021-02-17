@@ -22,7 +22,7 @@ use App\Http\Controllers\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Session;
-
+use Illuminate\Support\Facades\Hash;
 
 class VendorController extends Controller
 {
@@ -204,6 +204,7 @@ class VendorController extends Controller
             'file' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'shortcode' => 'required|string|max:3',
             'webname' => 'required|string|max:20',
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [
             'name.required' => 'A Vendor name is required',
             'latitude.required' => 'Latitude is required',
@@ -212,7 +213,8 @@ class VendorController extends Controller
             'mobile.required' => 'Mobile is required',
             'shortkey.required' => 'Shortkey is required',
             'shortcode.required' => 'ShortCode is required',
-            'webname.required' => 'Web name is required'
+            'webname.required' => 'Web name is required',
+            'password.required' => 'Password is required'
           ]);
           return $validator;
     }
@@ -226,12 +228,22 @@ class VendorController extends Controller
         $date = new DateTime('now', new DateTimeZone($timezone));
         $datetime = $date->format('Y-m-d H:i:s');
         $savestatus=0;
+        $user= User::create([
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'password' => Hash::make($request['password']),
+            'user_type' => Session::get('logged_user_type'),
+            'remember_token' => Str::random(20),
+        ]);
+        $userid=$user->id;
+
+
         $vendor= new Vendor();
         if($request['name']!="")
         {
-            $logged_user_id = Auth::id();
+            //$logged_user_id = Auth::id();
             $vendor->name               =$request['name'];
-            $vendor->user_id            =$logged_user_id;
+            $vendor->user_id            =$userid;//$logged_user_id;
             $vendor->address            =$request['address'];
             $vendor->location_lat       =$request['latitude'];
             $vendor->location_long      =$request['longitude'];
@@ -278,6 +290,10 @@ class VendorController extends Controller
 
 
             $saved=$vendor->save();
+
+
+
+
             if ($saved) {
                 $savestatus++;
             }

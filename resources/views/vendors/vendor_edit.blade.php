@@ -121,7 +121,7 @@ select > option {
                                     @include('alerts.feedback', ['field' => 'mobile'])
                                 </div>
                             </div>
-                            <input type="hidden" name="packid" id="packid" value="1">
+                            <input type="hidden" name="packid" id="packid" value="{{ Session::get('default_package') }}">
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label>{{ __('Vendor Category') }}</label>

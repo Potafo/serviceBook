@@ -135,6 +135,17 @@ select > option {
                                     {{-- @include('alerts.feedback', ['field' => 'mobile']) --}}
                                 </div>
                             </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>{{ __('Login Password') }}</label>
+                                    <input type="password" name="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" placeholder="{{ __('Password') }}">
+                            @include('alerts.feedback', ['field' => 'password'])
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>{{ __('Confirm Password') }}</label>
+                                    <input type="password" name="password_confirmation" class="form-control" placeholder="{{ __('Confirm Password') }}">
+                                </div>
+                            </div>
                             {{-- <div class="form-group">
                                 <label>{{ __('Digital Profile Status') }}</label>
                                 <select class="form-control selectpicker " data-style="select-with-transition" title="Single Select" data-size="7" placeholder="{{ __('Digital Profile Status') }}" name="dps" id="dps">
