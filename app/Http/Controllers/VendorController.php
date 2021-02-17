@@ -232,7 +232,7 @@ class VendorController extends Controller
             'name' => $request['name'],
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
-            'user_type' => Session::get('logged_user_type'),
+            'user_type' => Session::get('default_usertype'),
             'remember_token' => Str::random(20),
         ]);
         $userid=$user->id;
