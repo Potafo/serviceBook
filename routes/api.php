@@ -43,3 +43,9 @@ Route::post('addService','ApiController@add_service');
 Route::post('editService','ApiController@editService');
 Route::get('getCustomerList','ApiController@getCustomerList');
 Route::get('getVendorStatusList','ApiController@getVendorStatusList');
+Route::get('generalsettingsapp','ApiController@generalSettingsApp');
+Route::get('getVendorData','ApiController@getVendorData');
+Route::get('getAppDashbord','ApiController@getAppDashbord');
+Route::get('getPendingservices','ApiController@getPendingservices');
+Route::get('getReport','ApiController@getReport');
+
