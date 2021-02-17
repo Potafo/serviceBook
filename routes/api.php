@@ -48,4 +48,4 @@ Route::get('getVendorData','ApiController@getVendorData');
 Route::get('getAppDashbord','ApiController@getAppDashbord');
 Route::get('getPendingservices','ApiController@getPendingservices');
 Route::get('getReport','ApiController@getReport');
-
+Route::get('firebasetokenupdate','ApiController@firebasetokenupdate');

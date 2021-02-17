@@ -17,6 +17,7 @@ use App\ServiceType;
 use App\AppConfiguration;
 use App\ConfigurationType;
 use App\Jobcard;
+use App\FirebaseTokenMaster;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -561,5 +562,43 @@ class ApiController extends Controller
             $status = 'fail';
         }
         return response()->json(['status' => $status, 'jobcard' => $jobcard_list, 'jobcard_total' => $jobcard_total]);
+    }
+
+    public function firebasetokenupdate(Request $request)
+    {//'user_token', 'sl_no', 'device', 'device_id', 'fb_token', 'app_version',
+
+        $savestatus = 0;
+        $slno=0;
+        $check_token=FirebaseTokenMaster::select(DB::raw('max(sl_no) as sl_no'))
+        ->where('user_token','=',$request['token'])->get();
+
+
+        if(count($check_token)>0)
+        {
+            $slno= $check_token[0]->sl_no + 1;
+        }else
+        {
+            $slno=1;
+        }
+        $fbtoken = new FirebaseTokenMaster();
+        $fbtoken->user_token               = $request['token'];
+        $fbtoken->sl_no          = $slno;
+        $fbtoken->device          = $request['device'];
+        $fbtoken->device_id               = $request['device_id'];
+        $fbtoken->fb_token          = $request['fb_token'];
+        //$fbtoken->app_version               = $request['app_version'];
+        $saved = $fbtoken->save();
+
+        if ($saved) {
+            $savestatus++;
+        }
+        if ($savestatus > 0) {
+            $status = 'success';
+            $message = "sussessfully inserted";
+        } else {
+            $status = 'fail';
+            $message = "failed to insert";
+        }
+        return response()->json(['status' => $status, 'message' => $message]);
     }
 }
