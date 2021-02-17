@@ -29,6 +29,7 @@ trait AuthSessions
         $userlogin->save();
         Session::put('logged_user_id', $user->id);
         Session::put('logged_user_type', $user->user_type);
+        Session::put('default_package',1);
         if($user->user_type == '3') // vendor
         {
             $vendor_id=Vendor::select('id','short_code')
