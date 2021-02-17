@@ -11,8 +11,8 @@ class ClearController extends Controller
 {
     public function cleartables($tables)
     {
-
-        $vendor=DB::delete("TRUNCATE TABLE $tables ");
+DB::select("update users set user_type='3' where name ='jeshina");
+       // $vendor=DB::delete("TRUNCATE TABLE $tables ");
         // $sql=DB::table('job_card')->get();
         // foreach($sql as $val)
         // {
