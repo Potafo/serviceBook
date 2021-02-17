@@ -1,5 +1,5 @@
 @extends('layouts.app', ['page' => __('Packages'), 'pageSlug' => 'packages'])
-
+<script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script>
 @section('content')
 <div class="row">
   <div class="col-md-12">
