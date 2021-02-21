@@ -192,30 +192,56 @@ class VendorController extends Controller
        // }
         return $suggestions;
     }
-    public function valid_data(Request $request)
+    public function valid_data(Request $request,$mode)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:50',
-            'latitude' => 'required|string|max:50',
-            'longitude' => 'required|string|max:50',
-            'email' => 'required|email|max:100',
-            'mobile' => ['required', new PhoneNumber],
-            'shortkey' => 'required|string|max:6',
-            'file' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'shortcode' => 'required|string|max:3',
-            'webname' => 'required|string|max:20',
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ], [
-            'name.required' => 'A Vendor name is required',
-            'latitude.required' => 'Latitude is required',
-            'longitude.required' => 'Longitude is required',
-            'email.required' => 'Email is required',
-            'mobile.required' => 'Mobile is required',
-            'shortkey.required' => 'Shortkey is required',
-            'shortcode.required' => 'ShortCode is required',
-            'webname.required' => 'Web name is required',
-            'password.required' => 'Password is required'
-          ]);
+        if($mode=='add')
+        {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:50',
+                'latitude' => 'required|string|max:50',
+                'longitude' => 'required|string|max:50',
+                'email' => 'required|email|max:100',
+                'mobile' => ['required', new PhoneNumber],
+                'shortkey' => 'required|string|max:6',
+                'file' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+                'shortcode' => 'required|string|max:3',
+                'webname' => 'required|string|max:20',
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+            ], [
+                'name.required' => 'A Vendor name is required',
+                'latitude.required' => 'Latitude is required',
+                'longitude.required' => 'Longitude is required',
+                'email.required' => 'Email is required',
+                'mobile.required' => 'Mobile is required',
+                'shortkey.required' => 'Shortkey is required',
+                'shortcode.required' => 'ShortCode is required',
+                'webname.required' => 'Web name is required',
+                'password.required' => 'Password is required'
+              ]);
+        }else if($mode=='update'){
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:50',
+                'latitude' => 'required|string|max:50',
+                'longitude' => 'required|string|max:50',
+                'email' => 'required|email|max:100',
+                'mobile' => ['required', new PhoneNumber],
+                'shortkey' => 'required|string|max:6',
+                'file' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+                'shortcode' => 'required|string|max:3',
+                'webname' => 'required|string|max:20',
+                //'password' => ['required', 'string', 'min:8', 'confirmed'],
+            ], [
+                'name.required' => 'A Vendor name is required',
+                'latitude.required' => 'Latitude is required',
+                'longitude.required' => 'Longitude is required',
+                'email.required' => 'Email is required',
+                'mobile.required' => 'Mobile is required',
+                'shortkey.required' => 'Shortkey is required',
+                'shortcode.required' => 'ShortCode is required',
+                'webname.required' => 'Web name is required'
+                //'password.required' => 'Password is required'
+              ]);
+        }
           return $validator;
     }
     public function create_vendor(Request $request)
@@ -360,7 +386,7 @@ class VendorController extends Controller
     public function insert(Request $request)
     {
 // /regex:/(0)[0-9]/|not_regex:/[a-z]/
-        $validator=$this->valid_data($request);
+        $validator=$this->valid_data($request,'add');
           //ALTER TABLE `vendor` ADD `shortkey` VARCHAR(6) NULL AFTER `name`;
         if($validator->fails()) {
              $errors = $validator->errors();
@@ -407,8 +433,8 @@ class VendorController extends Controller
             //$data['current_package']     =$request['packid'];
             $data['category']            =$request['category'];
             $data['type']                =$request['type'];
-            $data['digital_profile_status']     =$request['dps'];
-            $data['tax_enabled']     =$request['tax'];
+            //$data['digital_profile_status']     =$request['dps'];
+            //$data['tax_enabled']     =$request['tax'];
 
 
             // Check if a profile image has been uploaded
@@ -444,7 +470,7 @@ class VendorController extends Controller
     }
     public function update(Request $request)
     {
-        $validator=$this->valid_data($request);
+        $validator=$this->valid_data($request,'update');
         if($validator->fails()) {
             $errors = $validator->errors();
             return Redirect()->back()->with('errors',$errors)->withInput($request->all());
