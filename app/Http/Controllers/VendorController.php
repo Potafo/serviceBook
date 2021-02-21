@@ -39,6 +39,7 @@ class VendorController extends Controller
         ->join('vendor_category', 'vendor_category.id', '=', 'vendor.category')
         ->join('vendor_type', 'vendor_type.id', '=', 'vendor.type')
         ->join('users','users.id','=','vendor.user_id')
+        ->where('vendor.deleted_at','=',null)
         ->select('vendor.id as vid','users.active','vendor.last_renewal_date','vendor.user_id as userid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
         ->orderBy('vendor.name', 'ASC');
 
@@ -534,5 +535,14 @@ class VendorController extends Controller
         $saved = $jobcard->update($data);
 
         return Redirect('vendors')->with('status', 'Vendor Login Blocked successfully!');
+    }
+    public function delete_vendor(Request $request)
+    {
+       //$data['active']     ='N';
+
+        $jobcard = Vendor::firstOrFail()->where('id', $request['vendor_id']);
+        $saved = $jobcard->delete();
+
+        return Redirect('vendors')->with('status', 'Vendor Deleted successfully!');
     }
 }

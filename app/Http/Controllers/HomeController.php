@@ -116,6 +116,7 @@ class HomeController extends Controller
              ->select('vendor.*','vendor.id as vid','vendor.last_renewal_date','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
              ->orderBy('vendor.name', 'ASC')
              ->where('vendor.id','=',Session::get('logged_vendor_id'))
+             ->where('vendor.deleted_at','=',null)
              ->get();
 
             $package_days_count=$vendor[0]->days;
@@ -156,6 +157,7 @@ class HomeController extends Controller
             $today = DB::table('vendor')
             ->select(DB::raw('count(id) as `data`'))
             ->whereDay('created_at','=',$day)
+            ->where('deleted_at','=',null)
             ->get();
             if(count($today)>0)
             {
@@ -171,6 +173,7 @@ class HomeController extends Controller
 
             $last_30days = DB::table('vendor')
             ->select(DB::raw('count(id) as `data`'))
+            ->where('deleted_at','=',null)
             ->where('created_at','>=',Carbon::now()->subdays(30))->get(['name','created_at']);
             if(count($last_30days)>0)
             {
@@ -187,6 +190,7 @@ class HomeController extends Controller
             $this_month = DB::table('vendor')
             ->select(DB::raw('count(id) as `data`') ,  DB::raw('YEAR(created_at) year, MONTH(created_at) month'))
             ->whereMonth('created_at', '=', $month)
+            ->where('deleted_at','=',null)
             ->groupby('month')
             ->get();
             if(count($this_month)>0)
@@ -204,6 +208,7 @@ class HomeController extends Controller
             $this_year = DB::table('vendor')
             ->select(DB::raw('count(id) as `data`'), DB::raw("DATE_FORMAT(created_at, '%m-%Y') new_date"),  DB::raw('YEAR(created_at) year, MONTH(created_at) month'))
             ->whereYear('created_at', '=', $year)
+            ->where('deleted_at','=',null)
             ->groupby('year')
             ->get();
             if(count($this_year)>0)
@@ -222,6 +227,7 @@ class HomeController extends Controller
             $last_year = DB::table('vendor')
             ->select(DB::raw('count(id) as `data`'), DB::raw("DATE_FORMAT(created_at, '%m-%Y') new_date"),  DB::raw('YEAR(created_at) year, MONTH(created_at) month'))
             ->whereYear('created_at', '=', $year-1)
+            ->where('deleted_at','=',null)
             ->groupby('year')
             ->get();
             if(count($last_year)>0)
@@ -242,6 +248,7 @@ class HomeController extends Controller
             $this_month_chart = DB::table('vendor')
             ->select(DB::raw('count(id) as `data`') ,  DB::raw('DAY(created_at) day, MONTH(created_at) month'))
             ->whereMonth('created_at', '=', $month)
+            ->where('deleted_at','=',null)
             ->groupby('day')
             ->orderby('day','ASC')
             ->get();
