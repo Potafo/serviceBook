@@ -152,4 +152,81 @@ class ServiceController extends Controller
             //return Response::json(['success' => 1]);
         }
     }
+
+    public function services_edit($id)
+    {
+        $products=array();
+        if(Session::get('logged_user_type') =='3')
+        {
+        $products=$this->product_list_query(Session::get('logged_vendor_id'));
+        }
+        //`vendor_servicetype`(`id`, `service_type`, `vendor_id`, `status`, `deleted_at`, `created_at`,
+        //`service_type`(`id`, `name`, `status`, `created_at`, `updated_
+        //DB::enableQueryLog();
+        $category=Session::get('Parts');
+        $servicelist_vendor=DB::table('service_type')
+        ->select('service_type.*')
+        ->join('vendor_servicetype', 'service_type.id', '=', 'vendor_servicetype.service_type')
+         ->where('vendor_servicetype.vendor_id','=',Session::get('logged_vendor_id'))
+         ->where('vendor_servicetype.status','=','Y')
+         ->where( 'service_type.id', '!=', $category)
+         ->paginate(Session::get('paginate'));
+         //DB::enableQueryLog();
+        $services=DB::table('service')
+        ->join('service_pricedetails','service_pricedetails.service_id','=','service.id')
+        ->select('service.*','service_pricedetails.*','service.id as sid')
+        ->where('service.id','=',$id)
+        ->get();
+        //dd(DB::getQueryLog());
+        return view('services.services_edit',compact('services','id','servicelist_vendor','products'));
+    }
+    public function update(Request $request)
+    {
+        $validator=$this->validate_data($request);
+        if($validator->fails()) {
+            // $errors = $validator->errors();
+            // return Redirect()->back()->with('errors',$errors)->withInput($request->all());
+            return Response::json(['errors' => $validator->errors()]);
+        }else {
+           $this->update_service($request);
+           Session::flash('success_msg', 'Success!');
+            return Redirect('services')->with('status', 'Services Successfully Updated!');
+            //return Response::json(['success' => 1]);
+        }
+    }
+    public function update_service(Request $request)
+    {
+        //serviceid
+       $savestatus=0;
+       $data['name']           =$request['servicename'];
+       $data['type']           =$request['servicetype_list'];
+       if($request['serv_type']=='products')
+       $data['product_id']           =$request['product_list'];
+      // $data['name']           =$request['servicename'];
+       $service = Service::findOrFail($request['serviceid']);
+       $saved=$service->update($data);
+
+       $serviceprice = ServicePriceDetails::firstOrFail()->where('service_id','=',$request['serviceid']);
+       $data1['actual_price'] =$request['serviceprice'];
+       $data1['offer_price']=$request['serviceoffer'];
+       $data1['tax_sgst']=$request['servicesgst'];
+       $data1['tax_cgst']=$request['servicecgst'];
+       $data1['changed_by']=Session::get('logged_user_id');
+       $data1['date']=date('Y-m-d');
+
+       $saved=$serviceprice->update($data1);
+       if ($saved) {
+           $savestatus++;
+       }
+       if($savestatus>0){
+           $status = 'success';
+          }else {
+           $status = 'fail';
+          }
+
+           $response_code = '200';
+           return response::json(['status' =>$status,'response_code' =>$response_code]);
+
+
+   }
 }

@@ -110,6 +110,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('services', ['as' => 'services.services', 'uses' => 'ServiceController@services_view']);
     Route::get('services_add', ['as' => 'services.services_add', 'uses' => 'ServiceController@services_add']);
     Route::post('services_insert', ['as' => 'services.insert', 'uses' => 'ServiceController@insert']);
+    Route::get('services_edit/{id}', ['as' => 'services.services_edit', 'uses' => 'ServiceController@services_edit']);
+    Route::post('services_update', ['as' => 'services.update', 'uses' => 'ServiceController@update']);
 
     //configuration
     Route::get('vendor_configuration/{id}', ['as' => 'configuration.vendor_configuration', 'uses' => 'ConfigurationController@vendorconfig_view']);
@@ -127,7 +129,7 @@ Route::group(['middleware' => 'auth'], function () {
 
      Route::post('block_vendor_login', ['as' => 'block_vendor_login', 'uses' => 'VendorController@block_vendor_login']);
      Route::post('delete_vendor', ['as' => 'delete_vendor', 'uses' => 'VendorController@delete_vendor']);
-
+     Route::put('update_password', ['as' => 'update_password', 'uses' => 'VendorController@update_password']);
 });
 Route::get('/view_jobcard_details_fromemail/{id}/{vendor_id}/{taxenabled}', 'JobcardController@view_jobcard_fromemail');
 Route::get('/customer_rating_email/{id}', 'JobcardController@view_rating_fromemail');
