@@ -24,6 +24,12 @@
         </div>
         @include('alerts.success')
 
+        {{-- @if(Session::has('success_msg'))
+        <div class="alert alert-dismissable alert-sucess">
+            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+            {{Session::get('success_msg')}}
+        </div>
+     @endif --}}
 
       </div>
       <div class="card-body" style="display: block" id="view_package">
@@ -47,6 +53,9 @@
                   </th>
                 <th >
                     Product
+                  </th>
+                  <th >
+                    Action
                   </th>
               </tr>
             </thead>
@@ -76,13 +85,13 @@
                                 {{ $value->pdtname }}
 
                             </td>
-                            {{-- <td >
-                                <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
-                                    <a href="products_edit/{{ $value->id }}" ><i class="tim-icons icon-settings"></i></a>
-                                </button>
+                            <td >
+                                {{-- <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon"> --}}
+                                    <a href="services_edit/{{ $value->id }}" ><i class="tim-icons icon-settings"></i></a>
+                                {{-- </button> --}}
 
 
-                               </td> --}}
+                               </td>
                         </tr>
                 @endforeach
 
