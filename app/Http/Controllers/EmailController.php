@@ -23,10 +23,10 @@ class EmailController extends Controller
     $to_email =$this->to_email;// 'jeshi.p88@gmail.com';
     $data = array('name'=>"Cloudways (sender_name)", 'body' => "A test mail");
 
-    Mail::send('email.email', $data, function($message) use ($to_name, $to_email) {
+    Mail::send('email.email_test', $data, function($message) use ($to_name, $to_email) {
         $message->to($to_email, $to_name)
                 ->subject("Laravel Test Mail");
-        $message->from('webdev.potafo@gmail.com','Test Mail');
+        $message->from('service.oliek@gmail.com','Test Mail');
     });
 
        return 'Email sent Successfully';
