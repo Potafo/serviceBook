@@ -115,7 +115,7 @@ class JobcardController extends Controller
                 ->where('job_card.jobcard_number', '=', $jobcard)
                 ->get();
                 $status_list=Status::select('*')->where('id','=',$status)->get();
-                $status_name=$status_list[0]->name;
+                $status_name=$status_list[0]->name;//Session::put('default_email'
             $data_email = array('cust_name'=>$jobcard_cust[0]->custname,
             'body' => "Thank u for ur Order",
             'cust_email' =>$jobcard_cust[0]->email,
@@ -126,13 +126,14 @@ class JobcardController extends Controller
             'product_det'=>$jobcard_cust,
             'taxenabled'=>$taxenabled,
             'endstatus'=>$endstatus,
-            'status'=>$status_name
+            'status'=>$status_name,
+            'default_email'=>Session::get('default_email')
             );
             if($mode=='email_sent')
             {
                 Mail::send('email.email', $data_email, function ($message) use ($data_email) {
-                    $message->from('webdev.potafo@gmail.com', 'Service Book');//$vendor[0]->mail_id; $vendor[0]->name;
-                    $message->sender('webdev.potafo@gmail.com', 'Service Book');//$vendor[0]->mail_id; $vendor[0]->name;
+                    $message->from($data_email['default_email'], 'Service Book');//$vendor[0]->mail_id; $vendor[0]->name;
+                    $message->sender($data_email['default_email'], 'Service Book');//$vendor[0]->mail_id; $vendor[0]->name;
                     $message->to($data_email['cust_email'], $data_email['cust_name']);
                     //$message->cc('john@johndoe.com', 'John Doe');
                     //$message->bcc('john@johndoe.com', 'John Doe');

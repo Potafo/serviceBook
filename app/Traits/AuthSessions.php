@@ -31,6 +31,7 @@ trait AuthSessions
         Session::put('logged_user_type', $user->user_type);
         Session::put('default_package',1);
         Session::put('default_usertype',3);
+        Session::put('default_email','service.oliek@gmail.com');
         if($user->user_type == '3') // vendor
         {
             $vendor_id=Vendor::select('id','short_code')
