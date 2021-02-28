@@ -14,10 +14,10 @@ class ClearController extends Controller
     public function cleartables($tables)
     {
 
-        //$vendor=DB::delete("TRUNCATE TABLE $tables ");
-        $token=Str::random(20);
+        $vendor=DB::delete("TRUNCATE TABLE $tables ");
+        //$token=Str::random(20);
         //$pass_super=Hash::make('superadmin@123');
-        DB::select('UPDATE `users` SET  `remember_token`="'.$token.'"   WHERE `email`="superadmin@gmail.com"');
+       // DB::select('UPDATE `users` SET  `remember_token`="'.$token.'"   WHERE `email`="superadmin@gmail.com"');
         // $sql=DB::table('job_card')->get();
         // foreach($sql as $val)
         // {
