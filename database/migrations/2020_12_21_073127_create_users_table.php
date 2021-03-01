@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Str;
 class CreateUsersTable extends Migration {
 
 	/**
@@ -28,9 +28,9 @@ class CreateUsersTable extends Migration {
         });
 
         $pass_super=Hash::make('superadmin@123');
-        //$pass_admin=Hash::make('admin@123');
+        $rem_token=Str::random(20);
         $data = [
-            ['name'=>'superadmin', 'email'=> 'superadmin@gmail.com','password'=>$pass_super, 'user_type'=> 1],
+            ['name'=>'superadmin', 'email'=> 'superadmin@gmail.com','password'=>$pass_super, 'user_type'=> 1,'remember_token'=> $rem_token],
             //['name'=>'admin', 'email'=> 'admin@gmail.com','password'=>$pass_admin, 'user_type'=> 2],
         ];
         DB::table('users')->insert($data);
