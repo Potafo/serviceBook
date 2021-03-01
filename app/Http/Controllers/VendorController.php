@@ -40,7 +40,7 @@ class VendorController extends Controller
         ->join('vendor_type', 'vendor_type.id', '=', 'vendor.type')
         ->join('users','users.id','=','vendor.user_id')
         ->where('vendor.deleted_at','=',null)
-        ->select('vendor.id as vid','users.active','vendor.last_renewal_date','vendor.user_id as userid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype')
+        ->select('vendor.id as vid','users.active','vendor.last_renewal_date','vendor.user_id as userid','vendor.name as vname','package.days','package.type as pname','vendor.joined_on','vendor.contact_number','vendor_category.name as vcategory','vendor_type.name as vtype','users.password as pass')
         ->orderBy('vendor.name', 'ASC');
 
 
@@ -544,5 +544,35 @@ class VendorController extends Controller
         $saved = $jobcard->delete();
 
         return Redirect('vendors')->with('status', 'Vendor Deleted successfully!');
+    }
+    // public function validate_password(Request $request)
+    // {
+
+    //     $validator = Validator::make($request->all(), [
+    //         'new_password' => 'min:6',
+    //         'password_confirm' =>  'required_with:new_password|same:new_password'
+    //     ] );
+    //       return $validator;
+    // }
+    // public function update_pass(Request $request)
+    // {
+
+    // }
+    public function update_password(Request $request)
+    {
+        $data['password']=Hash::make($request['new_password']);
+        $vendor = User::findOrFail($request['vendor_id_pas']);
+        $saved=$vendor->update($data);
+        return Redirect('vendors')->with('status', 'Vendor Password Updated successfully!');
+        // $validator = $this->validate_password($request);
+        //     if($validator->fails()) {
+        //         $errors = $validator->errors();
+        //         return Redirect()->back()->with('errors',$errors)->withInput($request->all());
+
+        //    }else {
+        //     $updated = $this->update_pass($request);
+        //     return Redirect('vendors')->with('status', 'Vendor Password Updated successfully!');
+        //    }
+
     }
 }

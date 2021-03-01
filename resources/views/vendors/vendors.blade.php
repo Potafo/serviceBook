@@ -1,8 +1,10 @@
 @extends('layouts.app', ['page' => __('Vendors'), 'pageSlug' => 'vendors'])
+{{-- <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script> --}}
 <script src="{{ asset('black') }}/js/core/jquery-1.9.1.js"></script>
 <link href="{{ asset('black') }}/css/bootstrap.min.css" rel="stylesheet">
 <link href="{{ asset('black') }}/css/bootstrap-datepicker.css" rel="stylesheet">
 <script src="{{ asset('black') }}/js/core/bootstrap-datepicker.js"></script>
+<script src="{{ asset('black') }}/js/validate.min.js"></script>
 <style>
     select > option {
            color: black;
@@ -209,14 +211,16 @@
                                 {{-- <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon"> --}}
                                     <a href="vendor_view/{{ $value->vid }}" title="View,Renew,Package list"><i class="tim-icons icon-zoom-split"></i></a>
                                 {{-- </button> --}}
+                                {{-- <a href="vendor_view/{{ $value->vid }}" title="Edit Username/Password"><i class="tim-icons icon-single-02"></i></a> --}}
 
 
                             </td>
                             <td >
                                 {{-- <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-icon"> --}}
                                     <a href="vendor_edit/{{ $value->vid }}" title="Edit Vendor"><i class='tim-icons icon-pencil'></i></a>
+                                    <a  data-toggle='modal'   data-target='#edit_userpass' id="edit_userpass_button" style="color: #ba54f5;"  data-vendor_id='{{ $value->userid }}' data-pass='{{ Hash::make($value->pass) }}' title="Delete"><i class='tim-icons icon-single-02' ></i></a>
                                     <a href="vendor_configuration/{{ $value->vid }}" title="Vendor Configuration"><i class='tim-icons icon-settings'></i></a>
-                                    <a  data-toggle='modal'   data-target='#delete_vendor' id="delete_vendor_button" style="color: #ba54f5;"  data-vendor_id='{{ $value->vid }}' title="Delete"><i class='tim-icons icon-trash-simple' ></i></a>
+                                    <a  data-toggle='modal'   data-target='#delete_vendor' id="delete_vendor_button" style="color: #ba54f5;"  data-vendor_id='{{ $value->vid }}' title="Edit Username/Password"><i class='tim-icons icon-trash-simple' ></i></a>
                                     {{-- href="vendor_category/status" --}}
                                 {{-- </button> --}}
                                 {{-- <button type="button" rel="tooltip" class="btn btn-danger btn-sm btn-icon">
@@ -318,36 +322,115 @@
         </div>
     </div>
 </div>
-{{-- <script src="{{ asset('black') }}/js/core/jquery-3.4.1.min.js"></script> --}}
+
+
+<div class="modal fade" id="edit_userpass" tabindex="-1" role="dialog" aria-labelledby="smallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content" style="width: 160%">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLabel" style="    text-align: center !important;color: purple;margin-left: 18%;"> Edit Username & password</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              {{-- <form method="post" action="" autocomplete="off" id="edituspas">
+                @csrf --}}
+                <div class="modal-body">
+                    <div class="alert alert-danger passworddanger" style="display: none">
+                        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+                          <i class="tim-icons icon-simple-remove"></i>
+                        </button>
+                        <span>
+                          <b> Warning - </b> Passwords do not match</span>
+                      </div>
+
+
+                      <form method="POST" action="{{ route('update_password') }}" class="form-signin" id="form-signin">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" id="vendor_id_pas" name="vendor_id_pas" >
+                        {{-- <div class="form-group ">
+                            <label >{{ __('Current password') }}</label>
+
+
+                                <input id="old_password" name="old_password" type="password" class="form-control" required autofocus value="" style="color: black">
+                                <div class="icon-bulb-63" onmouseover="mouseoverPass();" onmouseout="mouseoutPass();" />
+
+                        </div> --}}
+                        <div class="form-group ">
+                            <label >{{ __('New password') }}</label>
+
+                                <input id="new_password" name="new_password" type="password"  class="form-control" required style="color: black">
+                                @include('alerts.feedback', ['field' => 'new_password'])
+                        </div>
+                        <div class="form-group ">
+                            <label >{{ __('Confirm password') }}</label>
+
+
+                                <input id="password_confirm" name="password_confirm" type="password"   class="form-control" required style="color: black">
+                                @include('alerts.feedback', ['field' => 'password_confirm'])
+                        </div>
+                        <div class="form-group login-row row mb-0 viewpassbutton" style="display: none">
+                            <div class="col-md-8 offset-md-2">
+                                {{-- <button type="submit" class="btn btn-primary">
+                                    {{ __('Submit') }}
+                                </button> --}}
+                                <button type="submit" class="btn" id="submit" name="submit"> Reset password</button>
+                            </div>
+                        </div>
+                    </form>
+
+
+                </div>
+                {{-- <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" id="submitForm" class="btn btn-primary" style="display: none">Save </button>
+                    <button type="button" id="updateForm" class="btn btn-primary" style="display: none">Update </button>
+                </div>
+            </form> --}}
+        </div>
+    </div>
+</div>
+
     <script language="JavaScript" type="text/javascript">
 
+
         $(document).ready(function() {
+            $(document).on('change', '#password_confirm', function(event) {
+                var password =$('#new_password').val();
+                var confirmPassword = $('#password_confirm').val();
+
+                //alert(password);alert($('#vendor_id_pas').val())
+                if(password === confirmPassword) {
+
+                    $('.viewpassbutton').css('display','block');
+                    $('.passworddanger').css('display','none');
+                   // alert("Passwords do not match.");
+                    return true;
+                }else{
+                    $('.passworddanger').css('display','block');
+                    $('.viewpassbutton').css('display','none');
+                    return false;
+                }
+                return true;
+            });
+
+
 
             $(document).on('click', '#delete_vendor_button', function(event) {
             event.preventDefault();
             var vendor =$(this).attr('data-vendor_id');
-
             $('#vendor_id').val(vendor);
             $('#delete_vendor').modal("show");
-            // $.ajax({
-            //     url: route('block_vendor_login')
-            //     , beforeSend: function() {
-            //     },
-            //     // return the result
-            //     success: function(result) {
-            //         $('#block_login').modal("show");
-            //     }
-            //     , complete: function() {
-            //     }
-            //     , error: function(jqXHR, testStatus, error) {
-            //         console.log(error);
-            //         alert("Page " + href + " cannot open. Error:" + error);
-            //         $('#loader').hide();
-            //     }
-            //     , timeout: 10000
-            // })
         });
 
+        $(document).on('click', '#edit_userpass_button', function(event) {
+            event.preventDefault();
+            var vendor =$(this).attr('data-vendor_id');
+            $('#vendor_id_pas').val(vendor);
+            $('#old_password').val($(this).attr('data-pass'));
+            $('#edit_userpass').modal("show");
+        });
 
             $(document).on('click', '#block_login_button', function(event) {
             event.preventDefault();
